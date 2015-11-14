@@ -241,7 +241,9 @@ public class Graphify extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Graphify().setVisible(true);
+                Graphify theGraph = new Graphify();
+                theGraph.setLocationRelativeTo(null);
+                theGraph.show();
             }
         });
     }
