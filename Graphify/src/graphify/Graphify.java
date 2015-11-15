@@ -158,10 +158,12 @@ public class Graphify extends javax.swing.JFrame {
                 }
                 if (_selectedNode == _dest) {
                     _dest = -1;
+                    glowMap.clear();
                 }
                 if (_selectedNode == _source) {
                     _source = -1;
                     _dest = -1;
+                    glowMap.clear();
                 }
                 _selectedNode = -1;
             }
@@ -297,9 +299,11 @@ public class Graphify extends javax.swing.JFrame {
         if (evt.getClickCount() == 2) {
             if (_source == -1 && _dest == -1
                     || _source != -1 && _dest != -1) {
+                glowMap.clear();
                 _source = _selectedNode;
                 _dest = -1;
             } else if (_source != _selectedNode) {
+                glowMap.clear();
                 _dest = _selectedNode;
                 // Implement path finding here.
                 set.clear();
@@ -318,17 +322,6 @@ public class Graphify extends javax.swing.JFrame {
         bufferGraphic.setColor(Color.white);
         bufferGraphic.fillRect(0, 0, pnlGraph.getWidth(), pnlGraph.getHeight());
         connectionCache.clear();
-
-        // Glowing connections
-        bufferGraphic.setColor(new Color(200,40, 232));
-        bufferGraphic.setStroke(new BasicStroke(8));
-        for (int sourceKey: glowMap.keySet()) {
-            int destKey = glowMap.get(sourceKey);
-            Point sourcePoint = (Point) locations.get(sourceKey);
-            Point destPoint = (Point) locations.get(destKey);
-            bufferGraphic.drawLine(sourcePoint.x, sourcePoint.y,
-                    destPoint.x, destPoint.y);
-        }
 
         // Regular connections
         bufferGraphic.setColor(Color.black);
@@ -350,6 +343,18 @@ public class Graphify extends javax.swing.JFrame {
             }
         }
         
+        // Glowing connections
+        bufferGraphic.setColor(new Color(200,40, 232));
+        bufferGraphic.setStroke(new BasicStroke(8));
+        for (int sourceKey: glowMap.keySet()) {
+            int destKey = glowMap.get(sourceKey);
+            Point sourcePoint = (Point) locations.get(sourceKey);
+            Point destPoint = (Point) locations.get(destKey);
+            bufferGraphic.drawLine(sourcePoint.x, sourcePoint.y,
+                    destPoint.x, destPoint.y);
+        }
+
+
         // Nodes - red circles.
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
@@ -386,7 +391,7 @@ public class Graphify extends javax.swing.JFrame {
             int deltaX = x - (thePoint.x - _SIZE_OF_NODE / 2);
             int deltaY = y - (thePoint.y - _SIZE_OF_NODE / 2);
             if (Math.sqrt(deltaX * deltaX
-                    + deltaY * deltaY) <= _SIZE_OF_NODE) {
+                    + deltaY * deltaY) <= _SIZE_OF_NODE + 6) {
                 return (int) locations.keySet().toArray()[i];
             }
         }
