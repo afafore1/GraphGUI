@@ -23,15 +23,16 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <Component id="btnReset" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="205" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="btnPrintList" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="pnlGraph" max="32767" attributes="0"/>
+                  <Component id="lblInfo" alignment="0" pref="458" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -42,6 +43,8 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlGraph" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="lblInfo" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnReset" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -80,7 +83,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="249" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="252" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -100,6 +103,11 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPrintListActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="java.awt.Label" name="lblInfo">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Source: None - Destination: None"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

@@ -17,6 +17,7 @@ import javax.swing.SwingUtilities;
 
 public class Graphify extends javax.swing.JFrame {
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
+    HashMap<Integer, Integer> glowMap = new HashMap<>();
     HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
     private Queue<Integer> queue;
     HashMap<Integer, Point> locations = new HashMap();
@@ -29,10 +30,12 @@ public class Graphify extends javax.swing.JFrame {
     static int _source = 0;
     Image bufferImage;
     Graphics bufferGraphic;
-
+    int sourceNode = -1;
+    int destinationNode = -1;
+    
     public Graphify() {
         initComponents();
-        bufferImage = createImage(pnlGraph.getWidth(), pnlGraph.getHeight());
+        bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = bufferImage.getGraphics();
         queue = new LinkedList<Integer>();
     }
@@ -44,6 +47,7 @@ public class Graphify extends javax.swing.JFrame {
         pnlGraph = new javax.swing.JPanel();
         btnReset = new javax.swing.JButton();
         btnPrintList = new javax.swing.JButton();
+        lblInfo = new java.awt.Label();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -79,7 +83,7 @@ public class Graphify extends javax.swing.JFrame {
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 249, Short.MAX_VALUE)
+            .addGap(0, 252, Short.MAX_VALUE)
         );
 
         btnReset.setText("Reset");
@@ -96,6 +100,8 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
 
+        lblInfo.setText("Source: None - Destination: None");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -105,9 +111,10 @@ public class Graphify extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnReset)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 205, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnPrintList))
-                    .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -115,6 +122,8 @@ public class Graphify extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReset)
@@ -144,6 +153,13 @@ public class Graphify extends javax.swing.JFrame {
                         }
                     }
                 }
+                if (_selectedNode == destinationNode) {
+                    destinationNode = -1;
+                }
+                if (_selectedNode == sourceNode) {
+                    sourceNode = -1;
+                    destinationNode = -1;
+                }
                 _selectedNode = -1;
             }
         }
@@ -153,13 +169,14 @@ public class Graphify extends javax.swing.JFrame {
     private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseDragged
         if (_selectedNode >= 0) {
             if (SwingUtilities.isLeftMouseButton(evt)) {
-                Image buff = createImage(pnlGraph.getWidth(), pnlGraph.getHeight());
+                Image buff = createImage(pnlGraph.getWidth() - 1
+                        , pnlGraph.getHeight() - 1);
                 Graphics buffG = buff.getGraphics();
                 buffG.drawImage(bufferImage, 0, 0, this);
                 Point source = locations.get(_selectedNode);
                 buffG.drawLine(source.x, source.y,
                         evt.getX(), evt.getY());
-                pnlGraph.getGraphics().drawImage(buff, 0, 0, this);
+                pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
             } else if (SwingUtilities.isMiddleMouseButton(evt)) {
                 locations.get(_selectedNode).x = evt.getX();
                 locations.get(_selectedNode).y = evt.getY();
@@ -169,7 +186,7 @@ public class Graphify extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlGraphMouseDragged
 
     private void pnlGraphComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_pnlGraphComponentResized
-        bufferImage = createImage(pnlGraph.getWidth(), pnlGraph.getHeight());
+        bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = bufferImage.getGraphics();
     }//GEN-LAST:event_pnlGraphComponentResized
 
@@ -202,6 +219,7 @@ public class Graphify extends javax.swing.JFrame {
         int i, element;
         visited.put(source, 0);
         queue.add(source);
+        int lastElement = source;
         while (!queue.isEmpty()) {
             element = queue.remove();
             System.out.println(element + " removed");
@@ -270,18 +288,33 @@ public class Graphify extends javax.swing.JFrame {
     private void pnlGraphMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseClicked
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
         if (evt.getClickCount() == 2) {
-            set.clear();
-            _source = _selectedNode;
-            bfs(_source);
-            shortestPath(_source, nodes.size() - 1);
+            if (sourceNode == -1 && destinationNode == -1
+                    || sourceNode != -1 && destinationNode != -1) {
+                sourceNode = _selectedNode;
+                destinationNode = -1;
+            } else if (sourceNode != _selectedNode) {
+                destinationNode = _selectedNode;
+                // Implement path finding here.
+                set.clear();
+                _source = _selectedNode;
+                bfs(_source);
+                shortestPath(_source, nodes.size() - 1);
+            }
+            graph();
         }
     }//GEN-LAST:event_pnlGraphMouseClicked
+    private String getNodeInfo(int nodeId) {
+        if (nodeId == -1) return "None";
+        return "" + nodeId;
+    }
 
     private void graph() {
         bufferGraphic.setColor(Color.white);
         bufferGraphic.fillRect(0, 0, pnlGraph.getWidth(), pnlGraph.getHeight());
         bufferGraphic.setColor(Color.black);
         connectionCache.clear();
+        
+        // Regular connections
         for (int i = 0; i < locations.size(); i++) {
             Integer sourceKey = (Integer) nodes.keySet().toArray()[i];
             Point thePoint = (Point) locations.values().toArray()[i];
@@ -298,9 +331,17 @@ public class Graphify extends javax.swing.JFrame {
                 }
             }
         }
+
+        // Nodes - red circles.
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
-            if (locations.keySet().toArray()[i] == (Integer) _selectedNode) {
+            if (locations.keySet().toArray()[i]
+                    == (Integer) sourceNode){
+                bufferGraphic.setColor(Color.green);
+            } else if (locations.keySet().toArray()[i]
+                    == (Integer) destinationNode){
+                bufferGraphic.setColor(Color.magenta);
+            } else if (locations.keySet().toArray()[i] == (Integer) _selectedNode) {
                 bufferGraphic.setColor(Color.orange);
             } else {
                 bufferGraphic.setColor(Color.red);
@@ -309,13 +350,16 @@ public class Graphify extends javax.swing.JFrame {
                     thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
         }
 
+        // Node labels.
         bufferGraphic.setColor(Color.blue);
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
             bufferGraphic.drawString("V " + locations.keySet().toArray()[i],
                     thePoint.x + _SIZE_OF_NODE + 4, thePoint.y + _SIZE_OF_NODE + 4);
         }
-        pnlGraph.getGraphics().drawImage(bufferImage, 0, 0, this);
+        pnlGraph.getGraphics().drawImage(bufferImage, 1, 1, this);
+        lblInfo.setText("Source: " + getNodeInfo(sourceNode)
+                + " - Destination: " + getNodeInfo(destinationNode));
     }
 
     private int nodeSelected(int x, int y) {
@@ -377,6 +421,7 @@ public class Graphify extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnPrintList;
     private javax.swing.JButton btnReset;
+    private java.awt.Label lblInfo;
     private javax.swing.JPanel pnlGraph;
     // End of variables declaration//GEN-END:variables
 }
