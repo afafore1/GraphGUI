@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
 
 public class Graphify extends javax.swing.JFrame {
-
+    HashMap<Integer, Integer> connectionCache = new HashMap<>();
     HashMap<Integer, ArrayList<Integer>> nodes = new HashMap();
     private Queue<Integer> queue;
     HashMap<Integer, Point> locations = new HashMap();
@@ -187,10 +187,6 @@ public class Graphify extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlGraphMouseReleased
 
     public ArrayList<Integer> getEdge(int source) {
-        if (source > nodes.size()) {
-            System.out.println("Vertex not present");
-            return null;
-        }
         return nodes.get(source);
     }
 
@@ -254,7 +250,8 @@ public class Graphify extends javax.swing.JFrame {
 
     private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintListActionPerformed
         for (int i = 0; i < nodes.size(); i++) {
-            System.out.println(i + "->" + getEdge(i));
+            int key = (Integer) nodes.keySet().toArray()[i];
+            System.out.println(key + "->" + getEdge(key));
         }
         System.out.println("Source is: " + _source);
     }//GEN-LAST:event_btnPrintListActionPerformed
@@ -282,12 +279,21 @@ public class Graphify extends javax.swing.JFrame {
         bufferGraphic.setColor(Color.white);
         bufferGraphic.fillRect(0, 0, pnlGraph.getWidth(), pnlGraph.getHeight());
         bufferGraphic.setColor(Color.black);
+        connectionCache.clear();
         for (int i = 0; i < locations.size(); i++) {
+            Integer sourceKey = (Integer) nodes.keySet().toArray()[i];
             Point thePoint = (Point) locations.values().toArray()[i];
-            for (Integer destinationIndex : (ArrayList<Integer>) nodes.values().toArray()[i]) {
-                Point destinantionPoint = locations.get(destinationIndex);
-                bufferGraphic.drawLine(thePoint.x, thePoint.y,
-                        destinantionPoint.x, destinantionPoint.y);
+            for (Integer destinationKey :
+                    (ArrayList<Integer>) nodes.values().toArray()[i]) {
+                if (!(connectionCache.containsKey(sourceKey) 
+                        && connectionCache.get(sourceKey) == destinationKey
+                        || connectionCache.containsKey(destinationKey) 
+                        && connectionCache.get(destinationKey) == sourceKey)) {
+                    Point destinantionPoint = locations.get(destinationKey);
+                    bufferGraphic.drawLine(thePoint.x, thePoint.y,
+                            destinantionPoint.x, destinantionPoint.y);
+                    connectionCache.put(sourceKey, destinationKey);
+                }
             }
         }
         for (int i = 0; i < locations.size(); i++) {
