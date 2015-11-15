@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -24,14 +25,14 @@ public class Graphify extends javax.swing.JFrame {
     private HashMap<Integer, Integer>distTo;
     private BiMap<Integer, Integer> set = HashBiMap.create();
     HashMap<Integer, Integer> visited;
+    ArrayList<Integer> conn;
     int _selectedNode = -1;
     int _SIZE_OF_NODE = 20;
     int id = 0;
-    static int _source = 0;
+    static int _source = -1;
+    static int _dest = -1;
     Image bufferImage;
     Graphics bufferGraphic;
-    int sourceNode = -1;
-    int destinationNode = -1;
     
     public Graphify() {
         initComponents();
@@ -153,12 +154,12 @@ public class Graphify extends javax.swing.JFrame {
                         }
                     }
                 }
-                if (_selectedNode == destinationNode) {
-                    destinationNode = -1;
+                if (_selectedNode == _dest) {
+                    _dest = -1;
                 }
-                if (_selectedNode == sourceNode) {
-                    sourceNode = -1;
-                    destinationNode = -1;
+                if (_selectedNode == _source) {
+                    _source = -1;
+                    _dest = -1;
                 }
                 _selectedNode = -1;
             }
@@ -215,7 +216,7 @@ public class Graphify extends javax.swing.JFrame {
             visited.put(key, -1);
             distTo.put(key, 0);
         }
-        ArrayList<Integer> conn = new ArrayList<Integer>();
+        conn = new ArrayList<Integer>();
         int i, element;
         visited.put(source, 0);
         queue.add(source);
@@ -288,15 +289,14 @@ public class Graphify extends javax.swing.JFrame {
     private void pnlGraphMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseClicked
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
         if (evt.getClickCount() == 2) {
-            if (sourceNode == -1 && destinationNode == -1
-                    || sourceNode != -1 && destinationNode != -1) {
-                sourceNode = _selectedNode;
-                destinationNode = -1;
-            } else if (sourceNode != _selectedNode) {
-                destinationNode = _selectedNode;
+            if (_source == -1 && _dest == -1
+                    || _source != -1 && _dest != -1) {
+                _source = _selectedNode;
+                _dest = -1;
+            } else if (_source != _selectedNode) {
+                _dest = _selectedNode;
                 // Implement path finding here.
                 set.clear();
-                _source = _selectedNode;
                 bfs(_source);
                 shortestPath(_source, nodes.size() - 1);
             }
@@ -336,10 +336,10 @@ public class Graphify extends javax.swing.JFrame {
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
             if (locations.keySet().toArray()[i]
-                    == (Integer) sourceNode){
+                    == (Integer) _source){
                 bufferGraphic.setColor(Color.green);
             } else if (locations.keySet().toArray()[i]
-                    == (Integer) destinationNode){
+                    == (Integer) _dest){
                 bufferGraphic.setColor(Color.magenta);
             } else if (locations.keySet().toArray()[i] == (Integer) _selectedNode) {
                 bufferGraphic.setColor(Color.orange);
@@ -358,8 +358,8 @@ public class Graphify extends javax.swing.JFrame {
                     thePoint.x + _SIZE_OF_NODE + 4, thePoint.y + _SIZE_OF_NODE + 4);
         }
         pnlGraph.getGraphics().drawImage(bufferImage, 1, 1, this);
-        lblInfo.setText("Source: " + getNodeInfo(sourceNode)
-                + " - Destination: " + getNodeInfo(destinationNode));
+        lblInfo.setText("Source: " + getNodeInfo(_source)
+                + " - Destination: " + getNodeInfo(_dest));
     }
 
     private int nodeSelected(int x, int y) {
