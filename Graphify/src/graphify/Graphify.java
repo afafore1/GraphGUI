@@ -298,7 +298,7 @@ public class Graphify extends javax.swing.JFrame {
                 // Implement path finding here.
                 set.clear();
                 bfs(_source);
-                shortestPath(_source, nodes.size() - 1);
+                shortestPath(_source, _dest);
             }
             graph();
         }
