@@ -2,12 +2,14 @@ package graphify;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,12 +34,12 @@ public class Graphify extends javax.swing.JFrame {
     static int _source = -1;
     static int _dest = -1;
     Image bufferImage;
-    Graphics bufferGraphic;
+    Graphics2D bufferGraphic;
     
     public Graphify() {
         initComponents();
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
-        bufferGraphic = bufferImage.getGraphics();
+        bufferGraphic = (Graphics2D) bufferImage.getGraphics();
         queue = new LinkedList<Integer>();
     }
 
@@ -188,7 +190,7 @@ public class Graphify extends javax.swing.JFrame {
 
     private void pnlGraphComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_pnlGraphComponentResized
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
-        bufferGraphic = bufferImage.getGraphics();
+        bufferGraphic = (Graphics2D) bufferImage.getGraphics();
     }//GEN-LAST:event_pnlGraphComponentResized
 
     private void pnlGraphMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseReleased
@@ -267,7 +269,11 @@ public class Graphify extends javax.swing.JFrame {
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
         System.out.println(rset.toString().replaceAll("=", "-->"));
-        
+        glowMap.clear();
+        for (int i : rset.keySet()) {
+            glowMap.put(i, rset.get(i));
+        }
+        graph();
     }
     //[0, 2, 19, 5, 7, 9, 14]
 
@@ -311,10 +317,22 @@ public class Graphify extends javax.swing.JFrame {
     private void graph() {
         bufferGraphic.setColor(Color.white);
         bufferGraphic.fillRect(0, 0, pnlGraph.getWidth(), pnlGraph.getHeight());
-        bufferGraphic.setColor(Color.black);
         connectionCache.clear();
-        
+
+        // Glowing connections
+        bufferGraphic.setColor(new Color(200,40, 232));
+        bufferGraphic.setStroke(new BasicStroke(8));
+        for (int sourceKey: glowMap.keySet()) {
+            int destKey = glowMap.get(sourceKey);
+            Point sourcePoint = (Point) locations.get(sourceKey);
+            Point destPoint = (Point) locations.get(destKey);
+            bufferGraphic.drawLine(sourcePoint.x, sourcePoint.y,
+                    destPoint.x, destPoint.y);
+        }
+
         // Regular connections
+        bufferGraphic.setColor(Color.black);
+        bufferGraphic.setStroke(new BasicStroke(1));
         for (int i = 0; i < locations.size(); i++) {
             Integer sourceKey = (Integer) nodes.keySet().toArray()[i];
             Point thePoint = (Point) locations.values().toArray()[i];
@@ -331,7 +349,7 @@ public class Graphify extends javax.swing.JFrame {
                 }
             }
         }
-
+        
         // Nodes - red circles.
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
