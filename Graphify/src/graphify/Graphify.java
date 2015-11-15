@@ -2,6 +2,7 @@ package graphify;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.sun.glass.events.MouseEvent;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -13,6 +14,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.stream.Collectors;
+import javax.swing.SwingUtilities;
 
 public class Graphify extends javax.swing.JFrame {
 
@@ -42,7 +44,7 @@ public class Graphify extends javax.swing.JFrame {
 
         pnlGraph = new javax.swing.JPanel();
         btnReset = new javax.swing.JButton();
-        btnReset1 = new javax.swing.JButton();
+        btnPrintList = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -88,10 +90,10 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
 
-        btnReset1.setText("Print List");
-        btnReset1.addActionListener(new java.awt.event.ActionListener() {
+        btnPrintList.setText("Print List");
+        btnPrintList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnReset1ActionPerformed(evt);
+                btnPrintListActionPerformed(evt);
             }
         });
 
@@ -105,7 +107,7 @@ public class Graphify extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnReset)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 205, Short.MAX_VALUE)
-                        .addComponent(btnReset1))
+                        .addComponent(btnPrintList))
                     .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -117,7 +119,7 @@ public class Graphify extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReset)
-                    .addComponent(btnReset1))
+                    .addComponent(btnPrintList))
                 .addContainerGap())
         );
 
@@ -126,22 +128,44 @@ public class Graphify extends javax.swing.JFrame {
 
     private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMousePressed
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
-        if (_selectedNode < 0) {
-            nodes.put(id, new ArrayList());
-            locations.put(id++, new Point(evt.getX(), evt.getY()));
+        if (_selectedNode < 0 && SwingUtilities.isLeftMouseButton(evt)) {
+                nodes.put(id, new ArrayList());
+                locations.put(id++, new Point(evt.getX(), evt.getY()));
+        } else {
+            if (SwingUtilities.isLeftMouseButton(evt)) {
+            } else if (SwingUtilities.isRightMouseButton(evt)) {
+                nodes.remove(_selectedNode);
+                locations.remove(_selectedNode);
+                for (ArrayList<Integer> connections: nodes.values()) {
+                    for (int j = 0; j < connections.size(); j++) {
+                        Integer connection = connections.get(j);
+                        if (connection == _selectedNode) {
+                            connections.remove(connection);
+                            j--;
+                        }
+                    }
+                }
+                _selectedNode = -1;
+            }
         }
         graph();
     }//GEN-LAST:event_pnlGraphMousePressed
 
     private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseDragged
         if (_selectedNode >= 0) {
-            Image buff = createImage(pnlGraph.getWidth(), pnlGraph.getHeight());
-            Graphics buffG = buff.getGraphics();
-            buffG.drawImage(bufferImage, 0, 0, this);
-            Point source = locations.get(_selectedNode);
-            buffG.drawLine(source.x, source.y,
-                    evt.getX(), evt.getY());
-            pnlGraph.getGraphics().drawImage(buff, 0, 0, this);
+            if (SwingUtilities.isLeftMouseButton(evt)) {
+                Image buff = createImage(pnlGraph.getWidth(), pnlGraph.getHeight());
+                Graphics buffG = buff.getGraphics();
+                buffG.drawImage(bufferImage, 0, 0, this);
+                Point source = locations.get(_selectedNode);
+                buffG.drawLine(source.x, source.y,
+                        evt.getX(), evt.getY());
+                pnlGraph.getGraphics().drawImage(buff, 0, 0, this);
+            } else if (SwingUtilities.isMiddleMouseButton(evt)) {
+                locations.get(_selectedNode).x = evt.getX();
+                locations.get(_selectedNode).y = evt.getY();
+                graph();
+            }
         }
     }//GEN-LAST:event_pnlGraphMouseDragged
 
@@ -228,12 +252,12 @@ public class Graphify extends javax.swing.JFrame {
     }
     //[0, 2, 19, 5, 7, 9, 14]
 
-    private void btnReset1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReset1ActionPerformed
+    private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintListActionPerformed
         for (int i = 0; i < nodes.size(); i++) {
             System.out.println(i + "->" + getEdge(i));
         }
         System.out.println("Source is: " + _source);
-    }//GEN-LAST:event_btnReset1ActionPerformed
+    }//GEN-LAST:event_btnPrintListActionPerformed
 
 
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
@@ -343,8 +367,8 @@ public class Graphify extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnPrintList;
     private javax.swing.JButton btnReset;
-    private javax.swing.JButton btnReset1;
     private javax.swing.JPanel pnlGraph;
     // End of variables declaration//GEN-END:variables
 }

@@ -29,7 +29,7 @@
                   <Group type="102" attributes="0">
                       <Component id="btnReset" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="205" max="32767" attributes="0"/>
-                      <Component id="btnReset1" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnPrintList" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="pnlGraph" max="32767" attributes="0"/>
               </Group>
@@ -45,7 +45,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnReset" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnReset1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnPrintList" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -93,12 +93,12 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnResetActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="btnReset1">
+    <Component class="javax.swing.JButton" name="btnPrintList">
       <Properties>
         <Property name="text" type="java.lang.String" value="Print List"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnReset1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPrintListActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
