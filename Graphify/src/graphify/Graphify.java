@@ -259,7 +259,7 @@ public class Graphify extends javax.swing.JFrame {
 //            System.exit(0);
             return;
         }
-        for (int i = e; i > 0; i = visited.get(i)) {
+        for (int i = e; i >= 0; i = visited.get(i)) {
             if (i == v) {
                 break;
             }
