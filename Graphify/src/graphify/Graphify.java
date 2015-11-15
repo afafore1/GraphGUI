@@ -363,7 +363,7 @@ public class Graphify extends javax.swing.JFrame {
                 bufferGraphic.setColor(Color.green);
             } else if (locations.keySet().toArray()[i]
                     == (Integer) _dest){
-                bufferGraphic.setColor(Color.magenta);
+                bufferGraphic.setColor(Color.blue);
             } else if (locations.keySet().toArray()[i] == (Integer) _selectedNode) {
                 bufferGraphic.setColor(Color.orange);
             } else {
