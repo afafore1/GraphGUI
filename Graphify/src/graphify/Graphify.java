@@ -9,6 +9,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -18,7 +19,7 @@ import javax.swing.SwingUtilities;
 
 public class Graphify extends javax.swing.JFrame {
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
-    HashMap<Integer, ArrayList<Integer>> nodes = new HashMap();
+    HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
     private Queue<Integer> queue;
     HashMap<Integer, Point> locations = new HashMap();
     private int[] distTo;
@@ -129,16 +130,16 @@ public class Graphify extends javax.swing.JFrame {
     private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMousePressed
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
         if (_selectedNode < 0 && SwingUtilities.isLeftMouseButton(evt)) {
-                nodes.put(id, new ArrayList());
+                nodes.put(id, new HashSet());
                 locations.put(id++, new Point(evt.getX(), evt.getY()));
         } else {
             if (SwingUtilities.isLeftMouseButton(evt)) {
             } else if (SwingUtilities.isRightMouseButton(evt)) {
                 nodes.remove(_selectedNode);
                 locations.remove(_selectedNode);
-                for (ArrayList<Integer> connections: nodes.values()) {
+                for (HashSet<Integer> connections: nodes.values()) {
                     for (int j = 0; j < connections.size(); j++) {
-                        Integer connection = connections.get(j);
+                        Integer connection = (Integer) connections.toArray()[j];
                         if (connection == _selectedNode) {
                             connections.remove(connection);
                             j--;
@@ -186,7 +187,7 @@ public class Graphify extends javax.swing.JFrame {
         graph();
     }//GEN-LAST:event_pnlGraphMouseReleased
 
-    public ArrayList<Integer> getEdge(int source) {
+    public HashSet<Integer> getEdge(int source) {
         return nodes.get(source);
     }
 
@@ -206,13 +207,13 @@ public class Graphify extends javax.swing.JFrame {
             System.out.println(element + " removed");
             i = element;
             conn.add(element);
-            ArrayList<Integer> iList = getEdge(i);
+            HashSet<Integer> iList = getEdge(i);
             int x = 0;
             while (x < iList.size()) {
-                if (visited[iList.get(x)] == -1) {
-                    queue.add(iList.get(x));
-                    visited[iList.get(x)] = i;
-                    distTo[iList.get(x)] = distTo[i] + 1;
+                if (visited[(Integer) iList.toArray()[x]] == -1) {
+                    queue.add((Integer) iList.toArray()[x]);
+                    visited[(Integer) iList.toArray()[x]] = i;
+                    distTo[(Integer) iList.toArray()[x]] = distTo[i] + 1;
                 }
                 x++;
             }
@@ -256,7 +257,6 @@ public class Graphify extends javax.swing.JFrame {
         System.out.println("Source is: " + _source);
     }//GEN-LAST:event_btnPrintListActionPerformed
 
-
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
         nodes = new HashMap();
         locations = new HashMap();
@@ -272,7 +272,6 @@ public class Graphify extends javax.swing.JFrame {
             bfs(_source);
             shortestPath(_source, nodes.size() - 1);
         }
-
     }//GEN-LAST:event_pnlGraphMouseClicked
 
     private void graph() {
@@ -284,7 +283,7 @@ public class Graphify extends javax.swing.JFrame {
             Integer sourceKey = (Integer) nodes.keySet().toArray()[i];
             Point thePoint = (Point) locations.values().toArray()[i];
             for (Integer destinationKey :
-                    (ArrayList<Integer>) nodes.values().toArray()[i]) {
+                    (HashSet<Integer>) nodes.values().toArray()[i]) {
                 if (!(connectionCache.containsKey(sourceKey) 
                         && connectionCache.get(sourceKey) == destinationKey
                         || connectionCache.containsKey(destinationKey) 
