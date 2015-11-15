@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,10 +24,12 @@ public class Graphify extends javax.swing.JFrame {
     private HashMap<Integer, Integer>distTo;
     private BiMap<Integer, Integer> set = HashBiMap.create();
     HashMap<Integer, Integer> visited;
+    ArrayList<Integer> conn;
     int _selectedNode = -1;
     int _SIZE_OF_NODE = 20;
     int id = 0;
     static int _source = 0;
+    static int _dest = 0;
     Image bufferImage;
     Graphics bufferGraphic;
 
@@ -198,7 +201,7 @@ public class Graphify extends javax.swing.JFrame {
             visited.put(key, -1);
             distTo.put(key, 0);
         }
-        ArrayList<Integer> conn = new ArrayList<Integer>();
+        conn = new ArrayList<Integer>();
         int i, element;
         visited.put(source, 0);
         queue.add(source);
@@ -273,7 +276,8 @@ public class Graphify extends javax.swing.JFrame {
             set.clear();
             _source = _selectedNode;
             bfs(_source);
-            shortestPath(_source, nodes.size() - 1);
+            _dest = conn.get(conn.size()-1);
+            shortestPath(_source, _dest);
         }
     }//GEN-LAST:event_pnlGraphMouseClicked
 
