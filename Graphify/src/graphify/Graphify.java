@@ -1,5 +1,7 @@
 package graphify;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -8,7 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 public class Graphify extends javax.swing.JFrame {
 
@@ -16,7 +20,7 @@ public class Graphify extends javax.swing.JFrame {
     private Queue<Integer> queue;
     HashMap<Integer, Point> locations = new HashMap();
     private int[] distTo;
-    private LinkedHashMap<Integer, Integer> set = new LinkedHashMap<Integer, Integer>();
+    private BiMap<Integer, Integer> set = HashBiMap.create();
     int[] visited;
     int _selectedNode = -1;
     int _SIZE_OF_NODE = 20;
@@ -217,9 +221,10 @@ public class Graphify extends javax.swing.JFrame {
                 set.put(i, visited[i]);
             }
         }
-        String dset = set.toString().replace("}", "").replace("{", "");
-        dset = new StringBuilder(dset).reverse().toString().replaceAll("=", "-->");
-        System.out.println(dset);
+        Map<Integer, Integer> rset = set.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+        System.out.println(rset.toString().replaceAll("=", "-->"));
     }
     //[0, 2, 19, 5, 7, 9, 14]
 
