@@ -2,7 +2,6 @@ package graphify;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.sun.glass.events.MouseEvent;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -10,7 +9,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -22,9 +20,9 @@ public class Graphify extends javax.swing.JFrame {
     HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
     private Queue<Integer> queue;
     HashMap<Integer, Point> locations = new HashMap();
-    private int[] distTo;
+    private HashMap<Integer, Integer>distTo;
     private BiMap<Integer, Integer> set = HashBiMap.create();
-    int[] visited;
+    HashMap<Integer, Integer> visited;
     int _selectedNode = -1;
     int _SIZE_OF_NODE = 20;
     int id = 0;
@@ -193,14 +191,16 @@ public class Graphify extends javax.swing.JFrame {
 
     void bfs(int source) {
         int V = nodes.size();
-        distTo = new int[V];
-        visited = new int[V];
+        distTo = new HashMap<>();
+        visited = new HashMap<>();
         for (int i = 0; i < V; i++) {
-            visited[i] = -1;
+            Integer key = (Integer) nodes.keySet().toArray()[i];
+            visited.put(key, -1);
+            distTo.put(key, 0);
         }
         ArrayList<Integer> conn = new ArrayList<Integer>();
         int i, element;
-        visited[source] = 0;
+        visited.put(source, 0);
         queue.add(source);
         while (!queue.isEmpty()) {
             element = queue.remove();
@@ -210,10 +210,11 @@ public class Graphify extends javax.swing.JFrame {
             HashSet<Integer> iList = getEdge(i);
             int x = 0;
             while (x < iList.size()) {
-                if (visited[(Integer) iList.toArray()[x]] == -1) {
+                Integer key = (Integer) iList.toArray()[x];
+                if (visited.get(key) == -1) {
                     queue.add((Integer) iList.toArray()[x]);
-                    visited[(Integer) iList.toArray()[x]] = i;
-                    distTo[(Integer) iList.toArray()[x]] = distTo[i] + 1;
+                    visited.put(key, i);
+                    distTo.put(key, distTo.get(i) + 1);
                 }
                 x++;
             }
@@ -222,30 +223,32 @@ public class Graphify extends javax.swing.JFrame {
     }
 
     public int hasPath(int v) {
-        return visited[v];
+        return visited.get(v);
     }
 
     public int distTo(int v) {
-        return distTo[v];
+        return distTo.get(v);
     }
 
     public void shortestPath(int v, int e) {
         if (e == v) {
             System.out.println(v + "-->" + v);
-            System.exit(0);
+//            System.exit(0);
+            return;
         }
-        for (int i = e; i > 0; i = visited[i]) {
+        for (int i = e; i > 0; i = visited.get(i)) {
             if (i == v) {
                 break;
             }
-            if (visited[i] != -1) {
-                set.put(i, visited[i]);
+            if (visited.get(i) != -1) {
+                set.put(i, visited.get(i));
             }
         }
         Map<Integer, Integer> rset = set.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
         System.out.println(rset.toString().replaceAll("=", "-->"));
+        
     }
     //[0, 2, 19, 5, 7, 9, 14]
 
