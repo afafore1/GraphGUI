@@ -264,16 +264,13 @@ public class Graphify extends javax.swing.JFrame {
                 break;
             }
             if (visited.get(i) != -1) {
-                set.put(i, visited.get(i));
+                set.put(visited.get(i), i);
             }
         }
-        Map<Integer, Integer> rset = set.entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
-        System.out.println(rset.toString().replaceAll("=", "-->"));
+        System.out.println(set.toString().replaceAll("=", "-->"));
         glowMap.clear();
-        for (int i : rset.keySet()) {
-            glowMap.put(i, rset.get(i));
+        for (int i : set.keySet()) {
+            glowMap.put(i, set.get(i));
         }
         graph();
     }
