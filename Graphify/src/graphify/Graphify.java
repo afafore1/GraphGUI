@@ -9,6 +9,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -28,9 +29,11 @@ public class Graphify extends javax.swing.JFrame {
     HashMap<Integer, Integer> visited;
     ArrayList<Integer> conn;
     ArrayList<Integer> bconn;
+    ArrayList<Integer> cutV;
     int _selectedNode = -1;
     int _SIZE_OF_NODE = 20;
     int id = 0;
+    int time = 0;
     static int _source = -1;
     static int _dest = -1;
     Image bufferImage;
@@ -42,6 +45,7 @@ public class Graphify extends javax.swing.JFrame {
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
         queue = new LinkedList<Integer>();
         stack = new Stack<Integer>();
+        cutV = new ArrayList<Integer>();
     }
 
     @SuppressWarnings("unchecked")
@@ -52,6 +56,7 @@ public class Graphify extends javax.swing.JFrame {
         btnReset = new javax.swing.JButton();
         btnPrintList = new javax.swing.JButton();
         lblInfo = new java.awt.Label();
+        lblResult = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -87,7 +92,7 @@ public class Graphify extends javax.swing.JFrame {
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 252, Short.MAX_VALUE)
+            .addGap(0, 341, Short.MAX_VALUE)
         );
 
         btnReset.setText("Reset");
@@ -115,10 +120,13 @@ public class Graphify extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnReset)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 324, Short.MAX_VALUE)
                         .addComponent(btnPrintList))
                     .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -127,7 +135,9 @@ public class Graphify extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblResult))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReset)
@@ -209,15 +219,57 @@ public class Graphify extends javax.swing.JFrame {
         return nodes.get(source);
     }
 
-    void cutVertex(int source) {
-        if (getEdge(source).size() <= 1) {
-            System.out.println("Cut vertex is "+source);
-            for (int i = 0; i < locations.size(); i++) {
-                Point thePoint = (Point) locations.values().toArray()[i];
-                if (locations.keySet().toArray()[i]
-                        == (Integer) source) {
-                    bufferGraphic.setColor(Color.gray);
+    void APF(int u, boolean visited[], int disc[], int low[], int parent[], boolean ap[]) {
+        int children = 0;
+        visited[u] = true;
+        disc[u] = low[u] = ++time;
+        Iterator<Integer> i = getEdge(u).iterator();
+        while (i.hasNext()) {
+            int v = i.next(); // v is current adj to u
+            if (!visited[v]) {
+                children++;
+                parent[v] = u;
+                APF(v, visited, disc, low, parent, ap); // recursive for it
+
+                low[u] = Math.min(low[u], low[v]);
+
+                if (u == _source && children > 1) {
+                    ap[u] = true;
                 }
+                // if u is not root and low value of one of its child is more than discovery value of u
+                if (u != _source && low[v] >= disc[u]) {
+                    ap[u] = true;
+                }
+            } else if (v != parent[u]) {
+                low[u] = Math.min(low[u], disc[v]);
+            }
+        }
+    }
+
+    void AP() {
+        int V = nodes.size();
+        boolean visited[] = new boolean[V];
+        int disc[] = new int[V];
+        int low[] = new int[V];
+        int parent[] = new int[V];
+        boolean ap[] = new boolean[V];
+
+        for (int i = 0; i < V; i++) {
+            parent[i] = -1;
+            visited[i] = false;
+            ap[i] = false;
+        }
+
+        for (int i = 0; i < V; i++) {
+            if (visited[i] == false) {
+                APF(i, visited, disc, low, parent, ap);
+            }
+        }
+
+        for (int i = 0; i < V; i++) {
+            if (ap[i] == true) {
+                System.out.println(i+" is a cut vertex");
+                cutV.add(i);
             }
         }
     }
@@ -357,8 +409,8 @@ public class Graphify extends javax.swing.JFrame {
                 set.clear();
                 bfs(_source);
                 shortestPath(_source, _dest);
-                dfs(_source);                
-                cutVertex(_source);
+                dfs(_source);
+                AP();
             }
             graph();
         }
@@ -417,8 +469,10 @@ public class Graphify extends javax.swing.JFrame {
                 bufferGraphic.setColor(Color.blue);
             } else if (locations.keySet().toArray()[i] == (Integer) _selectedNode) {
                 bufferGraphic.setColor(Color.orange);
-            } else {
+            } else if(!cutV.contains(locations.keySet().toArray()[i])){
                 bufferGraphic.setColor(Color.red);
+            } else{
+                bufferGraphic.setColor(Color.gray);
             }
             bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
@@ -496,6 +550,7 @@ public class Graphify extends javax.swing.JFrame {
     private javax.swing.JButton btnPrintList;
     private javax.swing.JButton btnReset;
     private java.awt.Label lblInfo;
+    private javax.swing.JLabel lblResult;
     private javax.swing.JPanel pnlGraph;
     // End of variables declaration//GEN-END:variables
 }
