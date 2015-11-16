@@ -19,6 +19,7 @@ We are working on running several algorithms and making an efficient way to visu
 - Drag mouse to place edges between vertices
 - Right click to remove vertex
 - Middle click to move vertex around
+- Double click to choose start vertex and destination vertex (Colors and label will be updated).
 
 
 
