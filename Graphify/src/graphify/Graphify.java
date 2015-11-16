@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Stack;
 import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
 
@@ -23,6 +24,7 @@ public class Graphify extends javax.swing.JFrame {
     HashMap<Integer, Integer> glowMap = new HashMap<>();
     HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
     private Queue<Integer> queue;
+    private Stack<Integer> stack;
     HashMap<Integer, Point> locations = new HashMap();
     private HashMap<Integer, Integer>distTo;
     private BiMap<Integer, Integer> set = HashBiMap.create();
@@ -41,6 +43,7 @@ public class Graphify extends javax.swing.JFrame {
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
         queue = new LinkedList<Integer>();
+        stack = new Stack<Integer>();
     }
 
     @SuppressWarnings("unchecked")
@@ -210,6 +213,43 @@ public class Graphify extends javax.swing.JFrame {
     public HashSet<Integer> getEdge(int source) {
         return nodes.get(source);
     }
+    
+    void dfs(int source){
+        int V = nodes.size();
+        distTo = new HashMap<>();
+        visited = new HashMap<>();
+        for (int i = 0; i < V; i++) {
+            Integer key = (Integer) nodes.keySet().toArray()[i];
+            visited.put(key, -1);
+            distTo.put(key, 0);
+        }
+        conn = new ArrayList<Integer>();
+        int element;
+        visited.put(source, 0); // start vertex
+        stack.push(source);
+        while(!stack.isEmpty()){
+            element = stack.peek();
+            System.out.println("Considering element "+element);
+            if(!conn.contains(element)) conn.add(element);
+            HashSet<Integer> iList = getEdge(element);
+            int x = 0;
+            while(x < iList.size()){
+                Integer key = (Integer) iList.toArray()[x];
+                if(visited.get(key) == -1){
+                    System.out.println("Pushing "+(Integer) iList.toArray()[x]);
+                    stack.push((Integer) iList.toArray()[x]);
+                    visited.put(key, element);
+                    distTo.put(key, distTo.get(element)+1);
+                    break;
+                }
+                x++;
+                if(x == iList.size()){
+                    stack.pop();
+                }
+            }
+        }
+        System.out.println("order is "+conn);
+    }
 
     void bfs(int source) {
         int V = nodes.size();
@@ -224,7 +264,6 @@ public class Graphify extends javax.swing.JFrame {
         int i, element;
         visited.put(source, 0);
         queue.add(source);
-        int lastElement = source;
         while (!queue.isEmpty()) {
             element = queue.remove();
             System.out.println(element + " removed");
@@ -306,6 +345,7 @@ public class Graphify extends javax.swing.JFrame {
                 // Implement path finding here.
                 set.clear();
                 bfs(_source);
+                dfs(_source);
                 shortestPath(_source, _dest);
             }
             graph();
