@@ -244,7 +244,8 @@ public class Graphify extends javax.swing.JFrame {
                 }
                 x++;
                 if(x == iList.size()){
-                    stack.pop();
+                   int backEdge = stack.pop();
+                   System.out.println("Back edge "+backEdge);
                 }
             }
         }
