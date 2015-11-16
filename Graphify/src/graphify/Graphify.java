@@ -267,6 +267,7 @@ public class Graphify extends javax.swing.JFrame {
                 set.put(visited.get(i), i);
             }
         }
+        // removed rset
         System.out.println(set.toString().replaceAll("=", "-->"));
         glowMap.clear();
         for (int i : set.keySet()) {
