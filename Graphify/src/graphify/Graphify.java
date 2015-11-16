@@ -1,7 +1,5 @@
 package graphify;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -27,7 +25,7 @@ public class Graphify extends javax.swing.JFrame {
     private Stack<Integer> stack;
     HashMap<Integer, Point> locations = new HashMap();
     private HashMap<Integer, Integer>distTo;
-    private BiMap<Integer, Integer> set = HashBiMap.create();
+    private Map<Integer, Integer> set = new HashMap<Integer, Integer>();
     HashMap<Integer, Integer> visited;
     ArrayList<Integer> conn;
     int _selectedNode = -1;
@@ -212,6 +210,12 @@ public class Graphify extends javax.swing.JFrame {
 
     public HashSet<Integer> getEdge(int source) {
         return nodes.get(source);
+    }
+    
+    void cutVertex(int source){
+        if(getEdge(source).size() <= 1){
+            
+        }
     }
     
     void dfs(int source){
