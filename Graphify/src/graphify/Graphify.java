@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,20 +13,21 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
-import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
 
 public class Graphify extends javax.swing.JFrame {
+
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     HashMap<Integer, Integer> glowMap = new HashMap<>();
     HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
     private Queue<Integer> queue;
     private Stack<Integer> stack;
     HashMap<Integer, Point> locations = new HashMap();
-    private HashMap<Integer, Integer>distTo;
+    private HashMap<Integer, Integer> distTo;
     private Map<Integer, Integer> set = new HashMap<Integer, Integer>();
     HashMap<Integer, Integer> visited;
     ArrayList<Integer> conn;
+    ArrayList<Integer> bconn;
     int _selectedNode = -1;
     int _SIZE_OF_NODE = 20;
     int id = 0;
@@ -35,7 +35,7 @@ public class Graphify extends javax.swing.JFrame {
     static int _dest = -1;
     Image bufferImage;
     Graphics2D bufferGraphic;
-    
+
     public Graphify() {
         initComponents();
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
@@ -141,33 +141,31 @@ public class Graphify extends javax.swing.JFrame {
     private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMousePressed
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
         if (_selectedNode < 0 && SwingUtilities.isLeftMouseButton(evt)) {
-                nodes.put(id, new HashSet());
-                locations.put(id++, new Point(evt.getX(), evt.getY()));
-        } else {
-            if (SwingUtilities.isLeftMouseButton(evt)) {
-            } else if (SwingUtilities.isRightMouseButton(evt)) {
-                nodes.remove(_selectedNode);
-                locations.remove(_selectedNode);
-                for (HashSet<Integer> connections: nodes.values()) {
-                    for (int j = 0; j < connections.size(); j++) {
-                        Integer connection = (Integer) connections.toArray()[j];
-                        if (connection == _selectedNode) {
-                            connections.remove(connection);
-                            j--;
-                        }
+            nodes.put(id, new HashSet());
+            locations.put(id++, new Point(evt.getX(), evt.getY()));
+        } else if (SwingUtilities.isLeftMouseButton(evt)) {
+        } else if (SwingUtilities.isRightMouseButton(evt)) {
+            nodes.remove(_selectedNode);
+            locations.remove(_selectedNode);
+            for (HashSet<Integer> connections : nodes.values()) {
+                for (int j = 0; j < connections.size(); j++) {
+                    Integer connection = (Integer) connections.toArray()[j];
+                    if (connection == _selectedNode) {
+                        connections.remove(connection);
+                        j--;
                     }
                 }
-                if (_selectedNode == _dest) {
-                    _dest = -1;
-                    glowMap.clear();
-                }
-                if (_selectedNode == _source) {
-                    _source = -1;
-                    _dest = -1;
-                    glowMap.clear();
-                }
-                _selectedNode = -1;
             }
+            if (_selectedNode == _dest) {
+                _dest = -1;
+                glowMap.clear();
+            }
+            if (_selectedNode == _source) {
+                _source = -1;
+                _dest = -1;
+                glowMap.clear();
+            }
+            _selectedNode = -1;
         }
         graph();
     }//GEN-LAST:event_pnlGraphMousePressed
@@ -175,8 +173,7 @@ public class Graphify extends javax.swing.JFrame {
     private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseDragged
         if (_selectedNode >= 0) {
             if (SwingUtilities.isLeftMouseButton(evt)) {
-                Image buff = createImage(pnlGraph.getWidth() - 1
-                        , pnlGraph.getHeight() - 1);
+                Image buff = createImage(pnlGraph.getWidth() - 1, pnlGraph.getHeight() - 1);
                 Graphics buffG = buff.getGraphics();
                 buffG.drawImage(bufferImage, 0, 0, this);
                 Point source = locations.get(_selectedNode);
@@ -211,14 +208,21 @@ public class Graphify extends javax.swing.JFrame {
     public HashSet<Integer> getEdge(int source) {
         return nodes.get(source);
     }
-    
-    void cutVertex(int source){
-        if(getEdge(source).size() <= 1){
-            
+
+    void cutVertex(int source) {
+        if (getEdge(source).size() <= 1) {
+            System.out.println("Cut vertex is "+source);
+            for (int i = 0; i < locations.size(); i++) {
+                Point thePoint = (Point) locations.values().toArray()[i];
+                if (locations.keySet().toArray()[i]
+                        == (Integer) source) {
+                    bufferGraphic.setColor(Color.gray);
+                }
+            }
         }
     }
-    
-    void dfs(int source){
+
+    void dfs(int source) {
         int V = nodes.size();
         distTo = new HashMap<>();
         visited = new HashMap<>();
@@ -227,33 +231,35 @@ public class Graphify extends javax.swing.JFrame {
             visited.put(key, -1);
             distTo.put(key, 0);
         }
-        conn = new ArrayList<Integer>();
+        bconn = new ArrayList<Integer>();
         int element;
         visited.put(source, 0); // start vertex
         stack.push(source);
-        while(!stack.isEmpty()){
+        while (!stack.isEmpty()) {
             element = stack.peek();
-            System.out.println("Considering element "+element);
-            if(!conn.contains(element)) conn.add(element);
+            System.out.println("Considering element " + element);
+            if (!bconn.contains(element)) {
+                bconn.add(element);
+            }
             HashSet<Integer> iList = getEdge(element);
             int x = 0;
-            while(x < iList.size()){
+            while (x < iList.size()) {
                 Integer key = (Integer) iList.toArray()[x];
-                if(visited.get(key) == -1){
-                    System.out.println("Pushing "+(Integer) iList.toArray()[x]);
+                if (visited.get(key) == -1) {
+                    System.out.println("Pushing " + (Integer) iList.toArray()[x]);
                     stack.push((Integer) iList.toArray()[x]);
                     visited.put(key, element);
-                    distTo.put(key, distTo.get(element)+1);
+                    distTo.put(key, distTo.get(element) + 1);
                     break;
                 }
                 x++;
-                if(x == iList.size()){
-                   int backEdge = stack.pop();
-                   System.out.println("Back edge "+backEdge);
+                if (x == iList.size()) {
+                    int backEdge = stack.pop();
+                    System.out.println("Back edge " + backEdge);
                 }
             }
         }
-        System.out.println("order is "+conn);
+        System.out.println("order is " + bconn);
     }
 
     void bfs(int source) {
@@ -350,14 +356,17 @@ public class Graphify extends javax.swing.JFrame {
                 // Implement path finding here.
                 set.clear();
                 bfs(_source);
-                dfs(_source);
                 shortestPath(_source, _dest);
+                dfs(_source);                
+                cutVertex(_source);
             }
             graph();
         }
     }//GEN-LAST:event_pnlGraphMouseClicked
     private String getNodeInfo(int nodeId) {
-        if (nodeId == -1) return "None";
+        if (nodeId == -1) {
+            return "None";
+        }
         return "" + nodeId;
     }
 
@@ -372,11 +381,11 @@ public class Graphify extends javax.swing.JFrame {
         for (int i = 0; i < locations.size(); i++) {
             Integer sourceKey = (Integer) nodes.keySet().toArray()[i];
             Point thePoint = (Point) locations.values().toArray()[i];
-            for (Integer destinationKey :
-                    (HashSet<Integer>) nodes.values().toArray()[i]) {
-                if (!(connectionCache.containsKey(sourceKey) 
+            for (Integer destinationKey
+                    : (HashSet<Integer>) nodes.values().toArray()[i]) {
+                if (!(connectionCache.containsKey(sourceKey)
                         && connectionCache.get(sourceKey) == destinationKey
-                        || connectionCache.containsKey(destinationKey) 
+                        || connectionCache.containsKey(destinationKey)
                         && connectionCache.get(destinationKey) == sourceKey)) {
                     Point destinantionPoint = locations.get(destinationKey);
                     bufferGraphic.drawLine(thePoint.x, thePoint.y,
@@ -385,11 +394,11 @@ public class Graphify extends javax.swing.JFrame {
                 }
             }
         }
-        
+
         // Glowing connections
-        bufferGraphic.setColor(new Color(200,40, 232));
+        bufferGraphic.setColor(new Color(200, 40, 232));
         bufferGraphic.setStroke(new BasicStroke(8));
-        for (int sourceKey: glowMap.keySet()) {
+        for (int sourceKey : glowMap.keySet()) {
             int destKey = glowMap.get(sourceKey);
             Point sourcePoint = (Point) locations.get(sourceKey);
             Point destPoint = (Point) locations.get(destKey);
@@ -397,15 +406,14 @@ public class Graphify extends javax.swing.JFrame {
                     destPoint.x, destPoint.y);
         }
 
-
         // Nodes - red circles.
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
             if (locations.keySet().toArray()[i]
-                    == (Integer) _source){
+                    == (Integer) _source) {
                 bufferGraphic.setColor(Color.green);
             } else if (locations.keySet().toArray()[i]
-                    == (Integer) _dest){
+                    == (Integer) _dest) {
                 bufferGraphic.setColor(Color.blue);
             } else if (locations.keySet().toArray()[i] == (Integer) _selectedNode) {
                 bufferGraphic.setColor(Color.orange);
