@@ -410,6 +410,7 @@ public class Graphify extends javax.swing.JFrame {
                 bfs(_source);
                 shortestPath(_source, _dest);
                 dfs(_source);
+                cutV = new ArrayList<Integer>();
                 AP();
             }
             graph();
