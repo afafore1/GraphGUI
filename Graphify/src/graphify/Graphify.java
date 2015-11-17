@@ -415,6 +415,10 @@ public class Graphify extends javax.swing.JFrame {
         nodes = new HashMap();
         locations = new HashMap();
         id = 0;
+        cutV = new ArrayList<Integer>();
+        glowMap.clear();
+        _source = -1;
+        _dest = -1;
         graph();
     }//GEN-LAST:event_btnResetActionPerformed
 
@@ -475,13 +479,16 @@ public class Graphify extends javax.swing.JFrame {
         // Glowing connections
         bufferGraphic.setColor(new Color(200, 40, 232));
         bufferGraphic.setStroke(new BasicStroke(8));
-        for (int sourceKey : glowMap.keySet()) {
+        if(!btnReset.isSelected()){
+            for (int sourceKey : glowMap.keySet()) {
             int destKey = glowMap.get(sourceKey);
             Point sourcePoint = (Point) locations.get(sourceKey);
             Point destPoint = (Point) locations.get(destKey);
             bufferGraphic.drawLine(sourcePoint.x, sourcePoint.y,
                     destPoint.x, destPoint.y);
         }
+        }
+        
 
         // Nodes - red circles.
         for (int i = 0; i < locations.size(); i++) {
