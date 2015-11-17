@@ -155,6 +155,10 @@ public class Graphify extends javax.swing.JFrame {
             locations.put(id++, new Point(evt.getX(), evt.getY()));
         } else if (SwingUtilities.isLeftMouseButton(evt)) {
         } else if (SwingUtilities.isRightMouseButton(evt)) {
+            glowMap.clear();
+            cutV.clear();
+            _source = -1;
+            _dest = -1;
             nodes.remove(_selectedNode);
             locations.remove(_selectedNode);
             for (HashSet<Integer> connections : nodes.values()) {
