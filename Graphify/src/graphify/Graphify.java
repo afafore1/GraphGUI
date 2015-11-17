@@ -333,26 +333,35 @@ public class Graphify extends javax.swing.JFrame {
         int V = nodes.size();
         distTo = new HashMap<>();
         visited = new HashMap<>();
+        HashMap<Integer, Integer> color = new HashMap<Integer, Integer>();
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             visited.put(key, -1);
             distTo.put(key, 0);
+            color.put(key, -1);
         }
         conn = new ArrayList<Integer>();
         int i, element;
         visited.put(source, 0);
+        color.put(source, 1); // start first color with 1, all adjacent to 1 should have color 0
         queue.add(source);
         while (!queue.isEmpty()) {
             element = queue.remove();
             System.out.println(element + " removed");
-            i = element;
+            i = element; // what is the point of i = element here ?
             conn.add(element);
             HashSet<Integer> iList = getEdge(i);
             int x = 0;
             while (x < iList.size()) {
                 Integer key = (Integer) iList.toArray()[x];
+                if(color.get(key) == color.get(i)){
+                        System.out.println("Graph is not bipartite at "+element+" and "+key+" with colors "+color.get(key));
+                    }
+                    else if(color.get(key) == -1){
+                        color.put(key, 1-color.get(element));
+                    }    
                 if (visited.get(key) == -1) {
-                    queue.add((Integer) iList.toArray()[x]);
+                    queue.add((Integer) iList.toArray()[x]);                                   
                     visited.put(key, i);
                     distTo.put(key, distTo.get(i) + 1);
                 }
