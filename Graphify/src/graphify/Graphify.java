@@ -225,11 +225,11 @@ public class Graphify extends javax.swing.JFrame {
         time = ++time;
         disc.put(u, time);
         low.put(u, time);
-        Iterator<Integer> i = getEdge(u).iterator(); // need to fix this point
+        Iterator<Integer> i = getEdge(u).iterator();
+        System.out.println(u+" has edges "+getEdge(u));
         while (i.hasNext()) {
             int v = i.next(); // v is current adj to u
-            Integer key = (Integer) nodes.keySet().toArray()[v]; 
-            if (visited.get(key) == -1) {
+            if (visited.get(v) == -1) {
                 children++;
                 parent.put(v, u);
                 APF(v, visited, disc, low, parent, ap); // recursive for it
@@ -276,8 +276,8 @@ public class Graphify extends javax.swing.JFrame {
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             if (ap.get(key) == 1) {
-                System.out.println(i+" is a cut vertex");
-                cutV.add(i);
+                System.out.println(key+" is a cut vertex");
+                cutV.add(key);
             }
         }
     }
