@@ -219,55 +219,63 @@ public class Graphify extends javax.swing.JFrame {
         return nodes.get(source);
     }
 
-    void APF(int u, boolean visited[], int disc[], int low[], int parent[], boolean ap[]) {
+    void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
         int children = 0;
-        visited[u] = true;
-        disc[u] = low[u] = ++time;
-        Iterator<Integer> i = getEdge(u).iterator();
+        visited.put(u, 0);
+        time = ++time;
+        disc.put(u, time);
+        low.put(u, time);
+        Iterator<Integer> i = getEdge(u).iterator(); // need to fix this point
         while (i.hasNext()) {
             int v = i.next(); // v is current adj to u
-            if (!visited[v]) {
+            Integer key = (Integer) nodes.keySet().toArray()[v]; 
+            if (visited.get(key) == -1) {
                 children++;
-                parent[v] = u;
+                parent.put(v, u);
                 APF(v, visited, disc, low, parent, ap); // recursive for it
-
-                low[u] = Math.min(low[u], low[v]);
+                int val = Math.min(low.get(u), low.get(v));
+                low.put(u, val);
 
                 if (u == _source && children > 1) {
-                    ap[u] = true;
+                    ap.put(u, 1);
                 }
                 // if u is not root and low value of one of its child is more than discovery value of u
-                if (u != _source && low[v] >= disc[u]) {
-                    ap[u] = true;
+                if (u != _source && low.get(v) >= disc.get(u)) {
+                    ap.put(u, 1);
                 }
-            } else if (v != parent[u]) {
-                low[u] = Math.min(low[u], disc[v]);
+            } else if (v != parent.get(u)) {
+                int val = Math.min(low.get(u), low.get(v));
+                low.put(u, val);
             }
         }
     }
 
     void AP() {
         int V = nodes.size();
-        boolean visited[] = new boolean[V];
-        int disc[] = new int[V];
-        int low[] = new int[V];
-        int parent[] = new int[V];
-        boolean ap[] = new boolean[V];
+        visited = new HashMap<>();
+        HashMap<Integer, Integer> disc = new HashMap<>();
+        HashMap <Integer, Integer> low = new HashMap<>();
+        HashMap <Integer, Integer> parent = new HashMap<>();
+        HashMap <Integer, Integer> ap = new HashMap<>();
 
         for (int i = 0; i < V; i++) {
-            parent[i] = -1;
-            visited[i] = false;
-            ap[i] = false;
+            Integer key = (Integer) nodes.keySet().toArray()[i];
+            parent.put(key, -1);
+           // parent[key] = -1;
+            visited.put(key, -1);
+            ap.put(key, 0);
         }
 
         for (int i = 0; i < V; i++) {
-            if (visited[i] == false) {
+            Integer key = (Integer) nodes.keySet().toArray()[i];
+            if (visited.get(key) == -1) {
                 APF(i, visited, disc, low, parent, ap);
             }
         }
 
         for (int i = 0; i < V; i++) {
-            if (ap[i] == true) {
+            Integer key = (Integer) nodes.keySet().toArray()[i];
+            if (ap.get(key) == 1) {
                 System.out.println(i+" is a cut vertex");
                 cutV.add(i);
             }
@@ -278,6 +286,7 @@ public class Graphify extends javax.swing.JFrame {
         int V = nodes.size();
         distTo = new HashMap<>();
         visited = new HashMap<>();
+        boolean ap[] = new boolean[V];
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             visited.put(key, -1);
@@ -309,6 +318,12 @@ public class Graphify extends javax.swing.JFrame {
                     int backEdge = stack.pop();
                     System.out.println("Back edge " + backEdge);
                 }
+            }
+        }
+        for (int i = 0; i < V; i++) {
+            if (ap[i] == true) {
+                System.out.println(i+" is a cut vertex");
+                cutV.add(i);
             }
         }
         System.out.println("order is " + bconn);
