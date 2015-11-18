@@ -57,6 +57,9 @@ public class Graphify extends javax.swing.JFrame {
         btnPrintList = new javax.swing.JButton();
         lblInfo = new java.awt.Label();
         lblResult = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtConsole = new javax.swing.JTextArea();
+        btnReset1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -92,7 +95,7 @@ public class Graphify extends javax.swing.JFrame {
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 341, Short.MAX_VALUE)
+            .addGap(0, 303, Short.MAX_VALUE)
         );
 
         btnReset.setText("Reset");
@@ -111,6 +114,19 @@ public class Graphify extends javax.swing.JFrame {
 
         lblInfo.setText("Source: None - Destination: None");
 
+        txtConsole.setEditable(false);
+        txtConsole.setColumns(20);
+        txtConsole.setFont(new java.awt.Font("Courier New", 0, 16)); // NOI18N
+        txtConsole.setRows(5);
+        jScrollPane1.setViewportView(txtConsole);
+
+        btnReset1.setText("Clear Console");
+        btnReset1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReset1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -118,9 +134,12 @@ public class Graphify extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnReset)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 324, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnReset1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 219, Short.MAX_VALUE)
                         .addComponent(btnPrintList))
                     .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -135,13 +154,16 @@ public class Graphify extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblResult))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReset)
-                    .addComponent(btnPrintList))
+                    .addComponent(btnPrintList)
+                    .addComponent(btnReset1))
                 .addContainerGap())
         );
 
@@ -231,7 +253,7 @@ public class Graphify extends javax.swing.JFrame {
         disc.put(u, time);
         low.put(u, time);
         Iterator<Integer> i = getEdge(u).iterator();
-        System.out.println(u+" has edges "+getEdge(u));
+        printlnConsole(u+" has edges "+getEdge(u));
         while (i.hasNext()) {
             int v = i.next(); // v is current adj to u
             if (visited.get(v) == -1) {
@@ -273,7 +295,7 @@ public class Graphify extends javax.swing.JFrame {
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             if (visited.get(key) == -1) {
-                //System.out.println("This is i -------------------- "+key);
+                //printlnConsole("This is i -------------------- "+key);
                 APF(key, visited, disc, low, parent, ap);
             }
         }
@@ -281,7 +303,7 @@ public class Graphify extends javax.swing.JFrame {
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             if (ap.get(key) == 1) {
-                System.out.println(key+" is a cut vertex");
+                printlnConsole(key+" is a cut vertex");
                 cutV.add(key);
             }
         }
@@ -303,7 +325,7 @@ public class Graphify extends javax.swing.JFrame {
         stack.push(source);
         while (!stack.isEmpty()) {
             element = stack.peek();
-            System.out.println("Considering element " + element);
+            printlnConsole("Considering element " + element);
             if (!bconn.contains(element)) {
                 bconn.add(element);
             }
@@ -312,7 +334,7 @@ public class Graphify extends javax.swing.JFrame {
             while (x < iList.size()) {
                 Integer key = (Integer) iList.toArray()[x];
                 if (visited.get(key) == -1) {
-                    System.out.println("Pushing " + (Integer) iList.toArray()[x]);
+                    printlnConsole("Pushing " + (Integer) iList.toArray()[x]);
                     stack.push((Integer) iList.toArray()[x]);
                     visited.put(key, element);
                     distTo.put(key, distTo.get(element) + 1);
@@ -321,17 +343,17 @@ public class Graphify extends javax.swing.JFrame {
                 x++;
                 if (x == iList.size()) {
                     int backEdge = stack.pop();
-                    System.out.println("Back edge " + backEdge);
+                    printlnConsole("Back edge " + backEdge);
                 }
             }
         }
         for (int i = 0; i < V; i++) {
             if (ap[i] == true) {
-                System.out.println(i+" is a cut vertex");
+                printlnConsole(i+" is a cut vertex");
                 cutV.add(i);
             }
         }
-        System.out.println("order is " + bconn);
+        printlnConsole("order is " + bconn);
     }
 
     void bfs(int source) {
@@ -352,7 +374,7 @@ public class Graphify extends javax.swing.JFrame {
         queue.add(source);
         while (!queue.isEmpty()) {
             element = queue.remove();
-            System.out.println(element + " removed");
+            printlnConsole(element + " removed");
             i = element; // what is the point of i = element here ?
             conn.add(element);
             HashSet<Integer> iList = getEdge(i);
@@ -360,7 +382,7 @@ public class Graphify extends javax.swing.JFrame {
             while (x < iList.size()) {
                 Integer key = (Integer) iList.toArray()[x];
                 if(color.get(key) == color.get(i)){
-                        System.out.println("Graph is not bipartite at "+element+" and "+key+" with colors "+color.get(key));
+                        printlnConsole("Graph is not bipartite at "+element+" and "+key+" with colors "+color.get(key));
                     }
                     else if(color.get(key) == -1){
                         color.put(key, 1-color.get(element));
@@ -373,7 +395,7 @@ public class Graphify extends javax.swing.JFrame {
                 x++;
             }
         }
-        System.out.println("Order is " + conn);
+        printlnConsole("Order is " + conn);
     }
 
     public int hasPath(int v) {
@@ -386,7 +408,7 @@ public class Graphify extends javax.swing.JFrame {
 
     public void shortestPath(int v, int e) {
         if (e == v) {
-            System.out.println(v + "-->" + v);
+            printlnConsole(v + "-->" + v);
 //            System.exit(0);
             return;
         }
@@ -399,7 +421,7 @@ public class Graphify extends javax.swing.JFrame {
             }
         }
         // removed rset
-        System.out.println(set.toString().replaceAll("=", "-->"));
+        printlnConsole(set.toString().replaceAll("=", "-->"));
         glowMap.clear();
         for (int i : set.keySet()) {
             glowMap.put(i, set.get(i));
@@ -411,9 +433,9 @@ public class Graphify extends javax.swing.JFrame {
     private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintListActionPerformed
         for (int i = 0; i < nodes.size(); i++) {
             int key = (Integer) nodes.keySet().toArray()[i];
-            System.out.println(key + "->" + getEdge(key));
+            printlnConsole(key + "->" + getEdge(key));
         }
-        System.out.println("Source is: " + _source);
+        printlnConsole("Source is: " + _source);
     }//GEN-LAST:event_btnPrintListActionPerformed
 
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
@@ -449,6 +471,10 @@ public class Graphify extends javax.swing.JFrame {
             graph();
         }
     }//GEN-LAST:event_pnlGraphMouseClicked
+
+    private void btnReset1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReset1ActionPerformed
+        txtConsole.setText("");
+    }//GEN-LAST:event_btnReset1ActionPerformed
     private String getNodeInfo(int nodeId) {
         if (nodeId == -1) {
             return "None";
@@ -540,6 +566,14 @@ public class Graphify extends javax.swing.JFrame {
         return -1;
     }
 
+    private void printConsole(String string) {
+        txtConsole.append(string);
+    }
+
+    private void printlnConsole(String string) {
+        txtConsole.append(string + "\n");
+    }
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -582,12 +616,17 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
     }
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnPrintList;
     private javax.swing.JButton btnReset;
+    private javax.swing.JButton btnReset1;
+    private javax.swing.JScrollPane jScrollPane1;
     private java.awt.Label lblInfo;
     private javax.swing.JLabel lblResult;
     private javax.swing.JPanel pnlGraph;
+    private javax.swing.JTextArea txtConsole;
     // End of variables declaration//GEN-END:variables
 }
