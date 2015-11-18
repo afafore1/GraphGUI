@@ -161,6 +161,7 @@ public class Graphify extends javax.swing.JFrame {
             _dest = -1;
             nodes.remove(_selectedNode);
             locations.remove(_selectedNode);
+            
             for (HashSet<Integer> connections : nodes.values()) {
                 for (int j = 0; j < connections.size(); j++) {
                     Integer connection = (Integer) connections.toArray()[j];
@@ -265,7 +266,6 @@ public class Graphify extends javax.swing.JFrame {
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             parent.put(key, -1);
-           // parent[key] = -1;
             visited.put(key, -1);
             ap.put(key, 0);
         }
@@ -273,7 +273,8 @@ public class Graphify extends javax.swing.JFrame {
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             if (visited.get(key) == -1) {
-                APF(i, visited, disc, low, parent, ap);
+                //System.out.println("This is i -------------------- "+key);
+                APF(key, visited, disc, low, parent, ap);
             }
         }
 
