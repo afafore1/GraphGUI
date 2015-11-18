@@ -2,7 +2,7 @@
 ##Purpose
 **To implement several graph algorithms with the use of visualization**
 
-App is written in *java programming language* and source code available for anyone to look at and make contributions.
+App is written in *java programming language - compile with Netbeans*, please suggest changes if you think any should be made.
 We are working on running several algorithms and making an efficient way to visualize how they work.
 
 **Algorithms covered so far:** 
