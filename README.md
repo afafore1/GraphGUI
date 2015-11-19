@@ -8,6 +8,8 @@ We are working on running several algorithms and making an efficient way to visu
 **Algorithms covered so far:** 
 - Bfs
 - Dfs
+- You can find all cut vertices (Using Dfs)
+- Check if graph is bipartite (Using Bfs)
 
 **How to Use**
 - Clone source (Note: you can only compile with Netbeans)
@@ -20,6 +22,7 @@ We are working on running several algorithms and making an efficient way to visu
 - Right click to remove vertex
 - Middle click to move vertex around
 - Double click to choose start vertex and destination vertex (Colors and label will be updated).
+- Click dropdown to choose what you wish to do
 
 
 
