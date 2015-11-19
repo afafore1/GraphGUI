@@ -27,6 +27,8 @@ public class Graphify extends javax.swing.JFrame {
     private HashMap<Integer, Integer> distTo;
     private Map<Integer, Integer> set = new HashMap<Integer, Integer>();
     HashMap<Integer, Integer> visited;
+    HashMap<Integer, Integer> color;
+    HashSet<Integer> _colors2;
     ArrayList<Integer> conn;
     ArrayList<Integer> bconn;
     ArrayList<Integer> cutV;
@@ -46,6 +48,7 @@ public class Graphify extends javax.swing.JFrame {
         queue = new LinkedList<Integer>();
         stack = new Stack<Integer>();
         cutV = new ArrayList<Integer>();
+        _colors2 = new HashSet<Integer>();
     }
 
     @SuppressWarnings("unchecked")
@@ -60,6 +63,7 @@ public class Graphify extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         txtConsole = new javax.swing.JTextArea();
         btnReset1 = new javax.swing.JButton();
+        jcbAlgo = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -127,6 +131,13 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
 
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Bipartite", "S" }));
+        jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jcbAlgoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -139,7 +150,9 @@ public class Graphify extends javax.swing.JFrame {
                         .addComponent(btnReset)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnReset1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 219, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
                         .addComponent(btnPrintList))
                     .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -163,7 +176,8 @@ public class Graphify extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReset)
                     .addComponent(btnPrintList)
-                    .addComponent(btnReset1))
+                    .addComponent(btnReset1)
+                    .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -179,11 +193,12 @@ public class Graphify extends javax.swing.JFrame {
         } else if (SwingUtilities.isRightMouseButton(evt)) {
             glowMap.clear();
             cutV.clear();
+            _colors2.clear();
             _source = -1;
             _dest = -1;
             nodes.remove(_selectedNode);
             locations.remove(_selectedNode);
-            
+
             for (HashSet<Integer> connections : nodes.values()) {
                 for (int j = 0; j < connections.size(); j++) {
                     Integer connection = (Integer) connections.toArray()[j];
@@ -253,7 +268,6 @@ public class Graphify extends javax.swing.JFrame {
         disc.put(u, time);
         low.put(u, time);
         Iterator<Integer> i = getEdge(u).iterator();
-        printlnConsole(u+" has edges "+getEdge(u));
         while (i.hasNext()) {
             int v = i.next(); // v is current adj to u
             if (visited.get(v) == -1) {
@@ -281,9 +295,9 @@ public class Graphify extends javax.swing.JFrame {
         int V = nodes.size();
         visited = new HashMap<>();
         HashMap<Integer, Integer> disc = new HashMap<>();
-        HashMap <Integer, Integer> low = new HashMap<>();
-        HashMap <Integer, Integer> parent = new HashMap<>();
-        HashMap <Integer, Integer> ap = new HashMap<>();
+        HashMap<Integer, Integer> low = new HashMap<>();
+        HashMap<Integer, Integer> parent = new HashMap<>();
+        HashMap<Integer, Integer> ap = new HashMap<>();
 
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
@@ -295,7 +309,6 @@ public class Graphify extends javax.swing.JFrame {
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             if (visited.get(key) == -1) {
-                //printlnConsole("This is i -------------------- "+key);
                 APF(key, visited, disc, low, parent, ap);
             }
         }
@@ -303,7 +316,7 @@ public class Graphify extends javax.swing.JFrame {
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             if (ap.get(key) == 1) {
-                printlnConsole(key+" is a cut vertex");
+                printlnConsole(key + " is a cut vertex");
                 cutV.add(key);
             }
         }
@@ -349,7 +362,7 @@ public class Graphify extends javax.swing.JFrame {
         }
         for (int i = 0; i < V; i++) {
             if (ap[i] == true) {
-                printlnConsole(i+" is a cut vertex");
+                printlnConsole(i + " is a cut vertex working ?");
                 cutV.add(i);
             }
         }
@@ -381,14 +394,13 @@ public class Graphify extends javax.swing.JFrame {
             int x = 0;
             while (x < iList.size()) {
                 Integer key = (Integer) iList.toArray()[x];
-                if(color.get(key) == color.get(i)){
-                        printlnConsole("Graph is not bipartite at "+element+" and "+key+" with colors "+color.get(key));
-                    }
-                    else if(color.get(key) == -1){
-                        color.put(key, 1-color.get(element));
-                    }    
+                if (color.get(key) == color.get(i)) {
+                    printlnConsole("Graph is not bipartite at " + element + " and " + key + " with colors " + color.get(key));
+                } else if (color.get(key) == -1) {
+                    color.put(key, 1 - color.get(element));
+                }
                 if (visited.get(key) == -1) {
-                    queue.add((Integer) iList.toArray()[x]);                                   
+                    queue.add((Integer) iList.toArray()[x]);
                     visited.put(key, i);
                     distTo.put(key, distTo.get(i) + 1);
                 }
@@ -396,6 +408,36 @@ public class Graphify extends javax.swing.JFrame {
             }
         }
         printlnConsole("Order is " + conn);
+    }
+
+    void Bipartite(int source) { // will test for 3
+        int V = nodes.size();
+        color = new HashMap<Integer, Integer>();
+        _colors2 = new HashSet<Integer>();
+        for (int i = 0; i < V; i++) {
+            Integer key = (Integer) nodes.keySet().toArray()[i];
+            color.put(key, -1);
+        }
+        int element;
+        color.put(source, 1); // start first color with 1, all adjacent to 1 should have color 0
+        queue.add(source);
+        while (!queue.isEmpty()) {
+            element = queue.remove();
+            printlnConsole(element + " removed");
+            Iterator<Integer> x = getEdge(element).iterator();
+            while (x.hasNext()) {
+                Integer n = (Integer) nodes.keySet().toArray()[x.next()];
+                if (color.get(element) == color.get(n)) {
+                    _colors2.add(element);
+                    _colors2.add(n);
+                    printlnConsole("oh oh same color " + color.get(n) + " for " + n + " and " + element);
+                } else if (color.get(n) == -1) {
+                    color.put(n, 1 - color.get(element));
+                    queue.add(n);
+                }
+            }
+        }
+        printlnConsole(_colors2.toString());
     }
 
     public int hasPath(int v) {
@@ -443,6 +485,7 @@ public class Graphify extends javax.swing.JFrame {
         locations = new HashMap();
         id = 0;
         cutV = new ArrayList<Integer>();
+        _colors2 = new HashSet<Integer>();
         glowMap.clear();
         _source = -1;
         _dest = -1;
@@ -467,6 +510,7 @@ public class Graphify extends javax.swing.JFrame {
                 dfs(_source);
                 cutV = new ArrayList<Integer>();
                 AP();
+                //lSC(3);
             }
             graph();
         }
@@ -475,6 +519,15 @@ public class Graphify extends javax.swing.JFrame {
     private void btnReset1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReset1ActionPerformed
         txtConsole.setText("");
     }//GEN-LAST:event_btnReset1ActionPerformed
+
+    private void jcbAlgoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbAlgoActionPerformed
+        // TODO add your handling code here:
+        String x = String.valueOf(jcbAlgo.getSelectedItem());
+        if (x == "Bipartite") {
+            Bipartite(_source);
+        }
+
+    }//GEN-LAST:event_jcbAlgoActionPerformed
     private String getNodeInfo(int nodeId) {
         if (nodeId == -1) {
             return "None";
@@ -510,20 +563,23 @@ public class Graphify extends javax.swing.JFrame {
         // Glowing connections
         bufferGraphic.setColor(new Color(200, 40, 232));
         bufferGraphic.setStroke(new BasicStroke(8));
-        if(!btnReset.isSelected()){
+        if (!btnReset.isSelected()) {
             for (int sourceKey : glowMap.keySet()) {
-            int destKey = glowMap.get(sourceKey);
-            Point sourcePoint = (Point) locations.get(sourceKey);
-            Point destPoint = (Point) locations.get(destKey);
-            bufferGraphic.drawLine(sourcePoint.x, sourcePoint.y,
-                    destPoint.x, destPoint.y);
+                int destKey = glowMap.get(sourceKey);
+                Point sourcePoint = (Point) locations.get(sourceKey);
+                Point destPoint = (Point) locations.get(destKey);
+                bufferGraphic.drawLine(sourcePoint.x, sourcePoint.y,
+                        destPoint.x, destPoint.y);
+            }
         }
-        }
-        
 
         // Nodes - red circles.
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
+            if(_colors2.contains(locations.keySet().toArray()[i])){ // code is not getting here for some reason
+                printlnConsole("colors  2 "+_colors2);
+                bufferGraphic.setColor(Color.black);
+            }
             if (locations.keySet().toArray()[i]
                     == (Integer) _source) {
                 bufferGraphic.setColor(Color.green);
@@ -532,11 +588,15 @@ public class Graphify extends javax.swing.JFrame {
                 bufferGraphic.setColor(Color.blue);
             } else if (locations.keySet().toArray()[i] == (Integer) _selectedNode) {
                 bufferGraphic.setColor(Color.orange);
-            } else if(!cutV.contains(locations.keySet().toArray()[i])){
+            }
+            else if (!cutV.contains(locations.keySet().toArray()[i])) {
                 bufferGraphic.setColor(Color.red);
-            } else{
+            }
+            else {
                 bufferGraphic.setColor(Color.gray);
             }
+            
+            
             bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
         }
@@ -616,14 +676,14 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
     }
-    
-    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnPrintList;
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnReset1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JComboBox<String> jcbAlgo;
     private java.awt.Label lblInfo;
     private javax.swing.JLabel lblResult;
     private javax.swing.JPanel pnlGraph;
