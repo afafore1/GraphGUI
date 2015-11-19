@@ -489,7 +489,7 @@ public class Graphify extends javax.swing.JFrame {
 
         // Regular connections
         bufferGraphic.setColor(Color.black);
-        bufferGraphic.setStroke(new BasicStroke(1));
+        bufferGraphic.setStroke(new BasicStroke(2));
         for (int i = 0; i < locations.size(); i++) {
             Integer sourceKey = (Integer) nodes.keySet().toArray()[i];
             Point thePoint = (Point) locations.values().toArray()[i];
