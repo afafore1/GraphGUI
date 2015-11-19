@@ -131,7 +131,7 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Bipartite", "S" }));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Bipartite", "Cut" }));
         jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbAlgoActionPerformed(evt);
@@ -373,17 +373,14 @@ public class Graphify extends javax.swing.JFrame {
         int V = nodes.size();
         distTo = new HashMap<>();
         visited = new HashMap<>();
-        HashMap<Integer, Integer> color = new HashMap<Integer, Integer>();
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             visited.put(key, -1);
             distTo.put(key, 0);
-            color.put(key, -1);
         }
         conn = new ArrayList<Integer>();
         int i, element;
         visited.put(source, 0);
-        color.put(source, 1); // start first color with 1, all adjacent to 1 should have color 0
         queue.add(source);
         while (!queue.isEmpty()) {
             element = queue.remove();
@@ -394,11 +391,6 @@ public class Graphify extends javax.swing.JFrame {
             int x = 0;
             while (x < iList.size()) {
                 Integer key = (Integer) iList.toArray()[x];
-                if (color.get(key) == color.get(i)) {
-                    printlnConsole("Graph is not bipartite at " + element + " and " + key + " with colors " + color.get(key));
-                } else if (color.get(key) == -1) {
-                    color.put(key, 1 - color.get(element));
-                }
                 if (visited.get(key) == -1) {
                     queue.add((Integer) iList.toArray()[x]);
                     visited.put(key, i);
@@ -505,11 +497,11 @@ public class Graphify extends javax.swing.JFrame {
                 _dest = _selectedNode;
                 // Implement path finding here.
                 set.clear();
-                bfs(_source);
-                shortestPath(_source, _dest);
-                dfs(_source);
-                cutV = new ArrayList<Integer>();
-                AP();
+                //bfs(_source);
+                //shortestPath(_source, _dest);
+                //dfs(_source);
+                //cutV = new ArrayList<Integer>();
+                //AP();
                 //lSC(3);
             }
             graph();
@@ -524,7 +516,38 @@ public class Graphify extends javax.swing.JFrame {
         // TODO add your handling code here:
         String x = String.valueOf(jcbAlgo.getSelectedItem());
         if (x == "Bipartite") {
+            glowMap.clear();
+            txtConsole.setText("");
+            if(_source == -1){
+                printlnConsole("Please choose a source by double clicking a node");
+                return;
+            }
             Bipartite(_source);
+        }else if(x == "DFS"){
+            glowMap.clear();
+            txtConsole.setText("");
+            if(_source == -1){
+                printlnConsole("Please choose a source by double clicking a node");
+                return;
+            }
+            dfs(_source);
+        }else if(x == "BFS"){
+            txtConsole.setText("");
+            if(_source == -1 || _dest == -1){
+                if(_source == -1){
+                    printlnConsole("Please choose a source by double clicking a node");
+                }else{
+                    printlnConsole("Please choose a destination by double clicking a node");
+                }                
+                return;
+            }
+            bfs(_source);
+            shortestPath(_source, _dest);
+        }else if(x == "Cut"){
+            glowMap.clear();
+            cutV = new ArrayList<Integer>();
+            AP();
+            graph();
         }
 
     }//GEN-LAST:event_jcbAlgoActionPerformed
