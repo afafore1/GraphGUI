@@ -31,9 +31,9 @@
                       <Component id="btnReset" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnReset1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
                       <Component id="jcbAlgo" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="181" max="32767" attributes="0"/>
+                      <EmptySpace pref="147" max="32767" attributes="0"/>
                       <Component id="btnPrintList" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="pnlGraph" max="32767" attributes="0"/>
@@ -157,7 +157,7 @@
     <Component class="javax.swing.JComboBox" name="jcbAlgo">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(new String[] { &quot;BFS&quot;, &quot;DFS&quot;, &quot;Bipartite&quot;, &quot;Cut&quot;, &quot;GColoring&quot; })" type="code"/>
+          <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(new String[] { &quot;BFS&quot;, &quot;DFS&quot;, &quot;Bipartite&quot;, &quot;Cut&quot;, &quot;GColoring&quot;, &quot;isEulerian&quot;, &quot;Connectedness&quot; })" type="code"/>
         </Property>
       </Properties>
       <Events>

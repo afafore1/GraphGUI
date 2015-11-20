@@ -138,7 +138,7 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Bipartite", "Cut", "GColoring" }));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness" }));
         jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbAlgoActionPerformed(evt);
@@ -157,9 +157,9 @@ public class Graphify extends javax.swing.JFrame {
                         .addComponent(btnReset)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnReset1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(44, 44, 44)
                         .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 147, Short.MAX_VALUE)
                         .addComponent(btnPrintList))
                     .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -406,8 +406,31 @@ public class Graphify extends javax.swing.JFrame {
         }
         printlnConsole("Order is " + conn);
     }
+    boolean isConnected(){
+        dfs(_source);
+        for(int i = 0; i < nodes.size(); i++){
+            Integer key = (Integer) nodes.keySet().toArray()[i];
+            if(visited.get(key) == -1) return false;
+        }
+        return true;
+    }
     
-    void greedyColoring(){
+    boolean isEulerian(){
+        int noOfOdds = 0;
+        if(isConnected()){
+            for(int i = 0; i < nodes.size(); i++){
+                Integer key = (Integer) nodes.keySet().toArray()[i];
+                int keyEdgeSize = getEdge(key).size();
+                if(keyEdgeSize % 2 != 0) noOfOdds++;
+            }
+        }else{
+            return false;
+        }
+        if(noOfOdds == 2) return true;
+        return false;
+    }
+    
+    void greedyColoring(int nc){
         int V = nodes.size();
         HashMap<Integer, Integer> result = new HashMap<Integer, Integer>();
         HashMap<Integer, Integer> available = new HashMap<Integer, Integer>();
@@ -631,8 +654,30 @@ public class Graphify extends javax.swing.JFrame {
             fcolor = new ArrayList<Integer>();
             scolor = new ArrayList<Integer>();
             tcolor = new ArrayList<Integer>();
-            greedyColoring();
+            greedyColoring(2);
             graph();
+        }else if(x == "Connectedness"){
+            txtConsole.setText("");
+            if(_source == -1){
+                printlnConsole("Please select a source to begin");
+                return;
+            }
+            if(isConnected()){
+                printlnConsole("Graph is Connected");
+            }else{
+                printlnConsole("Graph is a disconnected Graph");
+            }
+        }else if(x == "isEulerian"){
+            txtConsole.setText("");
+            if(_source == -1){
+                printlnConsole("Please select a source to begin");
+                return;
+            }
+            if(isEulerian()){
+                printlnConsole("There is an eulerian cycle");
+            }else {
+                printlnConsole("Eulerian cycle does not exist");
+            }
         }
 
     }//GEN-LAST:event_jcbAlgoActionPerformed
