@@ -268,6 +268,7 @@ public class Graphify extends javax.swing.JFrame {
         disc.put(u, time);
         low.put(u, time);
         Iterator<Integer> i = getEdge(u).iterator();
+        
         while (i.hasNext()) {
             int v = i.next(); // v is current adj to u
             if (visited.get(v) == -1) {
@@ -281,7 +282,7 @@ public class Graphify extends javax.swing.JFrame {
                     ap.put(u, 1);
                 }
                 // if u is not root and low value of one of its child is more than discovery value of u
-                if (u != _source && low.get(v) >= disc.get(u)) {
+                if (u != _source && low.get(v) >= disc.get(u)) { // need a check for this if statement.. always marks beginning as a cut even when it's not
                     ap.put(u, 1);
                 }
             } else if (v != parent.get(u)) {
@@ -298,7 +299,7 @@ public class Graphify extends javax.swing.JFrame {
         HashMap<Integer, Integer> low = new HashMap<>();
         HashMap<Integer, Integer> parent = new HashMap<>();
         HashMap<Integer, Integer> ap = new HashMap<>();
-
+        
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             parent.put(key, -1);
@@ -360,12 +361,6 @@ public class Graphify extends javax.swing.JFrame {
                 }
             }
         }
-        for (int i = 0; i < V; i++) {
-            if (ap[i] == true) {
-                printlnConsole(i + " is a cut vertex working ?");
-                cutV.add(i);
-            }
-        }
         printlnConsole("order is " + bconn);
     }
 
@@ -415,21 +410,26 @@ public class Graphify extends javax.swing.JFrame {
         queue.add(source);
         while (!queue.isEmpty()) {
             element = queue.remove();
-            printlnConsole(element + " removed");
-            Iterator<Integer> x = getEdge(element).iterator();
-            while (x.hasNext()) {
-                Integer n = (Integer) nodes.keySet().toArray()[x.next()];
-                if (color.get(element) == color.get(n)) {
+            HashSet<Integer> iList = getEdge(element);
+            int x = 0;
+            while (x < iList.size()) {
+                Integer key = (Integer) iList.toArray()[x];
+                if (color.get(element) == color.get(key)) {
                     _colors2.add(element);
-                    _colors2.add(n);
-                    printlnConsole("oh oh same color " + color.get(n) + " for " + n + " and " + element);
-                } else if (color.get(n) == -1) {
-                    color.put(n, 1 - color.get(element));
-                    queue.add(n);
+                    _colors2.add(key);
+                }else if(color.get(key) == -1){
+                    color.put(key, 1 - color.get(element));
+                    queue.add(key);
                 }
+                x++;
             }
         }
-        printlnConsole(_colors2.toString());
+        if(_colors2.size() > 1){
+            printlnConsole("Graph is not bipartite at "+_colors2.toString());
+        }else{
+            printlnConsole("Graph is bipartite");
+        }
+        
     }
 
     public int hasPath(int v) {
