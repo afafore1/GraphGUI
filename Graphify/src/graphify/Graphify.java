@@ -28,7 +28,9 @@ public class Graphify extends javax.swing.JFrame {
     private Map<Integer, Integer> set = new HashMap<Integer, Integer>();
     HashMap<Integer, Integer> visited;
     HashMap<Integer, Integer> color;
+    HashMap<Integer, Integer> kcolors;
     HashSet<Integer> _colors2;
+    ArrayList<Integer> kcolor;
     ArrayList<Integer> conn;
     ArrayList<Integer> bconn;
     ArrayList<Integer> cutV;
@@ -48,6 +50,7 @@ public class Graphify extends javax.swing.JFrame {
         queue = new LinkedList<Integer>();
         stack = new Stack<Integer>();
         cutV = new ArrayList<Integer>();
+        kcolor = new ArrayList<Integer>();
         _colors2 = new HashSet<Integer>();
     }
 
@@ -131,7 +134,7 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Bipartite", "Cut" }));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Bipartite", "Cut", "GColoring" }));
         jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbAlgoActionPerformed(evt);
@@ -193,6 +196,7 @@ public class Graphify extends javax.swing.JFrame {
         } else if (SwingUtilities.isRightMouseButton(evt)) {
             glowMap.clear();
             cutV.clear();
+            kcolor.clear();
             _colors2.clear();
             _source = -1;
             _dest = -1;
@@ -396,6 +400,56 @@ public class Graphify extends javax.swing.JFrame {
         }
         printlnConsole("Order is " + conn);
     }
+    
+    void greedyColoring(){
+        int V = nodes.size();
+        HashMap<Integer, Integer> result = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> available = new HashMap<Integer, Integer>();
+        for(int i = 0; i < V; i++){
+            Integer key = (Integer) nodes.keySet().toArray()[i];
+            result.put(key, -1);
+            available.put(key, 0); //set all to false
+        }
+        result.put(_source, 0);
+        for(int x = 0; x < V; x++){
+            Integer key = (Integer) nodes.keySet().toArray()[x];
+            HashSet<Integer> kList = getEdge(key);
+            int u = 0;
+            while(u < kList.size()){
+                Integer k = (Integer)kList.toArray()[u];
+                if(result.get(k) != -1){
+                    available.put(result.get(k), 1);
+                }
+                u++;
+            }
+            // find first avail color
+            Integer nColor = 0;
+            for(int i = 0; i < V; i++){
+                nColor = (Integer) nodes.keySet().toArray()[i];
+                if(available.get(nColor) == 0) break;
+            }
+            result.put(key, nColor);
+            u = 0;
+            while(u < kList.size()){
+                Integer k = (Integer)kList.toArray()[u];
+                if(result.get(k) != -1){
+                    available.put(result.get(k), 0);
+                }
+                u++;
+            }
+        }
+        for(int i = 0; i < V; i++){
+            Integer key = (Integer) nodes.keySet().toArray()[i];
+            if(result.get(key) == 1){
+                kcolor.add(key);
+            }
+            printlnConsole("Vertex "+key+" ---> Color "+result.get(key));
+        }
+        
+        
+        
+        
+    }
 
     void Bipartite(int source) { // will test for 3
         int V = nodes.size();
@@ -477,6 +531,7 @@ public class Graphify extends javax.swing.JFrame {
         locations = new HashMap();
         id = 0;
         cutV = new ArrayList<Integer>();
+        kcolor = new ArrayList<Integer>();
         _colors2 = new HashSet<Integer>();
         glowMap.clear();
         _source = -1;
@@ -545,9 +600,19 @@ public class Graphify extends javax.swing.JFrame {
             shortestPath(_source, _dest);
         }else if(x == "Cut"){
             glowMap.clear();
+            txtConsole.setText("");
             cutV = new ArrayList<Integer>();
             AP();
             graph();
+        }else if(x == "GColoring"){
+            glowMap.clear();
+            if(_source == -1){
+                printlnConsole("Please select a source to begin ");
+                return;
+            }
+            //txtConsole.setText("");
+            kcolor = new ArrayList<Integer>();
+            greedyColoring();
         }
 
     }//GEN-LAST:event_jcbAlgoActionPerformed
@@ -599,26 +664,29 @@ public class Graphify extends javax.swing.JFrame {
         // Nodes - red circles.
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
-            if(_colors2.contains(locations.keySet().toArray()[i])){ // code is not getting here for some reason
-                printlnConsole("colors  2 "+_colors2);
-                bufferGraphic.setColor(Color.black);
-            }
+            
             if (locations.keySet().toArray()[i]
                     == (Integer) _source) {
                 bufferGraphic.setColor(Color.green);
-            } else if (locations.keySet().toArray()[i]
+            }else if (locations.keySet().toArray()[i]
                     == (Integer) _dest) {
                 bufferGraphic.setColor(Color.blue);
             } else if (locations.keySet().toArray()[i] == (Integer) _selectedNode) {
                 bufferGraphic.setColor(Color.orange);
+            }else if(!kcolor.contains(locations.keySet().toArray()[i])){
+                bufferGraphic.setColor(Color.red);
+            }else if(kcolor.contains(locations.keySet().toArray()[i])){
+                bufferGraphic.setColor(Color.black);
             }
             else if (!cutV.contains(locations.keySet().toArray()[i])) {
                 bufferGraphic.setColor(Color.red);
             }
-            else {
+            else if(cutV.contains(locations.keySet().toArray()[i])){
                 bufferGraphic.setColor(Color.gray);
             }
-            
+            else{
+                bufferGraphic.setBackground(Color.red);
+            }
             
             bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
