@@ -28,9 +28,11 @@ public class Graphify extends javax.swing.JFrame {
     private Map<Integer, Integer> set = new HashMap<Integer, Integer>();
     HashMap<Integer, Integer> visited;
     HashMap<Integer, Integer> color;
-    HashMap<Integer, Integer> kcolors;
+    HashMap<Integer, Integer> fcolors;
     HashSet<Integer> _colors2;
-    ArrayList<Integer> kcolor;
+    ArrayList<Integer> fcolor; 
+    ArrayList<Integer> scolor; 
+    ArrayList<Integer> tcolor; 
     ArrayList<Integer> conn;
     ArrayList<Integer> bconn;
     ArrayList<Integer> cutV;
@@ -50,7 +52,9 @@ public class Graphify extends javax.swing.JFrame {
         queue = new LinkedList<Integer>();
         stack = new Stack<Integer>();
         cutV = new ArrayList<Integer>();
-        kcolor = new ArrayList<Integer>();
+        fcolor = new ArrayList<Integer>();
+        scolor = new ArrayList<Integer>();
+        tcolor = new ArrayList<Integer>(); 
         _colors2 = new HashSet<Integer>();
     }
 
@@ -196,7 +200,9 @@ public class Graphify extends javax.swing.JFrame {
         } else if (SwingUtilities.isRightMouseButton(evt)) {
             glowMap.clear();
             cutV.clear();
-            kcolor.clear();
+            fcolor.clear();
+            scolor.clear();
+            tcolor.clear();
             _colors2.clear();
             _source = -1;
             _dest = -1;
@@ -440,8 +446,13 @@ public class Graphify extends javax.swing.JFrame {
         }
         for(int i = 0; i < V; i++){
             Integer key = (Integer) nodes.keySet().toArray()[i];
-            if(result.get(key) == 1){
-                kcolor.add(key);
+            if(result.get(key) == 0){
+                fcolor.add(key);
+            }
+            else if(result.get(key) == 1){
+                scolor.add(key);
+            }else if(result.get(key) == 2){
+                tcolor.add(key);
             }
             printlnConsole("Vertex "+key+" ---> Color "+result.get(key));
         }
@@ -531,7 +542,9 @@ public class Graphify extends javax.swing.JFrame {
         locations = new HashMap();
         id = 0;
         cutV = new ArrayList<Integer>();
-        kcolor = new ArrayList<Integer>();
+        fcolor = new ArrayList<Integer>();
+        scolor = new ArrayList<Integer>();
+        tcolor = new ArrayList<Integer>();
         _colors2 = new HashSet<Integer>();
         glowMap.clear();
         _source = -1;
@@ -600,19 +613,26 @@ public class Graphify extends javax.swing.JFrame {
             shortestPath(_source, _dest);
         }else if(x == "Cut"){
             glowMap.clear();
+            fcolor.clear();
+            scolor.clear();
+            tcolor.clear();
             txtConsole.setText("");
             cutV = new ArrayList<Integer>();
             AP();
             graph();
         }else if(x == "GColoring"){
             glowMap.clear();
+            cutV.clear();
             if(_source == -1){
                 printlnConsole("Please select a source to begin ");
                 return;
             }
             //txtConsole.setText("");
-            kcolor = new ArrayList<Integer>();
+            fcolor = new ArrayList<Integer>();
+            scolor = new ArrayList<Integer>();
+            tcolor = new ArrayList<Integer>();
             greedyColoring();
+            graph();
         }
 
     }//GEN-LAST:event_jcbAlgoActionPerformed
@@ -673,20 +693,22 @@ public class Graphify extends javax.swing.JFrame {
                 bufferGraphic.setColor(Color.blue);
             } else if (locations.keySet().toArray()[i] == (Integer) _selectedNode) {
                 bufferGraphic.setColor(Color.orange);
-            }else if(!kcolor.contains(locations.keySet().toArray()[i])){
-                bufferGraphic.setColor(Color.red);
-            }else if(kcolor.contains(locations.keySet().toArray()[i])){
-                bufferGraphic.setColor(Color.black);
-            }
-            else if (!cutV.contains(locations.keySet().toArray()[i])) {
+            }else{
                 bufferGraphic.setColor(Color.red);
             }
-            else if(cutV.contains(locations.keySet().toArray()[i])){
+            
+            if(fcolor.contains(locations.keySet().toArray()[i])){
+                bufferGraphic.setColor(Color.green);
+            }else if(scolor.contains(locations.keySet().toArray()[i])){
+                bufferGraphic.setColor(Color.blue);
+            }else if(tcolor.contains(locations.keySet().toArray()[i])){
+                bufferGraphic.setColor(Color.MAGENTA);
+            }
+            if(cutV.contains(locations.keySet().toArray()[i])){
                 bufferGraphic.setColor(Color.gray);
             }
-            else{
-                bufferGraphic.setBackground(Color.red);
-            }
+            
+            
             
             bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
