@@ -8,6 +8,9 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -82,6 +85,14 @@ public class Graphify extends javax.swing.JFrame {
         });
         animationTimer.start();
         greedyresult = new HashMap<Integer, Integer>();
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (checkForChange()) {
+                    System.exit(0);
+                }
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -106,7 +117,7 @@ public class Graphify extends javax.swing.JFrame {
         mnuSaveAs = new javax.swing.JMenuItem();
         mnuQuit = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
         pnlGraph.setBackground(new java.awt.Color(255, 255, 255));
         pnlGraph.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -652,7 +663,6 @@ public class Graphify extends javax.swing.JFrame {
     //[0, 2, 19, 5, 7, 9, 14]
 
     private void reset() {
-        changesMade = true;
         nodes = new HashMap();
         locations = new HashMap();
         id = 0;
@@ -674,6 +684,7 @@ public class Graphify extends javax.swing.JFrame {
     }//GEN-LAST:event_btnPrintListActionPerformed
 
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
+        changesMade = true;
         reset();
     }//GEN-LAST:event_btnResetActionPerformed
 
@@ -791,7 +802,10 @@ public class Graphify extends javax.swing.JFrame {
     }//GEN-LAST:event_mnuNewActionPerformed
 
     private void mnuQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuQuitActionPerformed
-        System.exit(0);
+        if (checkForChange()) {
+            System.exit(0);
+        }
+
     }//GEN-LAST:event_mnuQuitActionPerformed
 
     private void mnuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveActionPerformed
@@ -1014,15 +1028,17 @@ public class Graphify extends javax.swing.JFrame {
     }
 
     private boolean checkForChange() {
-        int option = JOptionPane.showConfirmDialog(this,
-                "Changes have been made. Do you want to save before continuing?", "", JOptionPane.YES_NO_CANCEL_OPTION);
-        if (option == JOptionPane.YES_OPTION) {
-            justSave();
-            return true;
-        } else if (option == JOptionPane.CANCEL_OPTION) {
-            return false;
-        } else if (option == JOptionPane.NO_OPTION) {
-            return true;
+        if (changesMade) {
+            int option = JOptionPane.showConfirmDialog(this,
+                    "Changes have been made. Do you want to save before continuing?", "", JOptionPane.YES_NO_CANCEL_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
+                justSave();
+                return true;
+            } else if (option == JOptionPane.CANCEL_OPTION) {
+                return false;
+            } else if (option == JOptionPane.NO_OPTION) {
+                return true;
+            }
         }
         return true;
     }
