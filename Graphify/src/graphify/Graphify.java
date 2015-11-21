@@ -296,6 +296,7 @@ public class Graphify extends javax.swing.JFrame {
         } else if (SwingUtilities.isRightMouseButton(evt)) {
             changesMade = true;
             glowMap.clear();
+            greedyresult.clear();
             cutV.clear();
             _colors2.clear();
             _source = -1;
@@ -658,6 +659,7 @@ public class Graphify extends javax.swing.JFrame {
         cutV = new ArrayList<Integer>();
         _colors2 = new HashSet<Integer>();
         glowMap.clear();
+        greedyresult.clear();
         _source = -1;
         _dest = -1;
         graph();
