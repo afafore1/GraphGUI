@@ -34,7 +34,10 @@ We are working on running several algorithms and making an efficient way to visu
 - CTRL SHIFT S to save as
 - CTRL Q to Quit
 
+**Test file in SSandTestfile folder**
 
+
+**ScreenShots**
 ![ScreenShot for bfs](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/bfs.jpg)
 ![ScreenShot for Graph Coloring](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/VColoring.jpg)
 ![ScreenShot for Cut vertices](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/cut.jpg)
