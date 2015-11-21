@@ -726,6 +726,7 @@ public class Graphify extends javax.swing.JFrame {
         txtConsole.setText("");
         visited.clear();
         set.clear();
+        greedyresult.clear();
         if (x == "Bipartite") {
             glowMap.clear();
             txtConsole.setText("");
@@ -767,6 +768,7 @@ public class Graphify extends javax.swing.JFrame {
             }
             greedyColoring(2);
             graph();
+            greedyresult.clear();
         } else if (x == "Connectedness") {
             txtConsole.setText("");
             if (_source == -1) {
