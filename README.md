@@ -38,8 +38,17 @@ We are working on running several algorithms and making an efficient way to visu
 
 
 **ScreenShots**
-![ScreenShot for bfs](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/bfs.jpg)
-![ScreenShot for Graph Coloring](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/VColoring.jpg)
+
+*bfs*
+![ScreenShot for bfs](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/bfs.PNG)
+
+*dfs*
+![ScreenShot for bfs](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/dfs.PNG)
+
+*Graph Coloring*
+![ScreenShot for Graph Coloring](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/VColoring.PNG)
+
+*Cut*
 ![ScreenShot for Cut vertices](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/cut.jpg)
 
 
