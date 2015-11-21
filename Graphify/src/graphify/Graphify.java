@@ -29,7 +29,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Graphify extends javax.swing.JFrame {
-
+    
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     HashMap<Integer, Integer> glowMap = new HashMap<>();
     HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
@@ -71,7 +71,7 @@ public class Graphify extends javax.swing.JFrame {
         tcolor = new ArrayList<Integer>();
         _colors2 = new HashSet<Integer>();
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -273,7 +273,7 @@ public class Graphify extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
     private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMousePressed
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
         if (_selectedNode < 0 && SwingUtilities.isLeftMouseButton(evt)) {
@@ -293,7 +293,7 @@ public class Graphify extends javax.swing.JFrame {
             _dest = -1;
             nodes.remove(_selectedNode);
             locations.remove(_selectedNode);
-
+            
             for (HashSet<Integer> connections : nodes.values()) {
                 for (int j = 0; j < connections.size(); j++) {
                     Integer connection = (Integer) connections.toArray()[j];
@@ -316,7 +316,7 @@ public class Graphify extends javax.swing.JFrame {
         }
         graph();
     }//GEN-LAST:event_pnlGraphMousePressed
-
+    
     private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseDragged
         if (_selectedNode >= 0) {
             if (SwingUtilities.isLeftMouseButton(evt)) {
@@ -335,12 +335,12 @@ public class Graphify extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_pnlGraphMouseDragged
-
+    
     private void pnlGraphComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_pnlGraphComponentResized
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
     }//GEN-LAST:event_pnlGraphComponentResized
-
+    
     private void pnlGraphMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseReleased
         if (_selectedNode >= 0) {
             int destination = nodeSelected(evt.getX(), evt.getY());
@@ -353,11 +353,11 @@ public class Graphify extends javax.swing.JFrame {
         }
         graph();
     }//GEN-LAST:event_pnlGraphMouseReleased
-
+    
     public HashSet<Integer> getEdge(int source) {
         return nodes.get(source);
     }
-
+    
     void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
         int children = 0;
         visited.put(u, 0);
@@ -365,7 +365,7 @@ public class Graphify extends javax.swing.JFrame {
         disc.put(u, time);
         low.put(u, time);
         Iterator<Integer> i = getEdge(u).iterator();
-
+        
         while (i.hasNext()) {
             int v = i.next(); // v is current adj to u
             if (visited.get(v) == -1) {
@@ -374,7 +374,7 @@ public class Graphify extends javax.swing.JFrame {
                 APF(v, visited, disc, low, parent, ap); // recursive for it
                 int val = Math.min(low.get(u), low.get(v));
                 low.put(u, val);
-
+                
                 if (u == _source && children > 1) {
                     ap.put(u, 1);
                 }
@@ -388,7 +388,7 @@ public class Graphify extends javax.swing.JFrame {
             }
         }
     }
-
+    
     void AP() {
         int V = nodes.size();
         visited = new HashMap<>();
@@ -396,21 +396,21 @@ public class Graphify extends javax.swing.JFrame {
         HashMap<Integer, Integer> low = new HashMap<>();
         HashMap<Integer, Integer> parent = new HashMap<>();
         HashMap<Integer, Integer> ap = new HashMap<>();
-
+        
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             parent.put(key, -1);
             visited.put(key, -1);
             ap.put(key, 0);
         }
-
+        
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             if (visited.get(key) == -1) {
                 APF(key, visited, disc, low, parent, ap);
             }
         }
-
+        
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             if (ap.get(key) == 1) {
@@ -419,7 +419,7 @@ public class Graphify extends javax.swing.JFrame {
             }
         }
     }
-
+    
     void dfs(int source) {
         int V = nodes.size();
         distTo = new HashMap<>();
@@ -460,7 +460,7 @@ public class Graphify extends javax.swing.JFrame {
         }
         printlnConsole("order is " + bconn);
     }
-
+    
     void bfs(int source) {
         int V = nodes.size();
         distTo = new HashMap<>();
@@ -493,7 +493,7 @@ public class Graphify extends javax.swing.JFrame {
         }
         printlnConsole("Order is " + conn);
     }
-
+    
     boolean isConnected() {
         dfs(_source);
         for (int i = 0; i < nodes.size(); i++) {
@@ -504,7 +504,7 @@ public class Graphify extends javax.swing.JFrame {
         }
         return true;
     }
-
+    
     boolean isEulerian() {
         int noOfOdds = 0;
         if (isConnected()) {
@@ -523,7 +523,7 @@ public class Graphify extends javax.swing.JFrame {
         }
         return false;
     }
-
+    
     void greedyColoring(int nc) {
         int V = nodes.size();
         HashMap<Integer, Integer> result = new HashMap<Integer, Integer>();
@@ -574,9 +574,9 @@ public class Graphify extends javax.swing.JFrame {
             }
             printlnConsole("Vertex " + key + " ---> Color " + result.get(key));
         }
-
+        
     }
-
+    
     void Bipartite(int source) { // will test for 3
         int V = nodes.size();
         color = new HashMap<Integer, Integer>();
@@ -609,17 +609,17 @@ public class Graphify extends javax.swing.JFrame {
         } else {
             printlnConsole("Graph is bipartite");
         }
-
+        
     }
-
+    
     public int hasPath(int v) {
         return visited.get(v);
     }
-
+    
     public int distTo(int v) {
         return distTo.get(v);
     }
-
+    
     public void shortestPath(int v, int e) {
         if (e == v) {
             printlnConsole(v + "-->" + v);
@@ -643,7 +643,7 @@ public class Graphify extends javax.swing.JFrame {
         graph();
     }
     //[0, 2, 19, 5, 7, 9, 14]
-
+    
     private void reset() {
         changesMade = true;
         nodes = new HashMap();
@@ -659,7 +659,7 @@ public class Graphify extends javax.swing.JFrame {
         _dest = -1;
         graph();
     }
-
+    
     private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintListActionPerformed
         for (int i = 0; i < nodes.size(); i++) {
             int key = (Integer) nodes.keySet().toArray()[i];
@@ -667,11 +667,11 @@ public class Graphify extends javax.swing.JFrame {
         }
         printlnConsole("Source is: " + _source);
     }//GEN-LAST:event_btnPrintListActionPerformed
-
+    
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
         reset();
     }//GEN-LAST:event_btnResetActionPerformed
-
+    
     private void pnlGraphMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseClicked
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
         if (evt.getClickCount() == 2) {
@@ -695,15 +695,15 @@ public class Graphify extends javax.swing.JFrame {
             graph();
         }
     }//GEN-LAST:event_pnlGraphMouseClicked
-
+    
     private void btnClearConsoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearConsoleActionPerformed
         txtConsole.setText("");
     }//GEN-LAST:event_btnClearConsoleActionPerformed
-
+    
     private void jcbAlgoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbAlgoActionPerformed
-
+        
     }//GEN-LAST:event_jcbAlgoActionPerformed
-
+    
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
         // TODO add your handling code here:
         String x = String.valueOf(jcbAlgo.getSelectedItem());
@@ -780,39 +780,40 @@ public class Graphify extends javax.swing.JFrame {
                 printlnConsole("Eulerian cycle does not exist");
             }
         }
-
+        
     }//GEN-LAST:event_btnStartActionPerformed
-
+    
     private void mnuNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNewActionPerformed
-        reset();
-        currentProject = null;
+        if (checkForChange()) {
+            reset();
+            currentProject = null;
+            changesMade = false;
+        }
     }//GEN-LAST:event_mnuNewActionPerformed
-
+    
     private void mnuQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuQuitActionPerformed
         System.exit(0);
     }//GEN-LAST:event_mnuQuitActionPerformed
-
+    
     private void mnuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveActionPerformed
-        if (currentProject == null) {
-            saveAs();
-        } else {
-            save(currentProject);
-        }
+        justSave();
     }//GEN-LAST:event_mnuSaveActionPerformed
-
+    
     private void mnuSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveAsActionPerformed
         saveAs();
     }//GEN-LAST:event_mnuSaveAsActionPerformed
-
+    
     private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuOpenActionPerformed
         if (checkForChange()) {
             JFileChooser theChooser = new JFileChooser();
             theChooser.setFileFilter(new FileNameExtensionFilter
-                ("Graphify files", "sgf"));
+                        ("Graphify files", "sgf"));
             if (theChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 try {
+                    changesMade = false;
                     reset();
-                    File theFile = new File(theChooser.getSelectedFile().getPath());
+                    currentProject = theChooser.getSelectedFile().getPath();
+                    File theFile = new File(currentProject);
                     Scanner scanner = new Scanner(theFile);
                     while (scanner.hasNext()) {
                         String currentLine = scanner.nextLine();
@@ -826,7 +827,9 @@ public class Graphify extends javax.swing.JFrame {
                         }
                         nodes.put(key, connections);
                         locations.put(key, new Point(x, y));
+                        id = key;
                     }
+                    id++;
                     graph();
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(Graphify.class.getName()).log(Level.SEVERE, null, ex);
@@ -835,19 +838,19 @@ public class Graphify extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_mnuOpenActionPerformed
-
+    
     private String getNodeInfo(int nodeId) {
         if (nodeId == -1) {
             return "None";
         }
         return "" + nodeId;
     }
-
+    
     private void graph() {
         bufferGraphic.setColor(Color.white);
         bufferGraphic.fillRect(0, 0, pnlGraph.getWidth(), pnlGraph.getHeight());
         connectionCache.clear();
-
+        
         // Regular connections
         bufferGraphic.setColor(Color.black);
         bufferGraphic.setStroke(new BasicStroke(2));
@@ -867,7 +870,7 @@ public class Graphify extends javax.swing.JFrame {
                 }
             }
         }
-
+        
         // Glowing connections
         bufferGraphic.setColor(new Color(200, 40, 232));
         bufferGraphic.setStroke(new BasicStroke(8));
@@ -880,11 +883,11 @@ public class Graphify extends javax.swing.JFrame {
                         destPoint.x, destPoint.y);
             }
         }
-
+        
         // Nodes - red circles.
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
-
+            
             if (locations.keySet().toArray()[i]
                     == (Integer) _source) {
                 bufferGraphic.setColor(Color.green);
@@ -896,7 +899,7 @@ public class Graphify extends javax.swing.JFrame {
             } else {
                 bufferGraphic.setColor(Color.red);
             }
-
+            
             if (fcolor.contains(locations.keySet().toArray()[i])) {
                 bufferGraphic.setColor(Color.green);
             } else if (scolor.contains(locations.keySet().toArray()[i])) {
@@ -907,11 +910,11 @@ public class Graphify extends javax.swing.JFrame {
             if (cutV.contains(locations.keySet().toArray()[i])) {
                 bufferGraphic.setColor(Color.gray);
             }
-
+            
             bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
         }
-
+        
         // Node labels.
         bufferGraphic.setColor(Color.blue);
         for (int i = 0; i < locations.size(); i++) {
@@ -923,7 +926,7 @@ public class Graphify extends javax.swing.JFrame {
         lblInfo.setText("Source: " + getNodeInfo(_source)
                 + " - Destination: " + getNodeInfo(_dest));
     }
-
+    
     private int nodeSelected(int x, int y) {
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
@@ -936,15 +939,15 @@ public class Graphify extends javax.swing.JFrame {
         }
         return -1;
     }
-
+    
     private void printConsole(String string) {
         txtConsole.append(string);
     }
-
+    
     private void printlnConsole(String string) {
         txtConsole.append(string + "\n");
     }
-
+    
     private String getSaveString() {
         String result = "";
         for (int i = 0; i < nodes.size(); i++) {
@@ -956,7 +959,6 @@ public class Graphify extends javax.swing.JFrame {
             }
             result += "\n";
         }
-        printlnConsole(result);
         return result;
     }
     
@@ -973,11 +975,11 @@ public class Graphify extends javax.swing.JFrame {
             Logger.getLogger(Graphify.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     private void saveAs() {
         JFileChooser theChooser = new JFileChooser();
         theChooser.setFileFilter(new FileNameExtensionFilter
-                ("Graphify files", "sgf"));
+                        ("Graphify files", "sgf"));
         if (theChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             String nominatedPath = theChooser.getSelectedFile().getPath();
             if (!nominatedPath.endsWith(".sgf")) {
@@ -988,12 +990,19 @@ public class Graphify extends javax.swing.JFrame {
         }
     }
     
+    private void justSave() {
+        if (currentProject == null) {
+            saveAs();
+        } else {
+            save(currentProject);
+        }
+    }
     private boolean checkForChange() {
-        int option = JOptionPane.showConfirmDialog(this, 
+        int option = JOptionPane.showConfirmDialog(this,
                 "Changes have been made. Do you want to save before continuing?"
                 , "", JOptionPane.YES_NO_CANCEL_OPTION);
         if (option == JOptionPane.YES_OPTION) {
-            saveAs();
+            justSave();
             return true;
         } else if (option == JOptionPane.CANCEL_OPTION) {
             return false;
@@ -1002,13 +1011,13 @@ public class Graphify extends javax.swing.JFrame {
         }
         return true;
     }
-
+    
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         graph();
     }
-
+    
     /**
      * @param args the command line arguments
      */
@@ -1016,8 +1025,8 @@ public class Graphify extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+        * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+        */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -1035,7 +1044,7 @@ public class Graphify extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Graphify.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -1045,8 +1054,8 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
     }
-
-
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClearConsole;
     private javax.swing.JButton btnPrintList;
