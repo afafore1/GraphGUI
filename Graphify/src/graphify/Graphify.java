@@ -6,6 +6,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,8 +17,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Scanner;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Graphify extends javax.swing.JFrame {
 
@@ -44,7 +56,9 @@ public class Graphify extends javax.swing.JFrame {
     static int _dest = -1;
     Image bufferImage;
     Graphics2D bufferGraphic;
-
+    String currentProject = null;
+    boolean changesMade = false;
+    
     public Graphify() {
         initComponents();
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
@@ -69,9 +83,16 @@ public class Graphify extends javax.swing.JFrame {
         lblResult = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtConsole = new javax.swing.JTextArea();
-        btnReset1 = new javax.swing.JButton();
+        btnClearConsole = new javax.swing.JButton();
         jcbAlgo = new javax.swing.JComboBox<>();
         btnStart = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        mnuFile = new javax.swing.JMenu();
+        mnuNew = new javax.swing.JMenuItem();
+        mnuOpen = new javax.swing.JMenuItem();
+        mnuSave = new javax.swing.JMenuItem();
+        mnuSaveAs = new javax.swing.JMenuItem();
+        mnuQuit = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -107,7 +128,7 @@ public class Graphify extends javax.swing.JFrame {
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 303, Short.MAX_VALUE)
+            .addGap(0, 282, Short.MAX_VALUE)
         );
 
         btnReset.setText("Reset");
@@ -132,10 +153,10 @@ public class Graphify extends javax.swing.JFrame {
         txtConsole.setRows(5);
         jScrollPane1.setViewportView(txtConsole);
 
-        btnReset1.setText("Clear Console");
-        btnReset1.addActionListener(new java.awt.event.ActionListener() {
+        btnClearConsole.setText("Clear Console");
+        btnClearConsole.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnReset1ActionPerformed(evt);
+                btnClearConsoleActionPerformed(evt);
             }
         });
 
@@ -153,6 +174,57 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
 
+        mnuFile.setText("File");
+
+        mnuNew.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
+        mnuNew.setText("New");
+        mnuNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuNewActionPerformed(evt);
+            }
+        });
+        mnuFile.add(mnuNew);
+
+        mnuOpen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+        mnuOpen.setText("Open");
+        mnuOpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuOpenActionPerformed(evt);
+            }
+        });
+        mnuFile.add(mnuOpen);
+
+        mnuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+        mnuSave.setText("Save");
+        mnuSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSaveActionPerformed(evt);
+            }
+        });
+        mnuFile.add(mnuSave);
+
+        mnuSaveAs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
+        mnuSaveAs.setText("Save as...");
+        mnuSaveAs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSaveAsActionPerformed(evt);
+            }
+        });
+        mnuFile.add(mnuSaveAs);
+
+        mnuQuit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
+        mnuQuit.setText("Quit");
+        mnuQuit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuQuitActionPerformed(evt);
+            }
+        });
+        mnuFile.add(mnuQuit);
+
+        jMenuBar1.add(mnuFile);
+
+        setJMenuBar(jMenuBar1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -164,7 +236,7 @@ public class Graphify extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnReset)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnReset1)
+                        .addComponent(btnClearConsole)
                         .addGap(44, 44, 44)
                         .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -193,7 +265,7 @@ public class Graphify extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReset)
                     .addComponent(btnPrintList)
-                    .addComponent(btnReset1)
+                    .addComponent(btnClearConsole)
                     .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnStart))
                 .addContainerGap())
@@ -205,10 +277,12 @@ public class Graphify extends javax.swing.JFrame {
     private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMousePressed
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
         if (_selectedNode < 0 && SwingUtilities.isLeftMouseButton(evt)) {
+            changesMade = true;
             nodes.put(id, new HashSet());
             locations.put(id++, new Point(evt.getX(), evt.getY()));
         } else if (SwingUtilities.isLeftMouseButton(evt)) {
         } else if (SwingUtilities.isRightMouseButton(evt)) {
+            changesMade = true;
             glowMap.clear();
             cutV.clear();
             fcolor.clear();
@@ -257,6 +331,7 @@ public class Graphify extends javax.swing.JFrame {
                 locations.get(_selectedNode).x = evt.getX();
                 locations.get(_selectedNode).y = evt.getY();
                 graph();
+                changesMade = true;
             }
         }
     }//GEN-LAST:event_pnlGraphMouseDragged
@@ -273,6 +348,7 @@ public class Graphify extends javax.swing.JFrame {
                 nodes.get(_selectedNode).add(destination);
                 nodes.get(destination).add(_selectedNode);
                 _selectedNode = -1;
+                changesMade = true;
             }
         }
         graph();
@@ -568,15 +644,8 @@ public class Graphify extends javax.swing.JFrame {
     }
     //[0, 2, 19, 5, 7, 9, 14]
 
-    private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintListActionPerformed
-        for (int i = 0; i < nodes.size(); i++) {
-            int key = (Integer) nodes.keySet().toArray()[i];
-            printlnConsole(key + "->" + getEdge(key));
-        }
-        printlnConsole("Source is: " + _source);
-    }//GEN-LAST:event_btnPrintListActionPerformed
-
-    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
+    private void reset() {
+        changesMade = true;
         nodes = new HashMap();
         locations = new HashMap();
         id = 0;
@@ -589,6 +658,18 @@ public class Graphify extends javax.swing.JFrame {
         _source = -1;
         _dest = -1;
         graph();
+    }
+
+    private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintListActionPerformed
+        for (int i = 0; i < nodes.size(); i++) {
+            int key = (Integer) nodes.keySet().toArray()[i];
+            printlnConsole(key + "->" + getEdge(key));
+        }
+        printlnConsole("Source is: " + _source);
+    }//GEN-LAST:event_btnPrintListActionPerformed
+
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
+        reset();
     }//GEN-LAST:event_btnResetActionPerformed
 
     private void pnlGraphMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseClicked
@@ -615,9 +696,9 @@ public class Graphify extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_pnlGraphMouseClicked
 
-    private void btnReset1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReset1ActionPerformed
+    private void btnClearConsoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearConsoleActionPerformed
         txtConsole.setText("");
-    }//GEN-LAST:event_btnReset1ActionPerformed
+    }//GEN-LAST:event_btnClearConsoleActionPerformed
 
     private void jcbAlgoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbAlgoActionPerformed
 
@@ -701,6 +782,60 @@ public class Graphify extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_btnStartActionPerformed
+
+    private void mnuNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNewActionPerformed
+        reset();
+        currentProject = null;
+    }//GEN-LAST:event_mnuNewActionPerformed
+
+    private void mnuQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuQuitActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_mnuQuitActionPerformed
+
+    private void mnuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveActionPerformed
+        if (currentProject == null) {
+            saveAs();
+        } else {
+            save(currentProject);
+        }
+    }//GEN-LAST:event_mnuSaveActionPerformed
+
+    private void mnuSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveAsActionPerformed
+        saveAs();
+    }//GEN-LAST:event_mnuSaveAsActionPerformed
+
+    private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuOpenActionPerformed
+        if (checkForChange()) {
+            JFileChooser theChooser = new JFileChooser();
+            theChooser.setFileFilter(new FileNameExtensionFilter
+                ("Graphify files", "sgf"));
+            if (theChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                try {
+                    reset();
+                    File theFile = new File(theChooser.getSelectedFile().getPath());
+                    Scanner scanner = new Scanner(theFile);
+                    while (scanner.hasNext()) {
+                        String currentLine = scanner.nextLine();
+                        String[] tokens = currentLine.split(",");
+                        Integer key = Integer.parseInt(tokens[0]);
+                        Integer x = Integer.parseInt(tokens[1]);
+                        Integer y = Integer.parseInt(tokens[2]);
+                        HashSet<Integer> connections = new HashSet();
+                        for (int i = 3; i < tokens.length; i++) {
+                            connections.add(Integer.parseInt(tokens[i]));
+                        }
+                        nodes.put(key, connections);
+                        locations.put(key, new Point(x, y));
+                    }
+                    graph();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(Graphify.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        }
+    }//GEN-LAST:event_mnuOpenActionPerformed
+
     private String getNodeInfo(int nodeId) {
         if (nodeId == -1) {
             return "None";
@@ -810,6 +945,64 @@ public class Graphify extends javax.swing.JFrame {
         txtConsole.append(string + "\n");
     }
 
+    private String getSaveString() {
+        String result = "";
+        for (int i = 0; i < nodes.size(); i++) {
+            int key = (int) nodes.keySet().toArray()[i];
+            result += key + ",";
+            result += locations.get(key).x + "," + locations.get(key).y;
+            for (Integer connection: nodes.get(key)) {
+                result += "," + connection;
+            }
+            result += "\n";
+        }
+        printlnConsole(result);
+        return result;
+    }
+    
+    private void save(String path) {
+        try {
+            File fileToSave = new File(path);
+            FileWriter writer;
+            writer = new FileWriter(fileToSave);
+            String stringToWrite = getSaveString();
+            writer.write(stringToWrite);
+            changesMade = false;
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Graphify.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void saveAs() {
+        JFileChooser theChooser = new JFileChooser();
+        theChooser.setFileFilter(new FileNameExtensionFilter
+                ("Graphify files", "sgf"));
+        if (theChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String nominatedPath = theChooser.getSelectedFile().getPath();
+            if (!nominatedPath.endsWith(".sgf")) {
+                nominatedPath += ".sgf";
+            }
+            currentProject = nominatedPath;
+            save(currentProject);
+        }
+    }
+    
+    private boolean checkForChange() {
+        int option = JOptionPane.showConfirmDialog(this, 
+                "Changes have been made. Do you want to save before continuing?"
+                , "", JOptionPane.YES_NO_CANCEL_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+            saveAs();
+            return true;
+        } else if (option == JOptionPane.CANCEL_OPTION) {
+            return false;
+        } else if (option == JOptionPane.NO_OPTION) {
+            return true;
+        }
+        return true;
+    }
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -855,14 +1048,21 @@ public class Graphify extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClearConsole;
     private javax.swing.JButton btnPrintList;
     private javax.swing.JButton btnReset;
-    private javax.swing.JButton btnReset1;
     private javax.swing.JButton btnStart;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox<String> jcbAlgo;
     private java.awt.Label lblInfo;
     private javax.swing.JLabel lblResult;
+    private javax.swing.JMenu mnuFile;
+    private javax.swing.JMenuItem mnuNew;
+    private javax.swing.JMenuItem mnuOpen;
+    private javax.swing.JMenuItem mnuQuit;
+    private javax.swing.JMenuItem mnuSave;
+    private javax.swing.JMenuItem mnuSaveAs;
     private javax.swing.JPanel pnlGraph;
     private javax.swing.JTextArea txtConsole;
     // End of variables declaration//GEN-END:variables
