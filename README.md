@@ -10,6 +10,10 @@ We are working on running several algorithms and making an efficient way to visu
 - Dfs
 - You can find all cut vertices (Using Dfs)
 - Check if graph is bipartite (Using Bfs)
+- Graph Coloring
+- Check connectedness
+- Find Euler path
+- Find Euler Cycle
 
 **How to Use**
 - Clone source (Note: you can only compile with Netbeans)
@@ -18,11 +22,17 @@ We are working on running several algorithms and making an efficient way to visu
 
 **Controls**
 - Left click to place vertices
-- Drag mouse to place edges between vertices
+- Left Click and Drag mouse to place edges between vertices
 - Right click to remove vertex
-- Middle click to move vertex around
+- Middle click and Drag to move vertex around
 - Double click to choose start vertex and destination vertex (Colors and label will be updated).
-- Click dropdown to choose what you wish to do
+- Click dropdown to select an algorithm to run
+- Click start
+- CTRL O to open
+- CTRL N for new file
+- CTRL S to save
+- CTRL SHIFT S to save as
+- CTRL Q to Quit
 
 
 
