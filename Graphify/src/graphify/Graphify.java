@@ -30,9 +30,9 @@ public class Graphify extends javax.swing.JFrame {
     HashMap<Integer, Integer> color;
     HashMap<Integer, Integer> fcolors;
     HashSet<Integer> _colors2;
-    ArrayList<Integer> fcolor; 
-    ArrayList<Integer> scolor; 
-    ArrayList<Integer> tcolor; 
+    ArrayList<Integer> fcolor;
+    ArrayList<Integer> scolor;
+    ArrayList<Integer> tcolor;
     ArrayList<Integer> conn;
     ArrayList<Integer> bconn;
     ArrayList<Integer> cutV;
@@ -54,7 +54,7 @@ public class Graphify extends javax.swing.JFrame {
         cutV = new ArrayList<Integer>();
         fcolor = new ArrayList<Integer>();
         scolor = new ArrayList<Integer>();
-        tcolor = new ArrayList<Integer>(); 
+        tcolor = new ArrayList<Integer>();
         _colors2 = new HashSet<Integer>();
     }
 
@@ -71,6 +71,7 @@ public class Graphify extends javax.swing.JFrame {
         txtConsole = new javax.swing.JTextArea();
         btnReset1 = new javax.swing.JButton();
         jcbAlgo = new javax.swing.JComboBox<>();
+        btnStart = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -145,6 +146,13 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
 
+        btnStart.setText("Start");
+        btnStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStartActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -159,7 +167,9 @@ public class Graphify extends javax.swing.JFrame {
                         .addComponent(btnReset1)
                         .addGap(44, 44, 44)
                         .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 147, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnStart)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 315, Short.MAX_VALUE)
                         .addComponent(btnPrintList))
                     .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -184,7 +194,8 @@ public class Graphify extends javax.swing.JFrame {
                     .addComponent(btnReset)
                     .addComponent(btnPrintList)
                     .addComponent(btnReset1)
-                    .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnStart))
                 .addContainerGap())
         );
 
@@ -278,7 +289,7 @@ public class Graphify extends javax.swing.JFrame {
         disc.put(u, time);
         low.put(u, time);
         Iterator<Integer> i = getEdge(u).iterator();
-        
+
         while (i.hasNext()) {
             int v = i.next(); // v is current adj to u
             if (visited.get(v) == -1) {
@@ -309,7 +320,7 @@ public class Graphify extends javax.swing.JFrame {
         HashMap<Integer, Integer> low = new HashMap<>();
         HashMap<Integer, Integer> parent = new HashMap<>();
         HashMap<Integer, Integer> ap = new HashMap<>();
-        
+
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             parent.put(key, -1);
@@ -406,83 +417,88 @@ public class Graphify extends javax.swing.JFrame {
         }
         printlnConsole("Order is " + conn);
     }
-    boolean isConnected(){
+
+    boolean isConnected() {
         dfs(_source);
-        for(int i = 0; i < nodes.size(); i++){
+        for (int i = 0; i < nodes.size(); i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
-            if(visited.get(key) == -1) return false;
+            if (visited.get(key) == -1) {
+                return false;
+            }
         }
         return true;
     }
-    
-    boolean isEulerian(){
+
+    boolean isEulerian() {
         int noOfOdds = 0;
-        if(isConnected()){
-            for(int i = 0; i < nodes.size(); i++){
+        if (isConnected()) {
+            for (int i = 0; i < nodes.size(); i++) {
                 Integer key = (Integer) nodes.keySet().toArray()[i];
                 int keyEdgeSize = getEdge(key).size();
-                if(keyEdgeSize % 2 != 0) noOfOdds++;
+                if (keyEdgeSize % 2 != 0) {
+                    noOfOdds++;
+                }
             }
-        }else{
+        } else {
             return false;
         }
-        if(noOfOdds == 2) return true;
+        if (noOfOdds == 2) {
+            return true;
+        }
         return false;
     }
-    
-    void greedyColoring(int nc){
+
+    void greedyColoring(int nc) {
         int V = nodes.size();
         HashMap<Integer, Integer> result = new HashMap<Integer, Integer>();
         HashMap<Integer, Integer> available = new HashMap<Integer, Integer>();
-        for(int i = 0; i < V; i++){
+        for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
             result.put(key, -1);
             available.put(key, 0); //set all to false
         }
         result.put(_source, 0);
-        for(int x = 0; x < V; x++){
+        for (int x = 0; x < V; x++) {
             Integer key = (Integer) nodes.keySet().toArray()[x];
             HashSet<Integer> kList = getEdge(key);
             int u = 0;
-            while(u < kList.size()){
-                Integer k = (Integer)kList.toArray()[u];
-                if(result.get(k) != -1){
+            while (u < kList.size()) {
+                Integer k = (Integer) kList.toArray()[u];
+                if (result.get(k) != -1) {
                     available.put(result.get(k), 1);
                 }
                 u++;
             }
             // find first avail color
             Integer nColor = 0;
-            for(int i = 0; i < V; i++){
+            for (int i = 0; i < V; i++) {
                 nColor = (Integer) nodes.keySet().toArray()[i];
-                if(available.get(nColor) == 0) break;
+                if (available.get(nColor) == 0) {
+                    break;
+                }
             }
             result.put(key, nColor);
             u = 0;
-            while(u < kList.size()){
-                Integer k = (Integer)kList.toArray()[u];
-                if(result.get(k) != -1){
+            while (u < kList.size()) {
+                Integer k = (Integer) kList.toArray()[u];
+                if (result.get(k) != -1) {
                     available.put(result.get(k), 0);
                 }
                 u++;
             }
         }
-        for(int i = 0; i < V; i++){
+        for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
-            if(result.get(key) == 0){
+            if (result.get(key) == 0) {
                 fcolor.add(key);
-            }
-            else if(result.get(key) == 1){
+            } else if (result.get(key) == 1) {
                 scolor.add(key);
-            }else if(result.get(key) == 2){
+            } else if (result.get(key) == 2) {
                 tcolor.add(key);
             }
-            printlnConsole("Vertex "+key+" ---> Color "+result.get(key));
+            printlnConsole("Vertex " + key + " ---> Color " + result.get(key));
         }
-        
-        
-        
-        
+
     }
 
     void Bipartite(int source) { // will test for 3
@@ -505,19 +521,19 @@ public class Graphify extends javax.swing.JFrame {
                 if (color.get(element) == color.get(key)) {
                     _colors2.add(element);
                     _colors2.add(key);
-                }else if(color.get(key) == -1){
+                } else if (color.get(key) == -1) {
                     color.put(key, 1 - color.get(element));
                     queue.add(key);
                 }
                 x++;
             }
         }
-        if(_colors2.size() > 1){
-            printlnConsole("Graph is not bipartite at "+_colors2.toString());
-        }else{
+        if (_colors2.size() > 1) {
+            printlnConsole("Graph is not bipartite at " + _colors2.toString());
+        } else {
             printlnConsole("Graph is bipartite");
         }
-        
+
     }
 
     public int hasPath(int v) {
@@ -604,37 +620,41 @@ public class Graphify extends javax.swing.JFrame {
     }//GEN-LAST:event_btnReset1ActionPerformed
 
     private void jcbAlgoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbAlgoActionPerformed
+
+    }//GEN-LAST:event_jcbAlgoActionPerformed
+
+    private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
         // TODO add your handling code here:
         String x = String.valueOf(jcbAlgo.getSelectedItem());
         if (x == "Bipartite") {
             glowMap.clear();
             txtConsole.setText("");
-            if(_source == -1){
+            if (_source == -1) {
                 printlnConsole("Please choose a source by double clicking a node");
                 return;
             }
             Bipartite(_source);
-        }else if(x == "DFS"){
+        } else if (x == "DFS") {
             glowMap.clear();
             txtConsole.setText("");
-            if(_source == -1){
+            if (_source == -1) {
                 printlnConsole("Please choose a source by double clicking a node");
                 return;
             }
             dfs(_source);
-        }else if(x == "BFS"){
+        } else if (x == "BFS") {
             txtConsole.setText("");
-            if(_source == -1 || _dest == -1){
-                if(_source == -1){
+            if (_source == -1 || _dest == -1) {
+                if (_source == -1) {
                     printlnConsole("Please choose a source by double clicking a node");
-                }else{
+                } else {
                     printlnConsole("Please choose a destination by double clicking a node");
-                }                
+                }
                 return;
             }
             bfs(_source);
             shortestPath(_source, _dest);
-        }else if(x == "Cut"){
+        } else if (x == "Cut") {
             glowMap.clear();
             fcolor.clear();
             scolor.clear();
@@ -643,10 +663,10 @@ public class Graphify extends javax.swing.JFrame {
             cutV = new ArrayList<Integer>();
             AP();
             graph();
-        }else if(x == "GColoring"){
+        } else if (x == "GColoring") {
             glowMap.clear();
             cutV.clear();
-            if(_source == -1){
+            if (_source == -1) {
                 printlnConsole("Please select a source to begin ");
                 return;
             }
@@ -656,31 +676,31 @@ public class Graphify extends javax.swing.JFrame {
             tcolor = new ArrayList<Integer>();
             greedyColoring(2);
             graph();
-        }else if(x == "Connectedness"){
+        } else if (x == "Connectedness") {
             txtConsole.setText("");
-            if(_source == -1){
+            if (_source == -1) {
                 printlnConsole("Please select a source to begin");
                 return;
             }
-            if(isConnected()){
+            if (isConnected()) {
                 printlnConsole("Graph is Connected");
-            }else{
+            } else {
                 printlnConsole("Graph is a disconnected Graph");
             }
-        }else if(x == "isEulerian"){
+        } else if (x == "isEulerian") {
             txtConsole.setText("");
-            if(_source == -1){
+            if (_source == -1) {
                 printlnConsole("Please select a source to begin");
                 return;
             }
-            if(isEulerian()){
+            if (isEulerian()) {
                 printlnConsole("There is an eulerian cycle");
-            }else {
+            } else {
                 printlnConsole("Eulerian cycle does not exist");
             }
         }
 
-    }//GEN-LAST:event_jcbAlgoActionPerformed
+    }//GEN-LAST:event_btnStartActionPerformed
     private String getNodeInfo(int nodeId) {
         if (nodeId == -1) {
             return "None";
@@ -729,32 +749,30 @@ public class Graphify extends javax.swing.JFrame {
         // Nodes - red circles.
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
-            
+
             if (locations.keySet().toArray()[i]
                     == (Integer) _source) {
                 bufferGraphic.setColor(Color.green);
-            }else if (locations.keySet().toArray()[i]
+            } else if (locations.keySet().toArray()[i]
                     == (Integer) _dest) {
                 bufferGraphic.setColor(Color.blue);
             } else if (locations.keySet().toArray()[i] == (Integer) _selectedNode) {
                 bufferGraphic.setColor(Color.orange);
-            }else{
+            } else {
                 bufferGraphic.setColor(Color.red);
             }
-            
-            if(fcolor.contains(locations.keySet().toArray()[i])){
+
+            if (fcolor.contains(locations.keySet().toArray()[i])) {
                 bufferGraphic.setColor(Color.green);
-            }else if(scolor.contains(locations.keySet().toArray()[i])){
+            } else if (scolor.contains(locations.keySet().toArray()[i])) {
                 bufferGraphic.setColor(Color.blue);
-            }else if(tcolor.contains(locations.keySet().toArray()[i])){
+            } else if (tcolor.contains(locations.keySet().toArray()[i])) {
                 bufferGraphic.setColor(Color.MAGENTA);
             }
-            if(cutV.contains(locations.keySet().toArray()[i])){
+            if (cutV.contains(locations.keySet().toArray()[i])) {
                 bufferGraphic.setColor(Color.gray);
             }
-            
-            
-            
+
             bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
         }
@@ -840,6 +858,7 @@ public class Graphify extends javax.swing.JFrame {
     private javax.swing.JButton btnPrintList;
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnReset1;
+    private javax.swing.JButton btnStart;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox<String> jcbAlgo;
     private java.awt.Label lblInfo;
