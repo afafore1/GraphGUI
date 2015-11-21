@@ -888,20 +888,18 @@ public class Graphify extends javax.swing.JFrame {
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
             
-            if (locations.keySet().toArray()[i]
-                    == (Integer) _source) {
+            if (locations.keySet().toArray()[i].equals((Integer) _source)){
                 bufferGraphic.setColor(Color.green);
-            } else if (locations.keySet().toArray()[i]
-                    == (Integer) _dest) {
+            } else if (locations.keySet().toArray()[i].equals((Integer) _dest)) {
                 bufferGraphic.setColor(Color.blue);
-            } else if (locations.keySet().toArray()[i] == (Integer) _selectedNode) {
+            } else if (locations.keySet().toArray()[i].equals((Integer) _selectedNode)) {
                 bufferGraphic.setColor(Color.orange);
             } else {
                 bufferGraphic.setColor(Color.red);
             }
             
             if (fcolor.contains(locations.keySet().toArray()[i])) {
-                bufferGraphic.setColor(Color.green);
+                bufferGraphic.setColor(Color.yellow);
             } else if (scolor.contains(locations.keySet().toArray()[i])) {
                 bufferGraphic.setColor(Color.blue);
             } else if (tcolor.contains(locations.keySet().toArray()[i])) {
