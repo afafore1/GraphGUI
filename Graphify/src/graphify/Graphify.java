@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -21,11 +23,10 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileFilter;
+import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Graphify extends javax.swing.JFrame {
@@ -58,7 +59,8 @@ public class Graphify extends javax.swing.JFrame {
     Graphics2D bufferGraphic;
     String currentProject = null;
     boolean changesMade = false;
-    
+    double dotOffset = 0.0;
+
     public Graphify() {
         initComponents();
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
@@ -70,6 +72,17 @@ public class Graphify extends javax.swing.JFrame {
         scolor = new ArrayList<Integer>();
         tcolor = new ArrayList<Integer>();
         _colors2 = new HashSet<Integer>();
+        Timer animationTimer = new Timer(30, new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (glowMap.size() > 0) {
+                    dotOffset = (dotOffset + .07) % 1;
+                    graph();
+                }
+            }
+        });
+        animationTimer.start();
     }
     
     @SuppressWarnings("unchecked")
@@ -705,7 +718,6 @@ public class Graphify extends javax.swing.JFrame {
     }//GEN-LAST:event_jcbAlgoActionPerformed
     
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
-        // TODO add your handling code here:
         String x = String.valueOf(jcbAlgo.getSelectedItem());
         if (x == "Bipartite") {
             glowMap.clear();
@@ -872,15 +884,14 @@ public class Graphify extends javax.swing.JFrame {
         }
         
         // Glowing connections
-        bufferGraphic.setColor(new Color(200, 40, 232));
+        bufferGraphic.setColor(new Color(30, 255, 60));
         bufferGraphic.setStroke(new BasicStroke(8));
         if (!btnReset.isSelected()) {
             for (int sourceKey : glowMap.keySet()) {
                 int destKey = glowMap.get(sourceKey);
                 Point sourcePoint = (Point) locations.get(sourceKey);
                 Point destPoint = (Point) locations.get(destKey);
-                bufferGraphic.drawLine(sourcePoint.x, sourcePoint.y,
-                        destPoint.x, destPoint.y);
+                drawDottedLine(bufferGraphic, sourcePoint, destPoint, dotOffset);
             }
         }
         
@@ -925,6 +936,18 @@ public class Graphify extends javax.swing.JFrame {
                 + " - Destination: " + getNodeInfo(_dest));
     }
     
+    private void drawDottedLine(Graphics2D g, Point p1, Point p2, double offset) {
+        long total = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
+        total = (long) Math.sqrt(total);
+        for (long i = (long)(offset * 20); i <= total; i += 20) {
+            int x1 = (int) (p1.x + (p2.x - p1.x) * i / total);
+            int y1 = (int) (p1.y + (p2.y - p1.y) * i / total);
+            int x2 = (int) (p1.x + (p2.x - p1.x) * Math.min(i + 5, total) / total);
+            int y2 = (int) (p1.y + (p2.y - p1.y) * Math.min(i + 5, total) / total);
+            g.drawLine(x1, y1, x2, y2);
+        }
+    }
+
     private int nodeSelected(int x, int y) {
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
@@ -995,6 +1018,7 @@ public class Graphify extends javax.swing.JFrame {
             save(currentProject);
         }
     }
+
     private boolean checkForChange() {
         int option = JOptionPane.showConfirmDialog(this,
                 "Changes have been made. Do you want to save before continuing?"
@@ -1052,7 +1076,6 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
     }
-    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClearConsole;
