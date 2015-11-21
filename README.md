@@ -35,7 +35,10 @@ We are working on running several algorithms and making an efficient way to visu
 - CTRL Q to Quit
 
 
-![ScreenShot](https://raw.github.com/afafore1/GraphGUI/blob/master/SSandTestfile/bfs.jpg)
+![ScreenShot for bfs](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/bfs.jpg)
+![ScreenShot for Graph Coloring](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/VColoring.jpg)
+![ScreenShot for Cut vertices](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/cut.jpg)
+
 
 
 *Contributors*
