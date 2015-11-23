@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -222,15 +222,16 @@ public class Algorithms {
             for (int i = 0; i < nodes.size(); i++) {
                 Integer key = (Integer) nodes.keySet().toArray()[i];
                 int keyEdgeSize = getEdge(key).size();
-                if (keyEdgeSize % 2 != 0) {
+                if (keyEdgeSize % 2 != 0 && keyEdgeSize != 0) {
                     noOfOdds++;
                 }
             }
         } else {
             return false;
         }
+        if(noOfOdds == 0) return true;
         if (noOfOdds == 2) {
-            return true;
+            GG.printlnConsole("There is an euler path");
         }
         return false;
     }
