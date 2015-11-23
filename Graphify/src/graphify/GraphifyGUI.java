@@ -1,7 +1,12 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package graphify;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -17,8 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
@@ -30,17 +33,19 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-public class Graphify extends javax.swing.JFrame {
-
+/**
+ *
+ * @author Ayomitunde
+ */
+public class GraphifyGUI extends javax.swing.JFrame{
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
-    HashMap<Integer, Integer> glowMap = new HashMap<>();
-    HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
-    private Queue<Integer> queue;
-    private Stack<Integer> stack;
+    HashMap<Integer, Integer> glowMap;
+    private static HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
+    Queue<Integer> queue;
+    Stack<Integer> stack;
     HashMap<Integer, Point> locations = new HashMap();
-    private HashMap<Integer, Integer> distTo;
-    private Map<Integer, Integer> set = new HashMap<Integer, Integer>();
+    HashMap<Integer, Integer> distTo;
+    Map<Integer, Integer> set;
     HashMap<Integer, Integer> visited;
     HashMap<Integer, Integer> color;
     HashMap<Integer, Integer> fcolors;
@@ -55,23 +60,33 @@ public class Graphify extends javax.swing.JFrame {
     int id = 0;
     int time = 0;
     Integer maxColors = 0;
-    static int _source = -1;
-    static int _dest = -1;
+    int _source = -1;
+    int _dest = -1;
     Image bufferImage;
     Graphics2D bufferGraphic;
     String currentProject = null;
     boolean changesMade = false;
+    static boolean algCalled = false;
     double dotOffset = 0.0;
-
-    public Graphify() {
+    Algorithms alg;
+    
+    public GraphifyGUI(){
         initComponents();
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
-        queue = new LinkedList<Integer>();
-        stack = new Stack<Integer>();
-        cutV = new ArrayList<Integer>();
-        _colors2 = new HashSet<Integer>();
-        visited = new HashMap<Integer, Integer>();
+        this.alg = new Algorithms(this);
+        queue = alg.getQueue();
+        stack = alg.getStack();
+        cutV = alg.getCutV();
+        color = alg.getColor();
+        _colors2 = alg.getColors2();
+        visited = alg.getVisited();
+        vertexColors = alg.getVertexColors();
+        greedyresult = alg.getGreedyResult();
+        glowMap = alg.getGlowMap();
+        set = alg.getSet();
+        distTo = alg.distTo();
+        vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
         Timer animationTimer = new Timer(30, new ActionListener() {
 
             @Override
@@ -83,7 +98,6 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
         animationTimer.start();
-        greedyresult = new HashMap<Integer, Integer>();
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -93,11 +107,13 @@ public class Graphify extends javax.swing.JFrame {
             }
         });
     }
-
+    
+    public static HashMap getNode(){
+        return GraphifyGUI.nodes;
+    }
+    
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
-
+        private void initComponents() {
         pnlGraph = new javax.swing.JPanel();
         btnReset = new javax.swing.JButton();
         btnPrintList = new javax.swing.JButton();
@@ -294,9 +310,9 @@ public class Graphify extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
-
-    private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMousePressed
+    }// </editor-fold>  
+        
+        private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {                                      
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
         if (_selectedNode < 0 && SwingUtilities.isLeftMouseButton(evt)) {
             changesMade = true;
@@ -335,9 +351,9 @@ public class Graphify extends javax.swing.JFrame {
             _selectedNode = -1;
         }
         graph();
-    }//GEN-LAST:event_pnlGraphMousePressed
-
-    private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseDragged
+    }        
+        
+           private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {                                      
         if (_selectedNode >= 0) {
             if (SwingUtilities.isLeftMouseButton(evt)) {
                 Image buff = createImage(pnlGraph.getWidth() - 1, pnlGraph.getHeight() - 1);
@@ -354,14 +370,14 @@ public class Graphify extends javax.swing.JFrame {
                 changesMade = true;
             }
         }
-    }//GEN-LAST:event_pnlGraphMouseDragged
-
-    private void pnlGraphComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_pnlGraphComponentResized
+    }           
+        
+            private void pnlGraphComponentResized(java.awt.event.ComponentEvent evt) {                                          
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
-    }//GEN-LAST:event_pnlGraphComponentResized
+    }                                         
 
-    private void pnlGraphMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseReleased
+    private void pnlGraphMouseReleased(java.awt.event.MouseEvent evt) {                                       
         if (_selectedNode >= 0) {
             int destination = nodeSelected(evt.getX(), evt.getY());
             if (destination >= 0 && destination != _selectedNode) {
@@ -372,321 +388,22 @@ public class Graphify extends javax.swing.JFrame {
             }
         }
         graph();
-    }//GEN-LAST:event_pnlGraphMouseReleased
-
-    public HashSet<Integer> getEdge(int source) {
-        return nodes.get(source);
-    }
-
-    void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
-        int children = 0;
-        visited.put(u, 0);
-        time = ++time;
-        disc.put(u, time);
-        low.put(u, time);
-        Iterator<Integer> i = getEdge(u).iterator();
-
-        while (i.hasNext()) {
-            int v = i.next(); // v is current adj to u
-            if (visited.get(v) == -1) {
-                children++;
-                parent.put(v, u);
-                APF(v, visited, disc, low, parent, ap); // recursive for it
-                int val = Math.min(low.get(u), low.get(v));
-                low.put(u, val);
-
-                if (u == _source && children > 1) {
-                    ap.put(u, 1);
-                }
-                // if u is not root and low value of one of its child is more than discovery value of u
-                if (u != _source && low.get(v) >= disc.get(u)) { // need a check for this if statement.. always marks beginning as a cut even when it's not
-                    ap.put(u, 1);
-                }
-            } else if (v != parent.get(u)) {
-                int val = Math.min(low.get(u), low.get(v));
-                low.put(u, val);
-            }
-        }
-    }
-
-    void AP() {
-        int V = nodes.size();
-        visited = new HashMap<>();
-        HashMap<Integer, Integer> disc = new HashMap<>();
-        HashMap<Integer, Integer> low = new HashMap<>();
-        HashMap<Integer, Integer> parent = new HashMap<>();
-        HashMap<Integer, Integer> ap = new HashMap<>();
-
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
-            parent.put(key, -1);
-            visited.put(key, -1);
-            ap.put(key, 0);
-        }
-
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
-            if (visited.get(key) == -1) {
-                APF(key, visited, disc, low, parent, ap);
-            }
-        }
-
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
-            if (ap.get(key) == 1) {
-                printlnConsole(key + " is a cut vertex");
-                cutV.add(key);
-            }
-        }
-    }
-
-    void dfs(int source) {
-        int V = nodes.size();
-        distTo = new HashMap<>();
-        visited = new HashMap<>();
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
-            visited.put(key, -1);
-            distTo.put(key, 0);
-        }
-        bconn = new ArrayList<Integer>();
-        int element;
-        visited.put(source, 0); // start vertex
-        stack.push(source);
-        while (!stack.isEmpty()) {
-            element = stack.peek();
-            printlnConsole("Considering element " + element);
-            if (!bconn.contains(element)) {
-                bconn.add(element);
-            }
-            HashSet<Integer> iList = getEdge(element);
-            int x = 0;
-            while (x < iList.size()) {
-                Integer key = (Integer) iList.toArray()[x];
-                if (visited.get(key) == -1) {
-                    printlnConsole("Pushing " + (Integer) iList.toArray()[x]);
-                    stack.push((Integer) iList.toArray()[x]);
-                    visited.put(key, element);
-                    distTo.put(key, distTo.get(element) + 1);
-                    break;
-                }
-                x++;
-                if (x == iList.size()) {
-                    int backEdge = stack.pop();
-                    printlnConsole("Back edge " + backEdge);
-                }
-            }
-        }
-        printlnConsole("order is " + bconn);
-    }
-
-    void bfs(int source) {
-        int V = nodes.size();
-        distTo = new HashMap<>();
-        visited = new HashMap<>();
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
-            visited.put(key, -1);
-            distTo.put(key, 0);
-        }
-        conn = new ArrayList<Integer>();
-        int i, element;
-        visited.put(source, 0);
-        queue.add(source);
-        while (!queue.isEmpty()) {
-            element = queue.remove();
-            printlnConsole(element + " removed");
-            i = element; // what is the point of i = element here ?
-            conn.add(element);
-            HashSet<Integer> iList = getEdge(i);
-            int x = 0;
-            while (x < iList.size()) {
-                Integer key = (Integer) iList.toArray()[x];
-                if (visited.get(key) == -1) {
-                    queue.add((Integer) iList.toArray()[x]);
-                    visited.put(key, i);
-                    distTo.put(key, distTo.get(i) + 1);
-                }
-                x++;
-            }
-        }
-        printlnConsole("Order is " + conn);
-    }
-
-    boolean isConnected() {
-        dfs(_source);
-        for (int i = 0; i < nodes.size(); i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
-            if (visited.get(key) == -1) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    boolean isEulerian() {
-        int noOfOdds = 0;
-        if (isConnected()) {
-            for (int i = 0; i < nodes.size(); i++) {
-                Integer key = (Integer) nodes.keySet().toArray()[i];
-                int keyEdgeSize = getEdge(key).size();
-                if (keyEdgeSize % 2 != 0) {
-                    noOfOdds++;
-                }
-            }
-        } else {
-            return false;
-        }
-        if (noOfOdds == 2) {
-            return true;
-        }
-        return false;
-    }
-
-    void greedyColoring(int nc) {
-        int V = nodes.size();
-        greedyresult = new HashMap<Integer, Integer>();
-        HashMap<Integer, Integer> available = new HashMap<Integer, Integer>();
-        vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
-            greedyresult.put(key, -1);
-            available.put(key, 0); //set all to false
-        }
-        greedyresult.put(_source, 0);
-        for (int x = 0; x < V; x++) {
-            Integer key = (Integer) nodes.keySet().toArray()[x];
-            HashSet<Integer> kList = getEdge(key);
-            int u = 0;
-            while (u < kList.size()) {
-                Integer k = (Integer) kList.toArray()[u];
-                if (greedyresult.get(k) != -1) {
-                    available.put(greedyresult.get(k), 1);
-                }
-                u++;
-            }
-            // find first avail color
-            Integer nColor = 0;
-            for (int i = 0; i < V; i++) {
-                nColor = (Integer) nodes.keySet().toArray()[i];
-                if (available.get(nColor) == 0) {
-                    break;
-                }
-            }
-            greedyresult.put(key, nColor);
-            if (greedyresult.get(key) > maxColors) {
-                maxColors = nColor;
-            }
-            u = 0;
-            while (u < kList.size()) {
-                Integer k = (Integer) kList.toArray()[u];
-                if (greedyresult.get(k) != -1) {
-                    available.put(greedyresult.get(k), 0);
-                }
-                u++;
-            }
-        }
-
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
-            printlnConsole("Vertex " + key + " ---> Color " + greedyresult.get(key));
-        }
-
-    }
-
-    void Bipartite(int source) { // will test for 3
-        int V = nodes.size();
-        color = new HashMap<Integer, Integer>();
-        _colors2 = new HashSet<Integer>();
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
-            color.put(key, -1);
-        }
-        int element;
-        color.put(source, 1); // start first color with 1, all adjacent to 1 should have color 0
-        queue.add(source);
-        while (!queue.isEmpty()) {
-            element = queue.remove();
-            HashSet<Integer> iList = getEdge(element);
-            int x = 0;
-            while (x < iList.size()) {
-                Integer key = (Integer) iList.toArray()[x];
-                if (color.get(element) == color.get(key)) {
-                    _colors2.add(element);
-                    _colors2.add(key);
-                } else if (color.get(key) == -1) {
-                    color.put(key, 1 - color.get(element));
-                    queue.add(key);
-                }
-                x++;
-            }
-        }
-        if (_colors2.size() > 1) {
-            printlnConsole("Graph is not bipartite at " + _colors2.toString());
-        } else {
-            printlnConsole("Graph is bipartite");
-        }
-
-    }
-
-    public int hasPath(int v) {
-        return visited.get(v);
-    }
-
-    public int distTo(int v) {
-        return distTo.get(v);
-    }
-
-    public void shortestPath(int v, int e) {
-        if (e == v) {
-            printlnConsole(v + "-->" + v);
-            return;
-        }
-        for (int i = e; i >= 0; i = visited.get(i)) {
-            if (i == v) {
-                break;
-            }
-            if (visited.get(i) != -1) {
-                set.put(visited.get(i), i);
-            }
-        }
-        // removed rset
-        printlnConsole(set.toString().replaceAll("=", "-->"));
-        glowMap.clear();
-        for (int i : set.keySet()) {
-            glowMap.put(i, set.get(i));
-        }
-        graph();
-    }
-    //[0, 2, 19, 5, 7, 9, 14]
-
-    private void reset() {
-        nodes = new HashMap();
-        locations = new HashMap();
-        id = 0;
-        cutV = new ArrayList<Integer>();
-        _colors2 = new HashSet<Integer>();
-        glowMap.clear();
-        greedyresult.clear();
-        _source = -1;
-        _dest = -1;
-        graph();
-    }
-
-    private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintListActionPerformed
+    }  
+    
+        private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {  
         for (int i = 0; i < nodes.size(); i++) {
             int key = (Integer) nodes.keySet().toArray()[i];
-            printlnConsole(key + "->" + getEdge(key));
+            printlnConsole(key + "->" + alg.getEdge(key));
         }
         printlnConsole("Source is: " + _source);
-    }//GEN-LAST:event_btnPrintListActionPerformed
+    }                                            
 
-    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {                                         
         changesMade = true;
         reset();
-    }//GEN-LAST:event_btnResetActionPerformed
+    }                                        
 
-    private void pnlGraphMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseClicked
+    private void pnlGraphMouseClicked(java.awt.event.MouseEvent evt) {                                      
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
         if (evt.getClickCount() == 2) {
             if (_source == -1 && _dest == -1
@@ -702,17 +419,30 @@ public class Graphify extends javax.swing.JFrame {
             }
             graph();
         }
-    }//GEN-LAST:event_pnlGraphMouseClicked
+    }                                     
 
-    private void btnClearConsoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearConsoleActionPerformed
+        private void reset() {
+        nodes = new HashMap();
+        locations = new HashMap();
+        id = 0;
+        cutV = new ArrayList<Integer>();
+        _colors2 = new HashSet<Integer>();
+        glowMap.clear();
+        greedyresult.clear();
+        _source = -1;
+        _dest = -1;
+        graph();
+    }
+        
+    private void btnClearConsoleActionPerformed(java.awt.event.ActionEvent evt) {                                                
         txtConsole.setText("");
-    }//GEN-LAST:event_btnClearConsoleActionPerformed
+    }                                               
 
-    private void jcbAlgoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbAlgoActionPerformed
+    private void jcbAlgoActionPerformed(java.awt.event.ActionEvent evt) {                                        
 
-    }//GEN-LAST:event_jcbAlgoActionPerformed
+    }                                       
 
-    private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
+    private void btnStartActionPerformed(java.awt.event.ActionEvent evt) { 
         String x = String.valueOf(jcbAlgo.getSelectedItem());
         glowMap.clear();
         txtConsole.setText("");
@@ -726,7 +456,7 @@ public class Graphify extends javax.swing.JFrame {
                 printlnConsole("Please choose a source by double clicking a node");
                 return;
             }
-            Bipartite(_source);
+            alg.Bipartite(_source);
         } else if (x == "DFS") {
             txtConsole.setText("");
              if (_source == -1 || _dest == -1) {
@@ -737,8 +467,9 @@ public class Graphify extends javax.swing.JFrame {
                 }
                 return;
             }
-            dfs(_source);
-            shortestPath(_source, _dest);
+             
+            alg.dfs(_source);
+            alg.shortestPath(_source, _dest);
         } else if (x == "BFS") {
             txtConsole.setText("");
             if (_source == -1 || _dest == -1) {
@@ -749,11 +480,11 @@ public class Graphify extends javax.swing.JFrame {
                 }
                 return;
             }
-            bfs(_source);
-            shortestPath(_source, _dest);
+            alg.bfs(_source);
+            alg.shortestPath(_source, _dest);
         } else if (x == "Cut") {
-            cutV = new ArrayList<Integer>();
-            AP();
+            printlnConsole(cutV.toString());
+            alg.AP();
             graph();
         } else if (x == "GColoring") {
             glowMap.clear();
@@ -762,7 +493,9 @@ public class Graphify extends javax.swing.JFrame {
                 printlnConsole("Please select a source to begin ");
                 return;
             }
-            greedyColoring(2);
+            greedyresult = alg.getGreedyResult();
+            printlnConsole(greedyresult.toString());
+            alg.greedyColoring(2);
             graph();
             greedyresult.clear();
         } else if (x == "Connectedness") {
@@ -771,7 +504,7 @@ public class Graphify extends javax.swing.JFrame {
                 printlnConsole("Please select a source to begin");
                 return;
             }
-            if (isConnected()) {
+            if (alg.isConnected()) {
                 printlnConsole("Graph is Connected");
             } else {
                 printlnConsole("Graph is a disconnected Graph");
@@ -782,42 +515,42 @@ public class Graphify extends javax.swing.JFrame {
                 printlnConsole("Please select a source to begin");
                 return;
             }
-            if (isEulerian()) {
+            if (alg.isEulerian()) {
                 printlnConsole("There is an eulerian cycle");
             } else {
-                printlnConsole("Eulerian cycle does not exist");
+                printlnConsole("Eulerian cycle does not exist haha");
             }
         }
 
-    }//GEN-LAST:event_btnStartActionPerformed
-
-    private void mnuNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNewActionPerformed
+    }               
+    
+       private void mnuNewActionPerformed(java.awt.event.ActionEvent evt) {                                       
         if (checkForChange()) {
             reset();
             currentProject = null;
             changesMade = false;
         }
-    }//GEN-LAST:event_mnuNewActionPerformed
+    }                                      
 
-    private void mnuQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuQuitActionPerformed
+    private void mnuQuitActionPerformed(java.awt.event.ActionEvent evt) {                                        
         if (checkForChange()) {
             System.exit(0);
         }
 
-    }//GEN-LAST:event_mnuQuitActionPerformed
+    }                                       
 
-    private void mnuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveActionPerformed
+    private void mnuSaveActionPerformed(java.awt.event.ActionEvent evt) {                                        
         justSave();
-    }//GEN-LAST:event_mnuSaveActionPerformed
+    }                                       
 
-    private void mnuSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveAsActionPerformed
+    private void mnuSaveAsActionPerformed(java.awt.event.ActionEvent evt) {                                          
         saveAs();
-    }//GEN-LAST:event_mnuSaveAsActionPerformed
+    }                                         
 
-    private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuOpenActionPerformed
+    private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) {                                        
         if (checkForChange()) {
             JFileChooser theChooser = new JFileChooser();
-            theChooser.setFileFilter(new FileNameExtensionFilter("Graphify files", "sgf"));
+            theChooser.setFileFilter(new FileNameExtensionFilter("GraphifyGUI files", "sgf"));
             if (theChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 try {
                     changesMade = false;
@@ -842,12 +575,12 @@ public class Graphify extends javax.swing.JFrame {
                     id++;
                     graph();
                 } catch (FileNotFoundException ex) {
-                    Logger.getLogger(Graphify.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
             }
         }
-    }//GEN-LAST:event_mnuOpenActionPerformed
+    }                                       
 
     private String getNodeInfo(int nodeId) {
         if (nodeId == -1) {
@@ -856,7 +589,7 @@ public class Graphify extends javax.swing.JFrame {
         return "" + nodeId;
     }
 
-    private void graph() {
+    public void graph() {
         bufferGraphic.setColor(Color.white);
         bufferGraphic.fillRect(0, 0, pnlGraph.getWidth(), pnlGraph.getHeight());
         connectionCache.clear();
@@ -907,6 +640,7 @@ public class Graphify extends javax.swing.JFrame {
                 bufferGraphic.setColor(Color.red);
             }
             if (greedyresult.size() > 0) {
+                printlnConsole("We are here");
                 Integer k = (Integer) nodes.keySet().toArray()[i];
                 if (greedyresult.get(k) == 0) {
                     bufferGraphic.setColor(vertexColors[0]);
@@ -972,7 +706,7 @@ public class Graphify extends javax.swing.JFrame {
         txtConsole.append(string);
     }
 
-    private void printlnConsole(String string) {
+    public void printlnConsole(String string) {
         txtConsole.append(string + "\n");
     }
 
@@ -1000,13 +734,13 @@ public class Graphify extends javax.swing.JFrame {
             changesMade = false;
             writer.close();
         } catch (IOException ex) {
-            Logger.getLogger(Graphify.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private void saveAs() {
         JFileChooser theChooser = new JFileChooser();
-        theChooser.setFileFilter(new FileNameExtensionFilter("Graphify files", "sgf"));
+        theChooser.setFileFilter(new FileNameExtensionFilter("GraphifyGUI files", "sgf"));
         if (theChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             String nominatedPath = theChooser.getSelectedFile().getPath();
             if (!nominatedPath.endsWith(".sgf")) {
@@ -1064,27 +798,27 @@ public class Graphify extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Graphify.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GraphifyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Graphify.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GraphifyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Graphify.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GraphifyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Graphify.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GraphifyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                Graphify theGraph = new Graphify();
+                GraphifyGUI theGraph = new GraphifyGUI();
                 theGraph.setLocationRelativeTo(null);
                 theGraph.show();
             }
         });
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    
     private javax.swing.JButton btnClearConsole;
     private javax.swing.JButton btnPrintList;
     private javax.swing.JButton btnReset;
@@ -1102,5 +836,6 @@ public class Graphify extends javax.swing.JFrame {
     private javax.swing.JMenuItem mnuSaveAs;
     private javax.swing.JPanel pnlGraph;
     private javax.swing.JTextArea txtConsole;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration             
+    
 }
