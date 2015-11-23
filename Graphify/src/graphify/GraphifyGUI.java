@@ -6,7 +6,6 @@
 package graphify;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -424,10 +423,10 @@ public class GraphifyGUI extends javax.swing.JFrame{
         nodes = new HashMap();
         locations = new HashMap();
         id = 0;
-        cutV = new ArrayList<Integer>();
-        _colors2 = new HashSet<Integer>();
-        glowMap.clear();
-        greedyresult.clear();
+        cutV = new ArrayList<Integer>(); alg.getCutV().clear();
+        _colors2 = new HashSet<Integer>(); alg.getColors2().clear();
+        glowMap.clear(); alg.getGlowMap().clear();
+        greedyresult.clear(); alg.getGreedyResult().clear();
         _source = -1;
         _dest = -1;
         graph();
@@ -443,12 +442,12 @@ public class GraphifyGUI extends javax.swing.JFrame{
 
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) { 
         String x = String.valueOf(jcbAlgo.getSelectedItem());
-        glowMap.clear();
+        glowMap.clear(); alg.getGlowMap().clear();
         txtConsole.setText("");
-        visited.clear();
-        set.clear();
-        greedyresult.clear();
-        cutV.clear();
+        visited.clear(); alg.getVisited().clear();
+        set.clear(); alg.getSet().clear();
+        greedyresult.clear(); alg.getGreedyResult().clear();
+        cutV.clear(); alg.getCutV().clear();
         if (x == "Bipartite") {
             glowMap.clear();
             txtConsole.setText("");
@@ -483,6 +482,8 @@ public class GraphifyGUI extends javax.swing.JFrame{
             alg.bfs(_source);
             alg.shortestPath(_source, _dest);
         } else if (x == "Cut") {
+            _source = -1;
+            _dest = -1;
             alg.AP();
             graph();
         } else if (x == "GColoring") {
@@ -513,9 +514,9 @@ public class GraphifyGUI extends javax.swing.JFrame{
                 return;
             }
             if (alg.isEulerian()) {
-                printlnConsole("There is an eulerian cycle");
+                printlnConsole("There is an euler circuit");
             } else {
-                printlnConsole("Eulerian cycle does not exist haha");
+                printlnConsole("Euler circuit does not exist");
             }
         }
 
