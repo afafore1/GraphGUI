@@ -81,7 +81,6 @@ public class GraphifyGUI extends javax.swing.JFrame{
         color = alg.getColor();
         _colors2 = alg.getColors2();
         visited = alg.getVisited();
-        vertexColors = alg.getVertexColors();
         greedyresult = alg.getGreedyResult();
         glowMap = alg.getGlowMap();
         set = alg.getSet();
@@ -449,6 +448,7 @@ public class GraphifyGUI extends javax.swing.JFrame{
         visited.clear();
         set.clear();
         greedyresult.clear();
+        cutV.clear();
         if (x == "Bipartite") {
             glowMap.clear();
             txtConsole.setText("");
@@ -483,7 +483,6 @@ public class GraphifyGUI extends javax.swing.JFrame{
             alg.bfs(_source);
             alg.shortestPath(_source, _dest);
         } else if (x == "Cut") {
-            printlnConsole(cutV.toString());
             alg.AP();
             graph();
         } else if (x == "GColoring") {
@@ -493,8 +492,6 @@ public class GraphifyGUI extends javax.swing.JFrame{
                 printlnConsole("Please select a source to begin ");
                 return;
             }
-            greedyresult = alg.getGreedyResult();
-            printlnConsole(greedyresult.toString());
             alg.greedyColoring(2);
             graph();
             greedyresult.clear();
@@ -640,7 +637,6 @@ public class GraphifyGUI extends javax.swing.JFrame{
                 bufferGraphic.setColor(Color.red);
             }
             if (greedyresult.size() > 0) {
-                printlnConsole("We are here");
                 Integer k = (Integer) nodes.keySet().toArray()[i];
                 if (greedyresult.get(k) == 0) {
                     bufferGraphic.setColor(vertexColors[0]);

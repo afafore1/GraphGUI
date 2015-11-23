@@ -6,13 +6,11 @@
 package graphify;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -32,7 +30,6 @@ public class Algorithms {
     private HashMap<Integer, Integer> set = new HashMap<Integer, Integer>();
     private HashMap<Integer, Integer> visited;
     private HashMap<Integer, Integer> color;
-    private HashMap<Integer, Integer> fcolors;
     private HashMap<Integer, Integer> greedyresult;
     private HashSet<Integer> _colors2;
     private ArrayList<Integer> conn;
@@ -65,7 +62,6 @@ public class Algorithms {
     
     
     public HashSet<Integer> getEdge(int source) {
-       // GG = new GraphifyGUI();
         nodes = GG.getNode();
         return nodes.get(source);
     }
@@ -102,7 +98,6 @@ public class Algorithms {
     }
 
     void AP() {
-       // GG = new GraphifyGUI();
         nodes = GG.getNode();
         int V = nodes.size();
         visited = new HashMap<>();
@@ -135,7 +130,6 @@ public class Algorithms {
     }
 
     void dfs(int source) {
-        //GG = new GraphifyGUI();
         nodes = GG.getNode();
         int V = nodes.size();
         distTo = new HashMap<>();
@@ -177,7 +171,6 @@ public class Algorithms {
     }
 
     void bfs(int source) {
-       // GG = new GraphifyGUI();
         nodes = GG.getNode();
         GG.printlnConsole(nodes.toString());
         int V = nodes.size();
@@ -244,10 +237,8 @@ public class Algorithms {
     
 
     void greedyColoring(int nc) {
-        //GG = new GraphifyGUI();
         nodes = GG.getNode();
         int V = nodes.size();
-        greedyresult = new HashMap<Integer, Integer>();
         HashMap<Integer, Integer> available = new HashMap<Integer, Integer>();
         for (int i = 0; i < V; i++) {
             Integer key = (Integer) nodes.keySet().toArray()[i];
@@ -296,7 +287,6 @@ public class Algorithms {
     }
 
     void Bipartite(int source) { // will test for 3
-        //GG = new GraphifyGUI();
         nodes = GG.getNode();
         int V = nodes.size();
         color = new HashMap<Integer, Integer>();
@@ -341,7 +331,6 @@ public class Algorithms {
     }
 
     public void shortestPath(int v, int e) {
-        //GG = new GraphifyGUI();
         if (e == v) {
             GG.printlnConsole(v + "-->" + v);
             return;
