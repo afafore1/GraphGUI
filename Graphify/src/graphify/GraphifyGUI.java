@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
@@ -50,6 +51,7 @@ public class GraphifyGUI extends javax.swing.JFrame{
     HashMap<Integer, Integer> fcolors;
     HashMap<Integer, Integer> greedyresult;
     HashSet<Integer> _colors2;
+    HashSet<Integer> randomKeys;
     ArrayList<Integer> conn;
     ArrayList<Integer> bconn;
     ArrayList<Integer> cutV;
@@ -85,6 +87,7 @@ public class GraphifyGUI extends javax.swing.JFrame{
         set = alg.getSet();
         distTo = alg.distTo();
         vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
+        randomKeys = new HashSet<Integer>();
         Timer animationTimer = new Timer(30, new ActionListener() {
 
             @Override
@@ -196,7 +199,7 @@ public class GraphifyGUI extends javax.swing.JFrame{
             }
         });
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness" }));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness", "Randomize" }));
         jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbAlgoActionPerformed(evt);
@@ -518,6 +521,8 @@ public class GraphifyGUI extends javax.swing.JFrame{
             } else {
                 printlnConsole("Euler circuit does not exist");
             }
+        }else if(x == "Randomize"){
+            randomize();
         }
 
     }               
@@ -545,7 +550,7 @@ public class GraphifyGUI extends javax.swing.JFrame{
         saveAs();
     }                                         
 
-    private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) {                                        
+    private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) {   
         if (checkForChange()) {
             JFileChooser theChooser = new JFileChooser();
             theChooser.setFileFilter(new FileNameExtensionFilter("GraphifyGUI files", "sgf"));
@@ -578,7 +583,8 @@ public class GraphifyGUI extends javax.swing.JFrame{
 
             }
         }
-    }                                       
+    }    
+    
 
     private String getNodeInfo(int nodeId) {
         if (nodeId == -1) {
@@ -719,6 +725,59 @@ public class GraphifyGUI extends javax.swing.JFrame{
             result += "\n";
         }
         return result;
+    }
+    
+    private void randomize(){
+        String result = "";
+		int max = 100;
+		for(int i = 0;i < max; i++){
+			HashSet<Integer> st = new HashSet<Integer>();
+			while(st.size() < (int)(Math.random() * 12)){
+				int con = (int) (Math.random() * max);
+				if(con != i) st.add(con);
+			}
+			nodes.put(i, st);			
+		}
+		
+		for(int i = 0; i < nodes.size(); i++){
+			Iterator<Integer> t = alg.getEdge(i).iterator();
+			while(t.hasNext()){
+				int nextNum = t.next();
+				if(nodes.get(nextNum) != null){
+					if(!(nodes.get(nextNum).contains(i))){
+						HashSet<Integer> tList = nodes.get(nextNum);
+						tList.add(i);
+						nodes.put(nextNum, tList);
+					}
+				}
+				
+			}
+		}
+
+		for(int i = 0; i< nodes.size(); i++){
+			int x = (int) (Math.random() * 1850+ 10);
+			int y = (int) (Math.random() * 650 + 20);
+			result += i+","+x+","+y+","+nodes.get(i).toString().replace("[", "").replace("]", "").replaceAll(" ", "") +"\n";
+		}
+                
+                Scanner scanner = new Scanner(result);
+                    while (scanner.hasNext()) {
+                        String currentLine = scanner.nextLine();
+                        String[] tokens = currentLine.split(",");
+                        Integer key = Integer.parseInt(tokens[0]);
+                        Integer x = Integer.parseInt(tokens[1]);
+                        Integer y = Integer.parseInt(tokens[2]);
+                        HashSet<Integer> connections = new HashSet();
+                        for (int i = 3; i < tokens.length; i++) {
+                            connections.add(Integer.parseInt(tokens[i]));
+                        }
+                        nodes.put(key, connections);
+                        locations.put(key, new Point(x, y));
+                        id = key;
+                    }
+                    id++;
+                    graph();
+        //return result;
     }
 
     private void save(String path) {
