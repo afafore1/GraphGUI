@@ -101,6 +101,7 @@ public class Algorithms {
         nodes = GG.getNode();
         int V = nodes.size();
         visited = new HashMap<>();
+        boolean cutExist = false;
         HashMap<Integer, Integer> disc = new HashMap<>();
         HashMap<Integer, Integer> low = new HashMap<>();
         HashMap<Integer, Integer> parent = new HashMap<>();
@@ -125,7 +126,11 @@ public class Algorithms {
             if (ap.get(key) == 1) {
                 GG.printlnConsole(key + " is a cut vertex");
                 cutV.add(key);
+                cutExist = true;
             }
+        }
+        if(cutExist == false){
+            GG.printlnConsole("No cut vertex in Graph");
         }
     }
 
