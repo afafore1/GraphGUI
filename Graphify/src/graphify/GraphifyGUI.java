@@ -522,7 +522,8 @@ public class GraphifyGUI extends javax.swing.JFrame{
                 printlnConsole("Euler circuit does not exist");
             }
         }else if(x == "Randomize"){
-            randomize();
+            String nodeNum = JOptionPane.showInputDialog(null, "Enter number of nodes");
+            randomize(Integer.parseInt(nodeNum));
         }
 
     }               
@@ -727,9 +728,8 @@ public class GraphifyGUI extends javax.swing.JFrame{
         return result;
     }
     
-    private void randomize(){
+    private void randomize(int max){
         String result = "";
-		int max = 100;
 		for(int i = 0;i < max; i++){
 			HashSet<Integer> st = new HashSet<Integer>();
 			while(st.size() < (int)(Math.random() * 12)){
