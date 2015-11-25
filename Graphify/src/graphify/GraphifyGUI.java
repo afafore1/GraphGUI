@@ -121,6 +121,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         pnlGraph = new javax.swing.JPanel();
         btnReset = new javax.swing.JButton();
         btnPrintList = new javax.swing.JButton();
+        btnRandomize = new javax.swing.JButton();
         lblInfo = new java.awt.Label();
         lblResult = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -188,6 +189,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 btnPrintListActionPerformed(evt);
             }
         });
+        
+        btnRandomize.setText("Randomize");
+        btnRandomize.addActionListener(new java.awt.event.ActionListener(){
+            public void actionPerformed(java.awt.event.ActionEvent evt){
+                btnRandomizeActionPerformed(evt);
+            }
+        });
 
         lblInfo.setText("Source: None - Destination: None");
 
@@ -204,7 +212,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         });
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness", "Randomize"}));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness"}));
         jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbAlgoActionPerformed(evt);
@@ -286,6 +294,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(btnStart)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 315, Short.MAX_VALUE)
+                                        .addComponent(btnRandomize)
                                         .addComponent(btnPrintList))
                                 .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(layout.createSequentialGroup()
@@ -308,6 +317,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(btnReset)
+                                .addComponent(btnRandomize)
                                 .addComponent(btnPrintList)
                                 .addComponent(btnClearConsole)
                                 .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -402,6 +412,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
             printlnConsole(key + "->" + alg.getEdge(key));
         }
         printlnConsole("Source is: " + _source);
+    }
+    
+    private void btnRandomizeActionPerformed(java.awt.event.ActionEvent evt){
+        String nodeNum = JOptionPane.showInputDialog(null, "Enter number of nodes");
+            randomize(Integer.parseInt(nodeNum));
     }
 
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {
@@ -536,10 +551,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             } else {
                 printlnConsole("Euler circuit does not exist");
             }
-        } else if (x == "Randomize") {
-            String nodeNum = JOptionPane.showInputDialog(null, "Enter number of nodes");
-            randomize(Integer.parseInt(nodeNum));
-        }
+        } 
 
     }
 
@@ -903,6 +915,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private javax.swing.JButton btnClearConsole;
     private javax.swing.JButton btnPrintList;
+    private javax.swing.JButton btnRandomize;
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnStart;
     private javax.swing.JMenuBar jMenuBar1;
