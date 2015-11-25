@@ -1,4 +1,4 @@
- /*
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -18,8 +19,8 @@ import java.util.Stack;
  *
  * @author Ayomitunde
  */
-
 public class Algorithms {
+
     private GraphifyGUI GG;
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     private HashMap<Integer, Integer> glowMap = new HashMap<>();
@@ -43,29 +44,27 @@ public class Algorithms {
     Integer maxColors = 0;
     int _source;
     int _dest;
-    
-    
-    public Algorithms(GraphifyGUI GG){
+
+    public Algorithms(GraphifyGUI GG) {
         this.GG = GG;
         this.nodes = new HashMap<>();
-        this.queue = new LinkedList<Integer>();  
-        this.stack = new Stack<Integer>();
-        this.cutV = new ArrayList<Integer>();
-        this._colors2 = new HashSet<Integer>();
-        this.visited = new HashMap<Integer, Integer>();
-        this.set = new HashMap<Integer, Integer>();
-        this.visited = new HashMap<Integer, Integer>();
-        this.color = new HashMap<Integer, Integer>();
-        this.greedyresult = new HashMap<Integer, Integer>();
+        this.queue = new LinkedList<>();
+        this.stack = new Stack<>();
+        this.cutV = new ArrayList<>();
+        this._colors2 = new HashSet<>();
+        this.visited = new HashMap<>();
+        this.set = new HashMap<>();
+        this.visited = new HashMap<>();
+        this.color = new HashMap<>();
+        this.greedyresult = new HashMap<>();
         this.vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
     }
-    
-    
+
     public HashSet<Integer> getEdge(int source) {
-        nodes = GG.getNode();
+        nodes = GraphifyGUI.getNode();
         return nodes.get(source);
     }
-    
+
     void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
         int children = 0;
         visited.put(u, 0);
@@ -98,38 +97,41 @@ public class Algorithms {
     }
 
     void AP() {
-        nodes = GG.getNode();
-        int V = nodes.size();
+        nodes = GraphifyGUI.getNode();
         visited = new HashMap<>();
         boolean cutExist = false;
         HashMap<Integer, Integer> disc = new HashMap<>();
         HashMap<Integer, Integer> low = new HashMap<>();
         HashMap<Integer, Integer> parent = new HashMap<>();
         HashMap<Integer, Integer> ap = new HashMap<>();
-
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
+        
+        Iterator<Integer> allNodes = nodes.keySet().iterator();
+        while(allNodes.hasNext()){
+            int key = allNodes.next();
             parent.put(key, -1);
             visited.put(key, -1);
             ap.put(key, 0);
         }
-
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
+        
+        allNodes = nodes.keySet().iterator();
+        while(allNodes.hasNext()){
+            int key = allNodes.next();
             if (visited.get(key) == -1) {
                 APF(key, visited, disc, low, parent, ap);
             }
         }
-
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
+        
+        allNodes = nodes.keySet().iterator();
+        while(allNodes.hasNext()){
+            int key = allNodes.next();
             if (ap.get(key) == 1) {
                 GG.printlnConsole(key + " is a cut vertex");
                 cutV.add(key);
                 cutExist = true;
             }
         }
-        if(cutExist == false){
+        
+        if (cutExist == false) {
             GG.printlnConsole("No cut vertex in Graph");
         }
     }
@@ -139,11 +141,14 @@ public class Algorithms {
         int V = nodes.size();
         distTo = new HashMap<>();
         visited = new HashMap<>();
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
+        
+        Iterator<Integer> allNodes = nodes.keySet().iterator();
+        while(allNodes.hasNext()){
+            int key = allNodes.next();
             visited.put(key, -1);
             distTo.put(key, 0);
         }
+        
         bconn = new ArrayList<Integer>();
         int element;
         visited.put(source, 0); // start vertex
@@ -155,18 +160,17 @@ public class Algorithms {
                 bconn.add(element);
             }
             HashSet<Integer> iList = getEdge(element);
-            int x = 0;
-            while (x < iList.size()) {
-                Integer key = (Integer) iList.toArray()[x];
-                if (visited.get(key) == -1) {
-                    GG.printlnConsole("Pushing " + (Integer) iList.toArray()[x]);
-                    stack.push((Integer) iList.toArray()[x]);
-                    visited.put(key, element);
-                    distTo.put(key, distTo.get(element) + 1);
+            Iterator<Integer> l = iList.iterator();
+            while (l.hasNext()) {
+                int n = l.next();
+                if (visited.get(n) == -1) {
+                    GG.printlnConsole("Pushing " + n);
+                    stack.push(n);
+                    visited.put(n, element);
+                    distTo.put(n, distTo.get(element) + 1);
                     break;
                 }
-                x++;
-                if (x == iList.size()) {
+                if (l.hasNext() == false) {
                     int backEdge = stack.pop();
                     GG.printlnConsole("Back edge " + backEdge);
                 }
@@ -181,11 +185,13 @@ public class Algorithms {
         int V = nodes.size();
         distTo = new HashMap<>();
         visited = new HashMap<>();
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
+        Iterator<Integer> allNodes = nodes.keySet().iterator();
+        while(allNodes.hasNext()){
+            int key = allNodes.next();
             visited.put(key, -1);
             distTo.put(key, 0);
         }
+        
         conn = new ArrayList<Integer>();
         int i, element;
         visited.put(source, 0);
@@ -196,15 +202,14 @@ public class Algorithms {
             i = element; // what is the point of i = element here ?
             conn.add(element);
             HashSet<Integer> iList = getEdge(i);
-            int x = 0;
-            while (x < iList.size()) {
-                Integer key = (Integer) iList.toArray()[x];
-                if (visited.get(key) == -1) {
-                    queue.add((Integer) iList.toArray()[x]);
-                    visited.put(key, i);
-                    distTo.put(key, distTo.get(i) + 1);
+            Iterator<Integer> l = iList.iterator();
+            while (l.hasNext()) {
+                int n = l.next();
+                if (visited.get(n) == -1) {
+                    queue.add(n);
+                    visited.put(n, i);
+                    distTo.put(n, distTo.get(i) + 1);
                 }
-                x++;
             }
         }
         GG.printlnConsole("Order is " + conn);
@@ -212,8 +217,9 @@ public class Algorithms {
 
     boolean isConnected() {
         dfs(_source);
-        for (int i = 0; i < nodes.size(); i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
+        Iterator<Integer> allNode = nodes.keySet().iterator();
+        while (allNode.hasNext()) {
+            int key = allNode.next();
             if (visited.get(key) == -1) {
                 return false;
             }
@@ -224,8 +230,9 @@ public class Algorithms {
     boolean isEulerian() {
         int noOfOdds = 0;
         if (isConnected()) {
-            for (int i = 0; i < nodes.size(); i++) {
-                Integer key = (Integer) nodes.keySet().toArray()[i];
+            Iterator<Integer> allNode = nodes.keySet().iterator();
+            while (allNode.hasNext()) {
+                int key = allNode.next();
                 int keyEdgeSize = getEdge(key).size();
                 if (keyEdgeSize % 2 != 0 && keyEdgeSize != 0) {
                     noOfOdds++;
@@ -234,62 +241,60 @@ public class Algorithms {
         } else {
             return false;
         }
-        if(noOfOdds == 0) return true;
+        if (noOfOdds == 0) {
+            return true;
+        }
         if (noOfOdds == 2) {
             GG.printlnConsole("There is an euler path");
         }
         return false;
     }
-    
 
     void greedyColoring(int nc) {
         nodes = GG.getNode();
-        int V = nodes.size();
         HashMap<Integer, Integer> available = new HashMap<Integer, Integer>();
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
+        Iterator<Integer> allNode = nodes.keySet().iterator();
+        while (allNode.hasNext()) {
+            int key = allNode.next();
             greedyresult.put(key, -1);
             available.put(key, 0); //set all to false
         }
         greedyresult.put(_source, 0);
-        for (int x = 0; x < V; x++) {
-            Integer key = (Integer) nodes.keySet().toArray()[x];
+        allNode = nodes.keySet().iterator();
+        while (allNode.hasNext()) {
+            int key = allNode.next();
             HashSet<Integer> kList = getEdge(key);
-            int u = 0;
-            while (u < kList.size()) {
-                Integer k = (Integer) kList.toArray()[u];
+            Iterator<Integer> u = kList.iterator();
+            while (u.hasNext()) {
+                int k = u.next();
                 if (greedyresult.get(k) != -1) {
                     available.put(greedyresult.get(k), 1);
                 }
-                u++;
             }
-            // find first avail color
             Integer nColor = 0;
-            for (int i = 0; i < V; i++) {
-                nColor = (Integer) nodes.keySet().toArray()[i];
-                if (available.get(nColor) == 0) {
-                    break;
-                }
+            Iterator<Integer> allNodes = nodes.keySet().iterator();
+            while (allNodes.hasNext()) {
+                nColor = allNodes.next();
+                if(available.get(nColor) == 0) break;
             }
             greedyresult.put(key, nColor);
             if (greedyresult.get(key) > maxColors) {
                 maxColors = nColor;
             }
-            u = 0;
-            while (u < kList.size()) {
-                Integer k = (Integer) kList.toArray()[u];
+            u = kList.iterator();
+            while(u.hasNext()){
+                int k = u.next();
                 if (greedyresult.get(k) != -1) {
                     available.put(greedyresult.get(k), 0);
                 }
-                u++;
             }
         }
-
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
+        
+        Iterator<Integer> allNodes = nodes.keySet().iterator();
+        while (allNodes.hasNext()) {
+            int key = allNodes.next();
             GG.printlnConsole("Vertex " + key + " ---> Color " + greedyresult.get(key));
         }
-
     }
 
     void Bipartite(int source) { // will test for 3
@@ -297,8 +302,9 @@ public class Algorithms {
         int V = nodes.size();
         color = new HashMap<Integer, Integer>();
         _colors2 = new HashSet<Integer>();
-        for (int i = 0; i < V; i++) {
-            Integer key = (Integer) nodes.keySet().toArray()[i];
+        Iterator<Integer> allNodes = nodes.keySet().iterator();
+        while(allNodes.hasNext()){
+            int key = allNodes.next();
             color.put(key, -1);
         }
         int element;
@@ -307,17 +313,16 @@ public class Algorithms {
         while (!queue.isEmpty()) {
             element = queue.remove();
             HashSet<Integer> iList = getEdge(element);
-            int x = 0;
-            while (x < iList.size()) {
-                Integer key = (Integer) iList.toArray()[x];
-                if (color.get(element) == color.get(key)) {
+            Iterator<Integer> x = iList.iterator();
+            while(x.hasNext()){
+                int key = x.next();
+                if (Objects.equals(color.get(element), color.get(key))) {
                     _colors2.add(element);
                     _colors2.add(key);
                 } else if (color.get(key) == -1) {
                     color.put(key, 1 - color.get(element));
                     queue.add(key);
                 }
-                x++;
             }
         }
         if (_colors2.size() > 1) {
@@ -358,45 +363,57 @@ public class Algorithms {
         GG.graph();
     }
     //[0, 2, 19, 5, 7, 9, 14]
-    
-     public Queue getQueue(){
+
+    public Queue getQueue() {
         return this.queue;
-    }    
-    public Stack getStack(){
+    }
+
+    public Stack getStack() {
         return this.stack;
     }
-    public HashMap getGlowMap(){
+
+    public HashMap getGlowMap() {
         return this.glowMap;
     }
-     public HashMap distTo(){
+
+    public HashMap distTo() {
         return this.distTo;
     }
-      public HashMap getSet(){
+
+    public HashMap getSet() {
         return this.set;
     }
-       public HashMap getVisited(){
+
+    public HashMap getVisited() {
         return this.visited;
     }
-       public HashMap getColor(){
+
+    public HashMap getColor() {
         return this.color;
     }
-       public HashMap getGreedyResult(){
+
+    public HashMap getGreedyResult() {
         return this.greedyresult;
     }
-       public HashSet getColors2(){
-           return this._colors2;
-       }
-       public ArrayList getConn(){
-           return this.conn;
-       }
-       public ArrayList getBConn(){
-           return this.bconn;
-       }
-       public ArrayList getCutV(){
-           return this.cutV;
-       }
-       public Color [] getVertexColors(){
-           return this.vertexColors;
-       }
+
+    public HashSet getColors2() {
+        return this._colors2;
+    }
+
+    public ArrayList getConn() {
+        return this.conn;
+    }
+
+    public ArrayList getBConn() {
+        return this.bconn;
+    }
+
+    public ArrayList getCutV() {
+        return this.cutV;
+    }
+
+    public Color[] getVertexColors() {
+        return this.vertexColors;
+    }
 
 }

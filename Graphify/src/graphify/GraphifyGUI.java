@@ -744,9 +744,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void randomize(int max) {
         String result = "";
+        int Ncon = 2;
         for (int i = 0; i < max; i++) {
-            HashSet<Integer> st = new HashSet<Integer>();
-            while (st.size() < (int) (Math.random() * 12)) {
+            HashSet<Integer> st = new HashSet<>();
+            while (st.size() < (int) (Math.random() * Ncon + 1)) {
                 int con = (int) (Math.random() * max);
                 if (con != i) {
                     st.add(con);
@@ -769,13 +770,21 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
             }
         }
-
+        HashMap<Integer, Integer> nums = new HashMap<Integer, Integer>();
         for (int i = 0; i < nodes.size(); i++) {
             int t = (int) (Math.random() * 925 + 20);
             int s = (int) (Math.random() * 325 + 20);
-            int x = (int) (2 * t);
-            int y = (int) (2 * s);
+            int x = 0;
+            int y = 0;
+            if(nums.containsKey(t) || nums.containsValue(s)){
+                i--;
+            }else{
+                nums.put(t, s);
+            x = (int) (2 * t);
+            y = (int) (2 * s);
             result += i + "," + x + "," + y + "," + nodes.get(i).toString().replace("[", "").replace("]", "").replaceAll(" ", "") + "\n";
+            }            
+            
         }
 
         Scanner scanner = new Scanner(result);
