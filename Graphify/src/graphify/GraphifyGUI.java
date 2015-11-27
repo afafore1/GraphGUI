@@ -768,7 +768,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void randomize(int max) {
         String result = "";
-        int Ncon = 2;
+        int Ncon = 12;
         for (int i = 0; i < max; i++) {
             HashSet<Integer> st = new HashSet<>();
             while (st.size() < (int) (Math.random() * Ncon)) {
