@@ -212,7 +212,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         });
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness"}));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Make Tree", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness"}));
         jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbAlgoActionPerformed(evt);
@@ -415,6 +415,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
     
     private void btnRandomizeActionPerformed(java.awt.event.ActionEvent evt){
+        _source = -1;
+        _dest = -1;
+        glowMap.clear();
         String nodeNum = JOptionPane.showInputDialog(null, "Enter number of nodes");
             randomize(Integer.parseInt(nodeNum));
     }
@@ -513,7 +516,16 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             alg.bfs(_source);
             alg.shortestPath(_source, _dest);
-        } else if (x == "Cut") {
+        }else if (x == "Make Tree"){
+            txtConsole.setText("");
+            if(_source == -1){
+                printlnConsole("Please choose a source by double clicking a node");
+                return;
+            }
+            alg.makeTree(_source);
+            graph();
+        }
+        else if (x == "Cut") {
             _source = -1;
             _dest = -1;
             alg.AP();
@@ -759,7 +771,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         int Ncon = 2;
         for (int i = 0; i < max; i++) {
             HashSet<Integer> st = new HashSet<>();
-            while (st.size() < (int) (Math.random() * Ncon + 1)) {
+            while (st.size() < (int) (Math.random() * Ncon)) {
                 int con = (int) (Math.random() * max);
                 if (con != i) {
                     st.add(con);

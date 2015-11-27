@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Stack;
@@ -104,25 +105,25 @@ public class Algorithms {
         HashMap<Integer, Integer> low = new HashMap<>();
         HashMap<Integer, Integer> parent = new HashMap<>();
         HashMap<Integer, Integer> ap = new HashMap<>();
-        
+
         Iterator<Integer> allNodes = nodes.keySet().iterator();
-        while(allNodes.hasNext()){
+        while (allNodes.hasNext()) {
             int key = allNodes.next();
             parent.put(key, -1);
             visited.put(key, -1);
             ap.put(key, 0);
         }
-        
+
         allNodes = nodes.keySet().iterator();
-        while(allNodes.hasNext()){
+        while (allNodes.hasNext()) {
             int key = allNodes.next();
             if (visited.get(key) == -1) {
                 APF(key, visited, disc, low, parent, ap);
             }
         }
-        
+
         allNodes = nodes.keySet().iterator();
-        while(allNodes.hasNext()){
+        while (allNodes.hasNext()) {
             int key = allNodes.next();
             if (ap.get(key) == 1) {
                 GG.printlnConsole(key + " is a cut vertex");
@@ -130,7 +131,7 @@ public class Algorithms {
                 cutExist = true;
             }
         }
-        
+
         if (cutExist == false) {
             GG.printlnConsole("No cut vertex in Graph");
         }
@@ -138,18 +139,17 @@ public class Algorithms {
 
     void dfs(int source) {
         nodes = GG.getNode();
-        int V = nodes.size();
         distTo = new HashMap<>();
         visited = new HashMap<>();
-        
+
         Iterator<Integer> allNodes = nodes.keySet().iterator();
-        while(allNodes.hasNext()){
+        while (allNodes.hasNext()) {
             int key = allNodes.next();
             visited.put(key, -1);
             distTo.put(key, 0);
         }
-        
-        bconn = new ArrayList<Integer>();
+
+        bconn = new ArrayList<>();
         int element;
         visited.put(source, 0); // start vertex
         stack.push(source);
@@ -181,17 +181,15 @@ public class Algorithms {
 
     void bfs(int source) {
         nodes = GG.getNode();
-        GG.printlnConsole(nodes.toString());
-        int V = nodes.size();
         distTo = new HashMap<>();
         visited = new HashMap<>();
         Iterator<Integer> allNodes = nodes.keySet().iterator();
-        while(allNodes.hasNext()){
+        while (allNodes.hasNext()) {
             int key = allNodes.next();
             visited.put(key, -1);
             distTo.put(key, 0);
         }
-        
+
         conn = new ArrayList<Integer>();
         int i, element;
         visited.put(source, 0);
@@ -213,6 +211,48 @@ public class Algorithms {
             }
         }
         GG.printlnConsole("Order is " + conn);
+    }
+    
+
+    void makeTree(int source) {
+        nodes = GraphifyGUI.getNode();
+        visited = new HashMap<>();
+        HashMap<Integer, Boolean> isVisited = new HashMap<>();
+        HashSet<Integer> bconn = new HashSet<>();
+        Iterator<Integer> allNodes = nodes.keySet().iterator();
+        while (allNodes.hasNext()) {
+            int key = allNodes.next();
+            visited.put(key, -1);
+            isVisited.put(key, false);
+        }
+        int element;
+        visited.put(source, 0); // start vertex
+        stack.push(source);
+        while (!stack.isEmpty()) {
+            element = stack.peek();
+            GG.printlnConsole("Considering element " + element);
+            bconn.add(element);
+            HashSet<Integer> iList = getEdge(element);
+            Iterator<Integer> l = iList.iterator();
+            while (l.hasNext()) {
+                int n = l.next();
+                if (visited.get(n) == -1) {
+                    GG.printlnConsole("Pushing " + n);
+                    isVisited.put(n, true);
+                    stack.push(n);
+                    visited.put(n, element);
+                    break;
+                }else if(visited.get(element) != n && visited.get(n) != element && n != source){
+                    l.remove();
+                    getEdge(n).remove(element);
+                    GG.printlnConsole("Removing connection between "+n+ " and "+element);
+                }
+                if (l.hasNext() == false) {
+                    stack.pop(); // not necessarily a back edge
+                }
+            }
+        }
+        GG.printlnConsole("order is " + bconn);
     }
 
     boolean isConnected() {
@@ -275,21 +315,23 @@ public class Algorithms {
             Iterator<Integer> allNodes = nodes.keySet().iterator();
             while (allNodes.hasNext()) {
                 nColor = allNodes.next();
-                if(available.get(nColor) == 0) break;
+                if (available.get(nColor) == 0) {
+                    break;
+                }
             }
             greedyresult.put(key, nColor);
             if (greedyresult.get(key) > maxColors) {
                 maxColors = nColor;
             }
             u = kList.iterator();
-            while(u.hasNext()){
+            while (u.hasNext()) {
                 int k = u.next();
                 if (greedyresult.get(k) != -1) {
                     available.put(greedyresult.get(k), 0);
                 }
             }
         }
-        
+
         Iterator<Integer> allNodes = nodes.keySet().iterator();
         while (allNodes.hasNext()) {
             int key = allNodes.next();
@@ -303,7 +345,7 @@ public class Algorithms {
         color = new HashMap<Integer, Integer>();
         _colors2 = new HashSet<Integer>();
         Iterator<Integer> allNodes = nodes.keySet().iterator();
-        while(allNodes.hasNext()){
+        while (allNodes.hasNext()) {
             int key = allNodes.next();
             color.put(key, -1);
         }
@@ -314,7 +356,7 @@ public class Algorithms {
             element = queue.remove();
             HashSet<Integer> iList = getEdge(element);
             Iterator<Integer> x = iList.iterator();
-            while(x.hasNext()){
+            while (x.hasNext()) {
                 int key = x.next();
                 if (Objects.equals(color.get(element), color.get(key))) {
                     _colors2.add(element);
