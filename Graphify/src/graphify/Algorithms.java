@@ -217,6 +217,7 @@ public class Algorithms {
     void makeTree(int source) {
         nodes = GraphifyGUI.getNode();
         visited = new HashMap<>();
+        boolean isTree = false;
         HashMap<Integer, Boolean> isVisited = new HashMap<>();
         HashSet<Integer> bconn = new HashSet<>();
         Iterator<Integer> allNodes = nodes.keySet().iterator();
@@ -230,19 +231,20 @@ public class Algorithms {
         stack.push(source);
         while (!stack.isEmpty()) {
             element = stack.peek();
-            GG.printlnConsole("Considering element " + element);
+            //GG.printlnConsole("Considering element " + element);
             bconn.add(element);
             HashSet<Integer> iList = getEdge(element);
             Iterator<Integer> l = iList.iterator();
             while (l.hasNext()) {
                 int n = l.next();
                 if (visited.get(n) == -1) {
-                    GG.printlnConsole("Pushing " + n);
+                   // GG.printlnConsole("Pushing " + n);
                     isVisited.put(n, true);
                     stack.push(n);
                     visited.put(n, element);
                     break;
                 }else if(visited.get(element) != n && visited.get(n) != element && n != source){
+                    isTree = true;
                     l.remove();
                     getEdge(n).remove(element);
                     GG.printlnConsole("Removing connection between "+n+ " and "+element);
@@ -251,6 +253,11 @@ public class Algorithms {
                     stack.pop(); // not necessarily a back edge
                 }
             }
+        }
+        if(isTree == false){
+            GG.printlnConsole("Graph is already a tree");
+        }else{
+            GG.printlnConsole("Graph is not a tree\nMaking it a tree ...");
         }
         GG.printlnConsole("order is " + bconn);
     }

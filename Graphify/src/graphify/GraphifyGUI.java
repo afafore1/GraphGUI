@@ -769,6 +769,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private void randomize(int max) {
         String result = "";
         int Ncon = 12;
+        // create connections for each nodes
         for (int i = 0; i < max; i++) {
             HashSet<Integer> st = new HashSet<>();
             while (st.size() < (int) (Math.random() * Ncon)) {
@@ -780,6 +781,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             nodes.put(i, st);
         }
 
+        // add connections for nodes equally. Undirected graph i.e. if node a consist node b, the same must happen the other way
         for (int i = 0; i < nodes.size(); i++) {
             Iterator<Integer> t = alg.getEdge(i).iterator();
             while (t.hasNext()) {
