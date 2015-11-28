@@ -261,6 +261,40 @@ public class Algorithms {
         }
         GG.printlnConsole("order is " + bconn);
     }
+    
+    void vertexCover(int source){
+        nodes = GraphifyGUI.getNode();
+        visited = new HashMap<>();
+        Iterator<Integer> allNodes = nodes.keySet().iterator();
+        while (allNodes.hasNext()) {
+            int key = allNodes.next();
+            visited.put(key, -1);
+        }
+        allNodes = nodes.keySet().iterator();
+        while(allNodes.hasNext()){
+            int key = allNodes.next();
+            if(visited.get(key) == -1){
+                Iterator <Integer> nNode = getEdge(key).iterator();
+                while(nNode.hasNext()){
+                    int v = nNode.next();
+                    if(visited.get(v) == -1){
+                        visited.put(key, 1);
+                        visited.put(v, 1);
+                        break;
+                    }
+                }
+            }
+        }
+        allNodes = nodes.keySet().iterator();
+        while (allNodes.hasNext()) {
+            int key = allNodes.next();
+            if(visited.get(key) == 1){
+                GG.printlnConsole(key+" ");
+            }
+        }
+        
+        
+    }
 
     boolean isConnected() {
         dfs(_source);

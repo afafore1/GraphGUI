@@ -212,7 +212,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         });
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Make Tree", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness"}));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Make Tree", "Vertex Cover", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness"}));
         jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbAlgoActionPerformed(evt);
@@ -524,6 +524,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             alg.makeTree(_source);
             graph();
+        }else if(x == "Vertex Cover"){
+            txtConsole.setText("");
+            if(_source == -1){
+                printlnConsole("Please choose a source by double clicking a node");
+                return;
+            }
+            alg.vertexCover(_source);
+            graph();
         }
         else if (x == "Cut") {
             _source = -1;
@@ -766,7 +774,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         return result;
     }
 
-    private void randomize(int max) {
+    private void randomize(int max) { // I don't really like this... Seem quite messy
         String result = "";
         int Ncon = 12;
         // create connections for each nodes
@@ -796,7 +804,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
             }
         }
-        HashMap<Integer, Integer> nums = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> nums = new HashMap<>();
         for (int i = 0; i < nodes.size(); i++) {
             int t = (int) (Math.random() * 925 + 20);
             int s = (int) (Math.random() * 325 + 20);
