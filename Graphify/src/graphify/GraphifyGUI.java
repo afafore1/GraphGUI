@@ -212,7 +212,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         });
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Make Tree", "Vertex Cover", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness"}));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Make Tree", "Double Graph", "Vertex Cover", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness"}));
         jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbAlgoActionPerformed(evt);
@@ -524,7 +524,16 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             alg.makeTree(_source);
             graph();
-        }else if(x == "Vertex Cover"){
+        }else if(x == "Double Graph"){
+            txtConsole.setText("");
+            if(_source == -1){
+                printlnConsole("Please choose a source by double clicking a node");
+                return;
+            }
+            alg.doubleGraph(_source);
+            graph();
+        }
+        else if(x == "Vertex Cover"){
             txtConsole.setText("");
             if(_source == -1){
                 printlnConsole("Please choose a source by double clicking a node");

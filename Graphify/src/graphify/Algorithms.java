@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Stack;
@@ -211,8 +212,74 @@ public class Algorithms {
             }
         }
         GG.printlnConsole("Order is " + conn);
+        GG.printlnConsole("DistTo is " + distTo);
     }
-    
+
+    void doubleGraph(int source) {
+        nodes = GG.getNode();
+        distTo = new HashMap<>();
+        visited = new HashMap<>();
+        int lastVisited = source;
+        Iterator<Integer> allNodes = nodes.keySet().iterator();
+        while (allNodes.hasNext()) {
+            int key = allNodes.next();
+            visited.put(key, -1);
+            distTo.put(key, 0);
+        }
+
+        conn = new ArrayList<Integer>();
+        int i, element;
+        visited.put(source, 0);
+        queue.add(source);
+        while (!queue.isEmpty()) {
+            element = queue.remove();
+            lastVisited = element;
+            GG.printlnConsole(element + " removed");
+            i = element;
+            conn.add(element);
+            HashSet<Integer> iHash = getEdge(i);
+            List<Integer> iList = new ArrayList<>(iHash);
+            ListIterator<Integer> iIterator = iList.listIterator();
+            while (iIterator.hasNext()) {
+                int n = iIterator.next();
+                if (visited.get(n) == -1) {
+                    queue.add(n);
+                    visited.put(n, i);
+                    distTo.put(n, distTo.get(i) + 1);
+                }
+            }
+        }
+        GG.printlnConsole("last is "+lastVisited);
+        allNodes = nodes.keySet().iterator();
+        while (allNodes.hasNext()) {
+            int n = allNodes.next(); // current node being visited
+            if(visited.get(n) == null) break;
+            GG.printlnConsole("checking "+n+"...");
+            if(!allNodes.hasNext()) break;
+            List<Integer> nList = new ArrayList<>(getEdge(n));
+            ListIterator<Integer> nChildren = nList.listIterator(); // iterate over it's children
+            while (nChildren.hasNext()) {
+                int nChild = nChildren.next();
+                HashSet<Integer> nHash = getEdge(nChild);
+                List<Integer> nChildList = new ArrayList<>(nHash);
+                ListIterator<Integer> nChildIterator = nChildList.listIterator();
+                while (nChildIterator.hasNext()) {
+                    int ngrandChild = nChildIterator.next();
+                    if (visited.get(ngrandChild) != n && ngrandChild != n) { // if this grandchild is not visited by the grand parent
+                        GG.printlnConsole("parent of "+ngrandChild +" is "+visited.get(ngrandChild)+" n is "+n);
+                        nChildren.add(ngrandChild); // add the grand child as one of the children
+                        nChildIterator.add(n);
+                        GG.printlnConsole("Adding a connection between " + n + " and " + ngrandChild);
+                    }
+                }
+                getEdge(n).addAll(nList);
+                getEdge(nChild).addAll(nChildList);
+            }
+
+        }
+        
+        GG.printlnConsole("Order is " + conn);
+    }
 
     void makeTree(int source) {
         nodes = GraphifyGUI.getNode();
@@ -238,31 +305,31 @@ public class Algorithms {
             while (l.hasNext()) {
                 int n = l.next();
                 if (visited.get(n) == -1) {
-                   // GG.printlnConsole("Pushing " + n);
+                    // GG.printlnConsole("Pushing " + n);
                     isVisited.put(n, true);
                     stack.push(n);
                     visited.put(n, element);
                     break;
-                }else if(visited.get(element) != n && visited.get(n) != element && n != source){
+                } else if (visited.get(element) != n && visited.get(n) != element && n != source) {
                     isTree = true;
                     l.remove();
                     getEdge(n).remove(element);
-                    GG.printlnConsole("Removing connection between "+n+ " and "+element);
+                    GG.printlnConsole("Removing connection between " + n + " and " + element);
                 }
                 if (l.hasNext() == false) {
                     stack.pop(); // not necessarily a back edge
                 }
             }
         }
-        if(isTree == false){
+        if (isTree == false) {
             GG.printlnConsole("Graph is already a tree");
-        }else{
+        } else {
             GG.printlnConsole("Graph is not a tree\nMaking it a tree ...");
         }
         GG.printlnConsole("order is " + bconn);
     }
-    
-    void vertexCover(int source){
+
+    void vertexCover(int source) {
         nodes = GraphifyGUI.getNode();
         visited = new HashMap<>();
         Iterator<Integer> allNodes = nodes.keySet().iterator();
@@ -271,13 +338,13 @@ public class Algorithms {
             visited.put(key, -1);
         }
         allNodes = nodes.keySet().iterator();
-        while(allNodes.hasNext()){
+        while (allNodes.hasNext()) {
             int key = allNodes.next();
-            if(visited.get(key) == -1){
-                Iterator <Integer> nNode = getEdge(key).iterator();
-                while(nNode.hasNext()){
+            if (visited.get(key) == -1) {
+                Iterator<Integer> nNode = getEdge(key).iterator();
+                while (nNode.hasNext()) {
                     int v = nNode.next();
-                    if(visited.get(v) == -1){
+                    if (visited.get(v) == -1) {
                         visited.put(key, 1);
                         visited.put(v, 1);
                         break;
@@ -288,12 +355,11 @@ public class Algorithms {
         allNodes = nodes.keySet().iterator();
         while (allNodes.hasNext()) {
             int key = allNodes.next();
-            if(visited.get(key) == 1){
-                GG.printlnConsole(key+" ");
+            if (visited.get(key) == 1) {
+                GG.printlnConsole(key + " ");
             }
         }
-        
-        
+
     }
 
     boolean isConnected() {
