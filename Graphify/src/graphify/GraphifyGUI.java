@@ -42,7 +42,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class GraphifyGUI extends javax.swing.JFrame {
 
-    HashMap<Vertex, Vertex> connectionCache = new HashMap<>();
+    HashMap<Integer, Integer> connectionCache = new HashMap<>();
     HashMap<Integer, Integer> glowMap;
     //private static HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
     Queue<Integer> queue;
@@ -679,18 +679,18 @@ public class GraphifyGUI extends javax.swing.JFrame {
         bufferGraphic.setColor(Color.black);
         bufferGraphic.setStroke(new BasicStroke(2));
         for (int i = 0; i < locations.size(); i++) {
-            Vertex sourceKey = vertices.get(i);
-            Point thePoint = (Point) locations.get(sourceKey.getId()); // get vertex id
+            int sourceKey = vertices.get(i).getId(); // needs fix
+            Point thePoint = (Point) locations.get(i); // get vertex id
             for (Vertex destinationKey
                     : vertices.get(i).vList()) {
                 if (!(connectionCache.containsKey(sourceKey)
-                        && connectionCache.get(sourceKey) == destinationKey
+                        && connectionCache.get(sourceKey) == destinationKey.getId()
                         || connectionCache.containsKey(destinationKey)
                         && connectionCache.get(destinationKey) == sourceKey)) {
                     Point destinantionPoint = locations.get(destinationKey.getId());
                     bufferGraphic.drawLine(thePoint.x, thePoint.y,
                             destinantionPoint.x, destinantionPoint.y);
-                    connectionCache.put(sourceKey, destinationKey);
+                    connectionCache.put(sourceKey, destinationKey.getId());
                 }
             }
         }
