@@ -24,10 +24,13 @@ import java.util.Stack;
 public class Algorithms {
 
     private GraphifyGUI GG;
+    private List<Vertex> vertex;
+    private Queue<Vertex> q;
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     private HashMap<Integer, Integer> glowMap = new HashMap<>();
     HashMap<Integer, HashSet<Integer>> nodes;
     private Queue<Integer> queue;
+    
     private Stack<Integer> stack;
     private HashMap<Integer, Integer> distTo;
     private HashMap<Integer, Integer> set = new HashMap<Integer, Integer>();
@@ -49,6 +52,7 @@ public class Algorithms {
 
     public Algorithms(GraphifyGUI GG) {
         this.GG = GG;
+        this.vertex = new LinkedList<Vertex>();
         this.nodes = new HashMap<>();
         this.queue = new LinkedList<>();
         this.stack = new Stack<>();
@@ -62,10 +66,11 @@ public class Algorithms {
         this.vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
     }
 
-    public HashSet<Integer> getEdge(int source) {
-        nodes = GraphifyGUI.getNode();
-        return nodes.get(source);
+    public HashSet<Vertex> getEdge(int source) {
+        vertex = GraphifyGUI.getNode();
+        return vertex.get(source).vList();
     }
+    
 
     void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
         int children = 0;
@@ -99,7 +104,7 @@ public class Algorithms {
     }
 
     void AP() {
-        nodes = GraphifyGUI.getNode();
+        vertex = GraphifyGUI.getNode();
         visited = new HashMap<>();
         boolean cutExist = false;
         HashMap<Integer, Integer> disc = new HashMap<>();
@@ -139,7 +144,7 @@ public class Algorithms {
     }
 
     void dfs(int source) {
-        nodes = GG.getNode();
+        vertex = GG.getNode();
         distTo = new HashMap<>();
         visited = new HashMap<>();
 
@@ -180,6 +185,60 @@ public class Algorithms {
         GG.printlnConsole("order is " + bconn);
     }
 
+ public void Bfs(Vertex source){
+                vertex = GG.getNode();
+		q = new LinkedList<Vertex>();
+		source.wasVisited = true;
+		q.add(source);
+		source.parent = source;
+		List<String> bAge = new LinkedList<>();
+                conn = new ArrayList<Integer>();
+		while(!q.isEmpty()){
+			Vertex current = q.poll();
+                        conn.add(current.getId());
+			//GG.printlnConsole("Current vertex is "+current.getName());
+			Iterator<Vertex> currentList = current.vList().iterator();
+			while(currentList.hasNext()){
+				Vertex next = currentList.next();
+				if(next.wasVisited == false){
+					next.wasVisited = true;
+					q.add(next);
+					next.parent = current;
+					//System.out.println("Adding "+next.getName()+" to the queue. Parent is "+next.getParent().getName());
+					if(next.getAge() >= 18 && next.getAge() <= 20){
+						bAge.add(next.getName());
+						System.out.println("Parents of "+next.getName()+" is "+next.getParent());
+						System.out.println(next.getName()+" has an age of "+next.getAge());
+					}
+				}
+			}
+		}
+                GG.printlnConsole("Order is "+conn);
+		
+	}
+ 
+  public void shortestPath(int v, int e) {
+        if (e == v) {
+            GG.printlnConsole(v + "-->" + v);
+            return;
+        }
+        GG.printlnConsole("vertex at e is "+vertex.get(e));
+        for (int i = e; i >= 0; i = vertex.get(i).getParent().getId()) {
+            if (i == v) {
+                break;
+            }
+            if (vertex.get(i).getParent().getId() != -1) {
+                set.put(vertex.get(i).getParent().getId(), i);
+            }
+        }
+        // removed rset
+        GG.printlnConsole(set.toString().replaceAll("=", "-->"));
+        glowMap.clear();
+        for (int i : set.keySet()) {
+            glowMap.put(i, set.get(i));
+        }
+        GG.graph();
+    }
     void bfs(int source) {
         nodes = GG.getNode();
         distTo = new HashMap<>();
@@ -490,27 +549,7 @@ public class Algorithms {
         return distTo.get(v);
     }
 
-    public void shortestPath(int v, int e) {
-        if (e == v) {
-            GG.printlnConsole(v + "-->" + v);
-            return;
-        }
-        for (int i = e; i >= 0; i = visited.get(i)) {
-            if (i == v) {
-                break;
-            }
-            if (visited.get(i) != -1) {
-                set.put(visited.get(i), i);
-            }
-        }
-        // removed rset
-        GG.printlnConsole(set.toString().replaceAll("=", "-->"));
-        glowMap.clear();
-        for (int i : set.keySet()) {
-            glowMap.put(i, set.get(i));
-        }
-        GG.graph();
-    }
+   
     //[0, 2, 19, 5, 7, 9, 14]
 
     public Queue getQueue() {
