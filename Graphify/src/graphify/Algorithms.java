@@ -24,7 +24,7 @@ import java.util.Stack;
 public class Algorithms {
 
     private GraphifyGUI GG;
-    private List<Vertex> vertex;
+    private HashMap<Integer, Vertex> vertex;
     private Queue<Vertex> q;
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     private HashMap<Integer, Integer> glowMap = new HashMap<>();
@@ -52,7 +52,7 @@ public class Algorithms {
 
     public Algorithms(GraphifyGUI GG) {
         this.GG = GG;
-        this.vertex = new LinkedList<Vertex>();
+        this.vertex = new HashMap<>();
         this.nodes = new HashMap<>();
         this.queue = new LinkedList<>();
         this.stack = new Stack<>();
@@ -186,7 +186,7 @@ public class Algorithms {
     }
 
  public void Bfs(Vertex source){
-                vertex = GG.getNode();
+                vertex = GraphifyGUI.getNode();
 		q = new LinkedList<Vertex>();
 		source.wasVisited = true;
 		q.add(source);
