@@ -10,6 +10,8 @@ We are working on running several algorithms and making an efficient way to visu
 - Dfs
 - You can find all cut vertices (Using Dfs)
 - Check if graph is bipartite (Using Bfs)
+- Make tree from graph/Check if graph is a tree
+- Given Graph G, double the graph (G^2)
 - Graph Coloring
 - Check connectedness
 - Find Euler path
