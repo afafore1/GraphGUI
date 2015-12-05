@@ -355,7 +355,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
             _source = -1;
             _dest = -1;
             
-            printlnConsole("this is vertices "+vertices);
             Vertex remove = vertices.get(_selectedNode);
             printlnConsole(" "+_selectedNode+" "+remove.label);
             Iterator<Vertex> v = vertices.values().iterator();
@@ -512,24 +511,24 @@ public class GraphifyGUI extends javax.swing.JFrame {
             alg.Bipartite(_source);
         } else if (x == "DFS") {
             txtConsole.setText("");
-            if (_source == -1 || _dest == -1) {
+            if (_source == -1 || _dest == -1 || vertices.get(_source).vList().isEmpty() || vertices.get(_dest).vList().isEmpty()) {
                 if (_source == -1) {
-                    printlnConsole("Please choose a source by double clicking a node");
+                    printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
                 } else {
-                    printlnConsole("Please choose a destination by double clicking a node");
+                    printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
                 }
                 return;
             }
-
-            alg.dfs(_source);
+            printlnConsole("Running Dfs...");
+            alg.dfs(vertices.get(_source));
             alg.shortestPath(_source, _dest);
         } else if (x == "BFS") {
             txtConsole.setText("");
-            if (_source == -1 || _dest == -1) {
+            if (_source == -1 || _dest == -1 || vertices.get(_source).vList().isEmpty() || vertices.get(_dest).vList().isEmpty()) {
                 if (_source == -1) {
-                    printlnConsole("Please choose a source by double clicking a node");
+                    printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
                 } else {
-                    printlnConsole("Please choose a destination by double clicking a node");
+                    printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
                 }
                 return;
             }
