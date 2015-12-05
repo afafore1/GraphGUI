@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
@@ -606,18 +605,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     while (scanner.hasNext()) {
                         String currentLine = scanner.nextLine();
                         String[] tokens = currentLine.split(",");
-                        Integer key = Integer.parseInt(tokens[0]);
-                        Integer x = Integer.parseInt(tokens[1]);
+                        int key = Integer.parseInt(tokens[0]); // vertex id
+                        Integer x = Integer.parseInt(tokens[1]); // locations x and y
                         Integer y = Integer.parseInt(tokens[2]);
-                        HashSet<Vertex> connections = new HashSet();
-                        Vertex v = new Vertex(key, "Vertex "+key, (int)(Math.random() * 50));
-                        vertices.put(v.getId(), v);
-                        locations.put(v.getId(), new Point(x, y));
+                        Vertex v = new Vertex(key, "Vertex "+key, (int) (Math.random() * 50));
+                        vertices.put(key, v);
+                        locations.put(key, new Point(x, y));
                         for (int i = 3; i < tokens.length; i++) {
-                            connections.add(vertices.get(Integer.parseInt(tokens[i])));
-                        }                        
-                        v.vList().addAll(connections);
-                        //nodes.put(key, connections);                        
+                            int e = Integer.parseInt(tokens[i]);
+                            Vertex d = new Vertex(e, "Vertex "+e, (int) (Math.random() * 50));
+                            v.vList().add(d);
+                        }                       
                         id = key;
                     }
                     id++;
@@ -762,20 +760,16 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private String getSaveString() {
         String result = "";
         for (int i = 0; i < vertices.size(); i++) {
-            int key = vertices.get(i).getId();
-            result += vertices.get(i).getId() + ",";
-            result += locations.get(key).x + "," + locations.get(key).y;
-            Iterator<Vertex> v = vertices.values().iterator();
+            Vertex key = vertices.get(i); // get the vertex
+            int keyId = key.getId();
+            result += keyId+",";
+            result += locations.get(key.getId()).x + "," + locations.get(key.getId()).y; // get locations
+            Iterator<Vertex> v = key.vList().iterator();
             while(v.hasNext()){
                 Vertex n = v.next();
-                Iterator<Vertex> next = n.vList().iterator();
-                while(next.hasNext()){
-                    Vertex nextCon = next.next();
-                    result += ","+nextCon.getId();
-                }
+                result+=","+n.getId();
             }
             result += "\n";
-            printlnConsole(result);
         }
         return result;
     }

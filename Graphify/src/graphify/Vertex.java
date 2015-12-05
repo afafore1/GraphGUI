@@ -49,6 +49,10 @@ public class Vertex {
 	public int getId(){
 		return this.id;
 	}
+        
+        void setId(int id){
+            this.id = id;
+        }
 	
 	public int getAge(){
 		return this.age;
