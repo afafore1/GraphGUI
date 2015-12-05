@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
@@ -43,7 +44,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     HashMap<Integer, Integer> glowMap;
-    private static HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
+    //private static HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
     Queue<Integer> queue;
     Stack<Integer> stack;
     HashMap<Integer, Point> locations = new HashMap();
@@ -73,12 +74,19 @@ public class GraphifyGUI extends javax.swing.JFrame {
     static boolean algCalled = false;
     double dotOffset = 0.0;
     Algorithms alg;
+    Vertex ver;
+    
+    private static HashMap<Integer, Vertex> vertices;
+    private HashSet<Edge> edges;
 
     public GraphifyGUI() {
         initComponents();
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
         this.alg = new Algorithms(this);
+        this.ver = new Vertex(this);
+        vertices = new HashMap<>();
+        edges = new HashSet<Edge>();
         queue = alg.getQueue();
         stack = alg.getStack();
         cutV = alg.getCutV();
@@ -113,7 +121,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     public static HashMap getNode() {
-        return GraphifyGUI.nodes;
+        return GraphifyGUI.vertices;
     }
 
     @SuppressWarnings("unchecked")
@@ -129,6 +137,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnClearConsole = new javax.swing.JButton();
         jcbAlgo = new javax.swing.JComboBox<>();
         btnStart = new javax.swing.JButton();
+        txtQuery = new javax.swing.JTextField(20);
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -225,6 +234,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 btnStartActionPerformed(evt);
             }
         });
+        txtQuery.setToolTipText("Enter Query");
 
         mnuFile.setText("File");
 
@@ -294,6 +304,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(btnStart)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 315, Short.MAX_VALUE)
+                                        .addComponent(txtQuery)
                                         .addComponent(btnRandomize)
                                         .addComponent(btnPrintList))
                                 .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -317,6 +328,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(btnReset)
+                                .addComponent(txtQuery)
                                 .addComponent(btnRandomize)
                                 .addComponent(btnPrintList)
                                 .addComponent(btnClearConsole)
@@ -332,8 +344,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
         if (_selectedNode < 0 && SwingUtilities.isLeftMouseButton(evt)) {
             changesMade = true;
-            nodes.put(id, new HashSet());
-            locations.put(id++, new Point(evt.getX(), evt.getY()));
+            //nodes.put(id, new HashSet());
+            Vertex v = new Vertex(id, String.valueOf(id), (int)(Math.random() * 50 ));
+            vertices.put(v.getId(),v);
+            locations.put(v.getId(), new Point(evt.getX(), evt.getY()));
+            id++;
         } else if (SwingUtilities.isLeftMouseButton(evt)) {
         } else if (SwingUtilities.isRightMouseButton(evt)) {
             changesMade = true;
@@ -343,18 +358,18 @@ public class GraphifyGUI extends javax.swing.JFrame {
             _colors2.clear();
             _source = -1;
             _dest = -1;
-            nodes.remove(_selectedNode);
-            locations.remove(_selectedNode);
-
-            for (HashSet<Integer> connections : nodes.values()) {
-                for (int j = 0; j < connections.size(); j++) {
-                    Integer connection = (Integer) connections.toArray()[j];
-                    if (connection == _selectedNode) {
-                        connections.remove(connection);
-                        j--;
-                    }
+            
+            Vertex remove = vertices.get(_selectedNode);
+            Iterator<Vertex> v = vertices.values().iterator();
+            while(v.hasNext()){
+                Vertex vert = v.next();
+                if(vert.vList().contains(remove)){
+                    vert.vList().remove(remove);
                 }
             }
+            vertices.remove(_selectedNode);
+            locations.remove(_selectedNode);
+
             if (_selectedNode == _dest) {
                 _dest = -1;
                 glowMap.clear();
@@ -397,8 +412,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         if (_selectedNode >= 0) {
             int destination = nodeSelected(evt.getX(), evt.getY());
             if (destination >= 0 && destination != _selectedNode) {
-                nodes.get(_selectedNode).add(destination);
-                nodes.get(destination).add(_selectedNode);
+                addEdge(String.valueOf(id), _selectedNode, destination, 0);
                 _selectedNode = -1;
                 changesMade = true;
             }
@@ -406,20 +420,30 @@ public class GraphifyGUI extends javax.swing.JFrame {
         graph();
     }
 
+    
+    private void addEdge(String edgeId, int sourceid, int destid, final int weight){
+        Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), weight);
+		edges.add(newEdge);
+		vertices.get(sourceid).vList().add(vertices.get(destid));
+		vertices.get(destid).vList().add(vertices.get(sourceid));
+    }
     private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {
-        for (int i = 0; i < nodes.size(); i++) {
-            int key = (Integer) nodes.keySet().toArray()[i];
-            printlnConsole(key + "->" + alg.getEdge(key));
+        for (int i = 0; i < vertices.size(); i++) {
+            printlnConsole(vertices.get(i) + "->" + vertices.get(i).vList());
         }
         printlnConsole("Source is: " + _source);
     }
     
     private void btnRandomizeActionPerformed(java.awt.event.ActionEvent evt){
-        _source = -1;
+        //_source = -1;
         _dest = -1;
         glowMap.clear();
-        String nodeNum = JOptionPane.showInputDialog(null, "Enter number of nodes");
-            randomize(Integer.parseInt(nodeNum));
+        String query = txtQuery.getText();
+        if(query.equalsIgnoreCase("people between age 20 to 50")){
+            alg.Bfs(vertices.get(_source));
+        }
+        //String nodeNum = JOptionPane.showInputDialog(null, "Enter number of nodes");
+           // randomize(Integer.parseInt(nodeNum));
     }
 
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {
@@ -446,7 +470,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     private void reset() {
-        nodes = new HashMap();
+        //nodes = new HashMap();
+        vertices = new HashMap();
         locations = new HashMap();
         id = 0;
         cutV = new ArrayList<Integer>();
@@ -472,6 +497,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {
         String x = String.valueOf(jcbAlgo.getSelectedItem());
+        String query = txtQuery.getText();
         glowMap.clear();
         alg.getGlowMap().clear();
         txtConsole.setText("");
@@ -483,64 +509,31 @@ public class GraphifyGUI extends javax.swing.JFrame {
         alg.getGreedyResult().clear();
         cutV.clear();
         alg.getCutV().clear();
-        if (x == "Bipartite") {
-            glowMap.clear();
+        if (x == "DFS") {
             txtConsole.setText("");
-            if (_source == -1) {
-                printlnConsole("Please choose a source by double clicking a node");
-                return;
-            }
-            alg.Bipartite(_source);
-        } else if (x == "DFS") {
-            txtConsole.setText("");
-            if (_source == -1 || _dest == -1) {
+            if (_source == -1 || _dest == -1 || vertices.get(_source).vList().isEmpty() || vertices.get(_dest).vList().isEmpty()) {
                 if (_source == -1) {
-                    printlnConsole("Please choose a source by double clicking a node");
+                    printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
                 } else {
-                    printlnConsole("Please choose a destination by double clicking a node");
+                    printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
                 }
                 return;
             }
-
-            alg.dfs(_source);
+            printlnConsole("Running Dfs..."); 
+            alg.dfs(vertices.get(_source));
             alg.shortestPath(_source, _dest);
         } else if (x == "BFS") {
             txtConsole.setText("");
-            if (_source == -1 || _dest == -1) {
+            if (_source == -1 || _dest == -1 || vertices.get(_source).vList().isEmpty() || vertices.get(_dest).vList().isEmpty()) {
                 if (_source == -1) {
-                    printlnConsole("Please choose a source by double clicking a node");
+                    printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
                 } else {
-                    printlnConsole("Please choose a destination by double clicking a node");
+                    printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
                 }
                 return;
             }
-            alg.bfs(_source);
+            alg.Bfs(vertices.get(_source));
             alg.shortestPath(_source, _dest);
-        }else if (x == "Make Tree"){
-            txtConsole.setText("");
-            if(_source == -1){
-                printlnConsole("Please choose a source by double clicking a node");
-                return;
-            }
-            alg.makeTree(_source);
-            graph();
-        }else if(x == "Double Graph"){
-            txtConsole.setText("");
-            if(_source == -1){
-                printlnConsole("Please choose a source by double clicking a node");
-                return;
-            }
-            alg.doubleGraph(_source);
-            graph();
-        }
-        else if(x == "Vertex Cover"){
-            txtConsole.setText("");
-            if(_source == -1){
-                printlnConsole("Please choose a source by double clicking a node");
-                return;
-            }
-            alg.vertexCover(_source);
-            graph();
         }
         else if (x == "Cut") {
             _source = -1;
@@ -548,16 +541,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
             alg.AP();
             cutV = alg.getCutV();
             graph();
-        } else if (x == "GColoring") {
-            glowMap.clear();
-            cutV.clear();
-            if (_source == -1) {
-                printlnConsole("Please select a source to begin ");
-                return;
-            }
-            alg.greedyColoring(2);
-            graph();
-            greedyresult.clear();
         } else if (x == "Connectedness") {
             txtConsole.setText("");
             if (_source == -1) {
@@ -581,6 +564,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 printlnConsole("Euler circuit does not exist");
             }
         } 
+        
+        
 
     }
 
@@ -624,12 +609,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         Integer key = Integer.parseInt(tokens[0]);
                         Integer x = Integer.parseInt(tokens[1]);
                         Integer y = Integer.parseInt(tokens[2]);
-                        HashSet<Integer> connections = new HashSet();
+                        HashSet<Vertex> connections = new HashSet();
+                        Vertex v = new Vertex(key, "Vertex "+key, (int)(Math.random() * 50));
+                        vertices.put(v.getId(), v);
+                        locations.put(v.getId(), new Point(x, y));
                         for (int i = 3; i < tokens.length; i++) {
-                            connections.add(Integer.parseInt(tokens[i]));
-                        }
-                        nodes.put(key, connections);
-                        locations.put(key, new Point(x, y));
+                            connections.add(vertices.get(Integer.parseInt(tokens[i])));
+                        }                        
+                        v.vList().addAll(connections);
+                        //nodes.put(key, connections);                        
                         id = key;
                     }
                     id++;
@@ -657,19 +645,19 @@ public class GraphifyGUI extends javax.swing.JFrame {
         // Regular connections
         bufferGraphic.setColor(Color.black);
         bufferGraphic.setStroke(new BasicStroke(2));
-        for (int i = 0; i < locations.size(); i++) {
-            Integer sourceKey = (Integer) nodes.keySet().toArray()[i];
-            Point thePoint = (Point) locations.values().toArray()[i];
-            for (Integer destinationKey
-                    : (HashSet<Integer>) nodes.values().toArray()[i]) {
-                if (!(connectionCache.containsKey(sourceKey)
-                        && connectionCache.get(sourceKey) == destinationKey
-                        || connectionCache.containsKey(destinationKey)
-                        && connectionCache.get(destinationKey) == sourceKey)) {
-                    Point destinantionPoint = locations.get(destinationKey);
-                    bufferGraphic.drawLine(thePoint.x, thePoint.y,
-                            destinantionPoint.x, destinantionPoint.y);
-                    connectionCache.put(sourceKey, destinationKey);
+        
+        Iterator<Integer> locs = locations.keySet().iterator();
+        while(locs.hasNext()){
+            int next = locs.next();
+            int sourceKey = vertices.get(next).getId();
+            Point thePoint = locations.get(next);
+            for(Vertex destKey : vertices.get(next).vList()){
+                if(!(connectionCache.containsKey(sourceKey)
+                        && connectionCache.get(sourceKey) == destKey.getId()
+                        || connectionCache.containsKey(destKey.getId())
+                        && connectionCache.get(destKey.getId()) == sourceKey)){
+                    Point destPoint = locations.get(destKey.getId());
+                    bufferGraphic.drawLine(thePoint.x, thePoint.y, destPoint.x, destPoint.y);
                 }
             }
         }
@@ -700,7 +688,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 bufferGraphic.setColor(Color.red);
             }
             if (greedyresult.size() > 0) {
-                Integer k = (Integer) nodes.keySet().toArray()[i];
+                Integer k = vertices.get(i).getId();
                 if (greedyresult.get(k) == 0) {
                     bufferGraphic.setColor(vertexColors[0]);
                 } else if (greedyresult.get(k) == 1) {
@@ -749,13 +737,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     private int nodeSelected(int x, int y) {
-        for (int i = 0; i < locations.size(); i++) {
-            Point thePoint = (Point) locations.values().toArray()[i];
+        Iterator<Integer> loc = locations.keySet().iterator();
+        while(loc.hasNext()){
+            int next = loc.next();
+            Point thePoint = locations.get(next);
             int deltaX = x - (thePoint.x - _SIZE_OF_NODE / 2);
             int deltaY = y - (thePoint.y - _SIZE_OF_NODE / 2);
             if (Math.sqrt(deltaX * deltaX
                     + deltaY * deltaY) <= _SIZE_OF_NODE + 6) {
-                return (int) locations.keySet().toArray()[i];
+                return next;
             }
         }
         return -1;
@@ -771,84 +761,91 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private String getSaveString() {
         String result = "";
-        for (int i = 0; i < nodes.size(); i++) {
-            int key = (int) nodes.keySet().toArray()[i];
-            result += key + ",";
+        for (int i = 0; i < vertices.size(); i++) {
+            int key = vertices.get(i).getId();
+            result += vertices.get(i).getId() + ",";
             result += locations.get(key).x + "," + locations.get(key).y;
-            for (Integer connection : nodes.get(key)) {
-                result += "," + connection;
+            Iterator<Vertex> v = vertices.values().iterator();
+            while(v.hasNext()){
+                Vertex n = v.next();
+                Iterator<Vertex> next = n.vList().iterator();
+                while(next.hasNext()){
+                    Vertex nextCon = next.next();
+                    result += ","+nextCon.getId();
+                }
             }
             result += "\n";
+            printlnConsole(result);
         }
         return result;
     }
 
-    private void randomize(int max) { // I don't really like this... Seem quite messy
-        String result = "";
-        int Ncon = 12;
-        // create connections for each nodes
-        for (int i = 0; i < max; i++) {
-            HashSet<Integer> st = new HashSet<>();
-            while (st.size() < (int) (Math.random() * Ncon)) {
-                int con = (int) (Math.random() * max);
-                if (con != i) {
-                    st.add(con);
-                }
-            }
-            nodes.put(i, st);
-        }
-
-        // add connections for nodes equally. Undirected graph i.e. if node a consist node b, the same must happen the other way
-        for (int i = 0; i < nodes.size(); i++) {
-            Iterator<Integer> t = alg.getEdge(i).iterator();
-            while (t.hasNext()) {
-                int nextNum = t.next();
-                if (nodes.get(nextNum) != null) {
-                    if (!(nodes.get(nextNum).contains(i))) {
-                        HashSet<Integer> tList = nodes.get(nextNum);
-                        tList.add(i);
-                        nodes.put(nextNum, tList);
-                    }
-                }
-
-            }
-        }
-        HashMap<Integer, Integer> nums = new HashMap<>();
-        for (int i = 0; i < nodes.size(); i++) {
-            int t = (int) (Math.random() * 925 + 20);
-            int s = (int) (Math.random() * 325 + 20);
-            int x = 0;
-            int y = 0;
-            if(nums.containsKey(t) || nums.containsValue(s)){
-                i--;
-            }else{
-                nums.put(t, s);
-            x = (int) (2 * t);
-            y = (int) (2 * s);
-            result += i + "," + x + "," + y + "," + nodes.get(i).toString().replace("[", "").replace("]", "").replaceAll(" ", "") + "\n";
-            }            
-            
-        }
-
-        Scanner scanner = new Scanner(result);
-        while (scanner.hasNext()) {
-            String currentLine = scanner.nextLine();
-            String[] tokens = currentLine.split(",");
-            Integer key = Integer.parseInt(tokens[0]);
-            Integer x = Integer.parseInt(tokens[1]);
-            Integer y = Integer.parseInt(tokens[2]);
-            HashSet<Integer> connections = new HashSet();
-            for (int i = 3; i < tokens.length; i++) {
-                connections.add(Integer.parseInt(tokens[i]));
-            }
-            nodes.put(key, connections);
-            locations.put(key, new Point(x, y));
-            id = key;
-        }
-        id++;
-        graph();
-        //return result;
-    }
+//    private void randomize(int max) { // I don't really like this... Seem quite messy
+//        String result = "";
+//        int Ncon = 12;
+//        // create connections for each nodes
+//        for (int i = 0; i < max; i++) {
+//            HashSet<Integer> st = new HashSet<>();
+//            while (st.size() < (int) (Math.random() * Ncon)) {
+//                int con = (int) (Math.random() * max);
+//                if (con != i) {
+//                    st.add(con);
+//                }
+//            }
+//            nodes.put(i, st);
+//        }
+//
+//        // add connections for nodes equally. Undirected graph i.e. if node a consist node b, the same must happen the other way
+//        for (int i = 0; i < nodes.size(); i++) {
+//            Iterator<Integer> t = alg.getEdge(i).iterator();
+//            while (t.hasNext()) {
+//                int nextNum = t.next();
+//                if (nodes.get(nextNum) != null) {
+//                    if (!(nodes.get(nextNum).contains(i))) {
+//                        HashSet<Integer> tList = nodes.get(nextNum);
+//                        tList.add(i);
+//                        nodes.put(nextNum, tList);
+//                    }
+//                }
+//
+//            }
+//        }
+//        HashMap<Integer, Integer> nums = new HashMap<>();
+//        for (int i = 0; i < nodes.size(); i++) {
+//            int t = (int) (Math.random() * 925 + 20);
+//            int s = (int) (Math.random() * 325 + 20);
+//            int x = 0;
+//            int y = 0;
+//            if(nums.containsKey(t) || nums.containsValue(s)){
+//                i--;
+//            }else{
+//                nums.put(t, s);
+//            x = (int) (2 * t);
+//            y = (int) (2 * s);
+//            result += i + "," + x + "," + y + "," + nodes.get(i).toString().replace("[", "").replace("]", "").replaceAll(" ", "") + "\n";
+//            }            
+//            
+//        }
+//
+//        Scanner scanner = new Scanner(result);
+//        while (scanner.hasNext()) {
+//            String currentLine = scanner.nextLine();
+//            String[] tokens = currentLine.split(",");
+//            Integer key = Integer.parseInt(tokens[0]);
+//            Integer x = Integer.parseInt(tokens[1]);
+//            Integer y = Integer.parseInt(tokens[2]);
+//            HashSet<Integer> connections = new HashSet();
+//            for (int i = 3; i < tokens.length; i++) {
+//                connections.add(Integer.parseInt(tokens[i]));
+//            }
+//            nodes.put(key, connections);
+//            locations.put(key, new Point(x, y));
+//            id = key;
+//        }
+//        id++;
+//        graph();
+//        //return result;
+//    }
 
     private void save(String path) {
         try {
@@ -949,6 +946,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JButton btnRandomize;
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnStart;
+    private javax.swing.JTextField txtQuery;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox<String> jcbAlgo;

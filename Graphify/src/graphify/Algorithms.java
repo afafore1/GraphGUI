@@ -24,19 +24,22 @@ import java.util.Stack;
 public class Algorithms {
 
     private GraphifyGUI GG;
+    private HashMap<Integer, Vertex> vertex;
+    private Queue<Vertex> q;
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     private HashMap<Integer, Integer> glowMap = new HashMap<>();
     HashMap<Integer, HashSet<Integer>> nodes;
     private Queue<Integer> queue;
-    private Stack<Integer> stack;
+    
+    private Stack<Vertex> stack;
     private HashMap<Integer, Integer> distTo;
     private HashMap<Integer, Integer> set = new HashMap<Integer, Integer>();
     private HashMap<Integer, Integer> visited;
-    private HashMap<Integer, Integer> color;
+    private HashMap<Integer, Vertex> color;
     private HashMap<Integer, Integer> greedyresult;
     private HashSet<Integer> _colors2;
     private ArrayList<Integer> conn;
-    private ArrayList<Integer> bconn;
+    private ArrayList<Vertex> bconn;
     private ArrayList<Integer> cutV;
     private Color[] vertexColors;
     int _selectedNode = -1;
@@ -49,6 +52,7 @@ public class Algorithms {
 
     public Algorithms(GraphifyGUI GG) {
         this.GG = GG;
+        this.vertex = new HashMap<>();
         this.nodes = new HashMap<>();
         this.queue = new LinkedList<>();
         this.stack = new Stack<>();
@@ -62,10 +66,11 @@ public class Algorithms {
         this.vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
     }
 
-    public HashSet<Integer> getEdge(int source) {
-        nodes = GraphifyGUI.getNode();
-        return nodes.get(source);
+    public HashSet<Vertex> getEdge(int source) {
+        vertex = GraphifyGUI.getNode();
+        return vertex.get(source).vList();
     }
+    
 
     void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
         int children = 0;
@@ -99,7 +104,7 @@ public class Algorithms {
     }
 
     void AP() {
-        nodes = GraphifyGUI.getNode();
+        vertex = GraphifyGUI.getNode();
         visited = new HashMap<>();
         boolean cutExist = false;
         HashMap<Integer, Integer> disc = new HashMap<>();
@@ -138,238 +143,110 @@ public class Algorithms {
         }
     }
 
-    void dfs(int source) {
-        nodes = GG.getNode();
-        distTo = new HashMap<>();
-        visited = new HashMap<>();
-
-        Iterator<Integer> allNodes = nodes.keySet().iterator();
-        while (allNodes.hasNext()) {
-            int key = allNodes.next();
-            visited.put(key, -1);
-            distTo.put(key, 0);
-        }
-
+    void dfs(Vertex source) {
+        vertex = GraphifyGUI.getNode();
+        reset();
+       // distTo = new HashMap<>();
         bconn = new ArrayList<>();
-        int element;
-        visited.put(source, 0); // start vertex
+        source.wasVisited = true;
+        source.parent = source;
         stack.push(source);
         while (!stack.isEmpty()) {
-            element = stack.peek();
-            GG.printlnConsole("Considering element " + element);
-            if (!bconn.contains(element)) {
-                bconn.add(element);
+            Vertex current = stack.peek();
+            GG.printlnConsole("Considering element " + current.getName());
+            if (!bconn.contains(current)) {
+                bconn.add(current);
             }
-            HashSet<Integer> iList = getEdge(element);
-            Iterator<Integer> l = iList.iterator();
-            while (l.hasNext()) {
-                int n = l.next();
-                if (visited.get(n) == -1) {
-                    GG.printlnConsole("Pushing " + n);
-                    stack.push(n);
-                    visited.put(n, element);
-                    distTo.put(n, distTo.get(element) + 1);
+            Iterator<Vertex> currentList = current.vList().iterator();
+            while (currentList.hasNext()) {
+                Vertex next = currentList.next();
+                if (!next.wasVisited) {
+                    GG.printlnConsole("Pushing " + next.getName());
+                    stack.push(next);
+                    next.parent = current;
+                    //distTo.put(n, distTo.get(element) + 1);
                     break;
                 }
-                if (l.hasNext() == false) {
-                    int backEdge = stack.pop();
-                    GG.printlnConsole("Back edge " + backEdge);
+                if (!currentList.hasNext()) {
+                    Vertex backEdge = stack.pop();
+                    GG.printlnConsole("Back edge " + backEdge.getName());
                 }
             }
         }
         GG.printlnConsole("order is " + bconn);
     }
 
-    void bfs(int source) {
-        nodes = GG.getNode();
-        distTo = new HashMap<>();
-        visited = new HashMap<>();
-        Iterator<Integer> allNodes = nodes.keySet().iterator();
-        while (allNodes.hasNext()) {
-            int key = allNodes.next();
-            visited.put(key, -1);
-            distTo.put(key, 0);
+ public void Bfs(Vertex source){
+                vertex = GraphifyGUI.getNode();
+                reset();
+		q = new LinkedList<>();
+		source.wasVisited = true;
+		q.add(source);
+		source.parent = source;
+		List<String> bAge = new LinkedList<>();
+                conn = new ArrayList<>();
+		while(!q.isEmpty()){
+			Vertex current = q.poll();
+                        conn.add(current.getId());
+			//GG.printlnConsole("Current vertex is "+current.getName());
+			Iterator<Vertex> currentList = current.vList().iterator();
+			while(currentList.hasNext()){
+				Vertex next = currentList.next();
+				if(next.wasVisited == false){
+					next.wasVisited = true;
+					q.add(next);
+					next.parent = current;
+					//System.out.println("Adding "+next.getName()+" to the queue. Parent is "+next.getParent().getName());
+					if(next.getAge() >= 18 && next.getAge() <= 20){
+						bAge.add(next.getName());
+						System.out.println("Parents of "+next.getName()+" is "+next.getParent());
+						System.out.println(next.getName()+" has an age of "+next.getAge());
+					}
+				}
+			}
+		}
+                GG.printlnConsole("Order is "+conn);
+		
+	}
+ 
+  public void shortestPath(int v, int e) {
+        if (e == v) {
+            GG.printlnConsole(v + "-->" + v);
+            return;
         }
-
-        conn = new ArrayList<Integer>();
-        int i, element;
-        visited.put(source, 0);
-        queue.add(source);
-        while (!queue.isEmpty()) {
-            element = queue.remove();
-            GG.printlnConsole(element + " removed");
-            i = element; // what is the point of i = element here ?
-            conn.add(element);
-            HashSet<Integer> iList = getEdge(i);
-            Iterator<Integer> l = iList.iterator();
-            while (l.hasNext()) {
-                int n = l.next();
-                if (visited.get(n) == -1) {
-                    queue.add(n);
-                    visited.put(n, i);
-                    distTo.put(n, distTo.get(i) + 1);
-                }
+        for (int i = e; i >= 0; i = vertex.get(i).getParent().getId()) {
+            if (i == v) {
+                break;
+            }
+            if (vertex.get(i).getParent().getId() != -1) {
+                set.put(vertex.get(i).getParent().getId(), i);
             }
         }
-        GG.printlnConsole("Order is " + conn);
-        GG.printlnConsole("DistTo is " + distTo);
+        // removed rset
+        GG.printlnConsole(set.toString().replaceAll("=", "-->"));
+        glowMap.clear();
+        for (int i : set.keySet()) {
+            glowMap.put(i, set.get(i));
+        }
+        GG.graph();
     }
 
-    void doubleGraph(int source) {
-        nodes = GG.getNode();
-        distTo = new HashMap<>();
-        visited = new HashMap<>();
-        int lastVisited = source;
-        Iterator<Integer> allNodes = nodes.keySet().iterator();
-        while (allNodes.hasNext()) {
-            int key = allNodes.next();
-            visited.put(key, -1);
-            distTo.put(key, 0);
-        }
-
-        conn = new ArrayList<Integer>();
-        int i, element;
-        visited.put(source, 0);
-        queue.add(source);
-        while (!queue.isEmpty()) {
-            element = queue.remove();
-            lastVisited = element;
-            GG.printlnConsole(element + " removed");
-            i = element;
-            conn.add(element);
-            HashSet<Integer> iHash = getEdge(i);
-            List<Integer> iList = new ArrayList<>(iHash);
-            ListIterator<Integer> iIterator = iList.listIterator();
-            while (iIterator.hasNext()) {
-                int n = iIterator.next();
-                if (visited.get(n) == -1) {
-                    queue.add(n);
-                    visited.put(n, i);
-                    distTo.put(n, distTo.get(i) + 1);
-                }
-            }
-        }
-        GG.printlnConsole("last is "+lastVisited);
-        allNodes = nodes.keySet().iterator();
-        while (allNodes.hasNext()) {
-            int n = allNodes.next(); // current node being visited
-            if(visited.get(n) == null) break;
-            GG.printlnConsole("checking "+n+"...");
-            if(!allNodes.hasNext()) break;
-            List<Integer> nList = new ArrayList<>(getEdge(n));
-            ListIterator<Integer> nChildren = nList.listIterator(); // iterate over it's children
-            while (nChildren.hasNext()) {
-                int nChild = nChildren.next();
-                HashSet<Integer> nHash = getEdge(nChild);
-                List<Integer> nChildList = new ArrayList<>(nHash);
-                ListIterator<Integer> nChildIterator = nChildList.listIterator();
-                while (nChildIterator.hasNext()) {
-                    int ngrandChild = nChildIterator.next();
-                    if (visited.get(ngrandChild) != n && ngrandChild != n) { // if this grandchild is not visited by the grand parent
-                        GG.printlnConsole("parent of "+ngrandChild +" is "+visited.get(ngrandChild)+" n is "+n);
-                        nChildren.add(ngrandChild); // add the grand child as one of the children
-                        nChildIterator.add(n);
-                        GG.printlnConsole("Adding a connection between " + n + " and " + ngrandChild);
-                    }
-                }
-                getEdge(n).addAll(nList);
-                getEdge(nChild).addAll(nChildList);
-            }
-
-        }
-        
-        GG.printlnConsole("Order is " + conn);
-    }
-
-    void makeTree(int source) {
-        nodes = GraphifyGUI.getNode();
-        visited = new HashMap<>();
-        boolean isTree = false;
-        HashMap<Integer, Boolean> isVisited = new HashMap<>();
-        HashSet<Integer> bconn = new HashSet<>();
-        Iterator<Integer> allNodes = nodes.keySet().iterator();
-        while (allNodes.hasNext()) {
-            int key = allNodes.next();
-            visited.put(key, -1);
-            isVisited.put(key, false);
-        }
-        int element;
-        visited.put(source, 0); // start vertex
-        stack.push(source);
-        while (!stack.isEmpty()) {
-            element = stack.peek();
-            //GG.printlnConsole("Considering element " + element);
-            bconn.add(element);
-            HashSet<Integer> iList = getEdge(element);
-            Iterator<Integer> l = iList.iterator();
-            while (l.hasNext()) {
-                int n = l.next();
-                if (visited.get(n) == -1) {
-                    // GG.printlnConsole("Pushing " + n);
-                    isVisited.put(n, true);
-                    stack.push(n);
-                    visited.put(n, element);
-                    break;
-                } else if (visited.get(element) != n && visited.get(n) != element && n != source) {
-                    isTree = true;
-                    l.remove();
-                    getEdge(n).remove(element);
-                    GG.printlnConsole("Removing connection between " + n + " and " + element);
-                }
-                if (l.hasNext() == false) {
-                    stack.pop(); // not necessarily a back edge
-                }
-            }
-        }
-        if (isTree == false) {
-            GG.printlnConsole("Graph is already a tree");
-        } else {
-            GG.printlnConsole("Graph is not a tree\nMaking it a tree ...");
-        }
-        GG.printlnConsole("order is " + bconn);
-    }
-
-    void vertexCover(int source) {
-        nodes = GraphifyGUI.getNode();
-        visited = new HashMap<>();
-        Iterator<Integer> allNodes = nodes.keySet().iterator();
-        while (allNodes.hasNext()) {
-            int key = allNodes.next();
-            visited.put(key, -1);
-        }
-        allNodes = nodes.keySet().iterator();
-        while (allNodes.hasNext()) {
-            int key = allNodes.next();
-            if (visited.get(key) == -1) {
-                Iterator<Integer> nNode = getEdge(key).iterator();
-                while (nNode.hasNext()) {
-                    int v = nNode.next();
-                    if (visited.get(v) == -1) {
-                        visited.put(key, 1);
-                        visited.put(v, 1);
-                        break;
-                    }
-                }
-            }
-        }
-        allNodes = nodes.keySet().iterator();
-        while (allNodes.hasNext()) {
-            int key = allNodes.next();
-            if (visited.get(key) == 1) {
-                GG.printlnConsole(key + " ");
-            }
-        }
-
-    }
+  void reset(){
+      vertex = GraphifyGUI.getNode();
+      Iterator<Vertex> vert = vertex.values().iterator();
+      while(vert.hasNext()){
+          Vertex v = vert.next();
+          v.wasVisited = false;
+      }
+  }
 
     boolean isConnected() {
-        dfs(_source);
-        Iterator<Integer> allNode = nodes.keySet().iterator();
-        while (allNode.hasNext()) {
-            int key = allNode.next();
-            if (visited.get(key) == -1) {
-                return false;
-            }
+        Vertex s = (Vertex) GraphifyGUI.getNode().get(_source);
+        Bfs(s);
+        Iterator<Vertex> vert = vertex.values().iterator();
+        while (vert.hasNext()) {
+            Vertex key = vert.next();
+            if(!key.wasVisited)return false;
         }
         return true;
     }
@@ -377,10 +254,10 @@ public class Algorithms {
     boolean isEulerian() {
         int noOfOdds = 0;
         if (isConnected()) {
-            Iterator<Integer> allNode = nodes.keySet().iterator();
+            Iterator<Vertex> allNode = vertex.values().iterator();
             while (allNode.hasNext()) {
-                int key = allNode.next();
-                int keyEdgeSize = getEdge(key).size();
+                Vertex key = allNode.next();
+                int keyEdgeSize = key.vList().size();
                 if (keyEdgeSize % 2 != 0 && keyEdgeSize != 0) {
                     noOfOdds++;
                 }
@@ -397,91 +274,6 @@ public class Algorithms {
         return false;
     }
 
-    void greedyColoring(int nc) {
-        nodes = GG.getNode();
-        HashMap<Integer, Integer> available = new HashMap<Integer, Integer>();
-        Iterator<Integer> allNode = nodes.keySet().iterator();
-        while (allNode.hasNext()) {
-            int key = allNode.next();
-            greedyresult.put(key, -1);
-            available.put(key, 0); //set all to false
-        }
-        greedyresult.put(_source, 0);
-        allNode = nodes.keySet().iterator();
-        while (allNode.hasNext()) {
-            int key = allNode.next();
-            HashSet<Integer> kList = getEdge(key);
-            Iterator<Integer> u = kList.iterator();
-            while (u.hasNext()) {
-                int k = u.next();
-                if (greedyresult.get(k) != -1) {
-                    available.put(greedyresult.get(k), 1);
-                }
-            }
-            Integer nColor = 0;
-            Iterator<Integer> allNodes = nodes.keySet().iterator();
-            while (allNodes.hasNext()) {
-                nColor = allNodes.next();
-                if (available.get(nColor) == 0) {
-                    break;
-                }
-            }
-            greedyresult.put(key, nColor);
-            if (greedyresult.get(key) > maxColors) {
-                maxColors = nColor;
-            }
-            u = kList.iterator();
-            while (u.hasNext()) {
-                int k = u.next();
-                if (greedyresult.get(k) != -1) {
-                    available.put(greedyresult.get(k), 0);
-                }
-            }
-        }
-
-        Iterator<Integer> allNodes = nodes.keySet().iterator();
-        while (allNodes.hasNext()) {
-            int key = allNodes.next();
-            GG.printlnConsole("Vertex " + key + " ---> Color " + greedyresult.get(key));
-        }
-    }
-
-    void Bipartite(int source) { // will test for 3
-        nodes = GG.getNode();
-        int V = nodes.size();
-        color = new HashMap<Integer, Integer>();
-        _colors2 = new HashSet<Integer>();
-        Iterator<Integer> allNodes = nodes.keySet().iterator();
-        while (allNodes.hasNext()) {
-            int key = allNodes.next();
-            color.put(key, -1);
-        }
-        int element;
-        color.put(source, 1); // start first color with 1, all adjacent to 1 should have color 0
-        queue.add(source);
-        while (!queue.isEmpty()) {
-            element = queue.remove();
-            HashSet<Integer> iList = getEdge(element);
-            Iterator<Integer> x = iList.iterator();
-            while (x.hasNext()) {
-                int key = x.next();
-                if (Objects.equals(color.get(element), color.get(key))) {
-                    _colors2.add(element);
-                    _colors2.add(key);
-                } else if (color.get(key) == -1) {
-                    color.put(key, 1 - color.get(element));
-                    queue.add(key);
-                }
-            }
-        }
-        if (_colors2.size() > 1) {
-            GG.printlnConsole("Graph is not bipartite at " + _colors2.toString());
-        } else {
-            GG.printlnConsole("Graph is bipartite");
-        }
-
-    }
-
     public int hasPath(int v) {
         return visited.get(v);
     }
@@ -490,27 +282,7 @@ public class Algorithms {
         return distTo.get(v);
     }
 
-    public void shortestPath(int v, int e) {
-        if (e == v) {
-            GG.printlnConsole(v + "-->" + v);
-            return;
-        }
-        for (int i = e; i >= 0; i = visited.get(i)) {
-            if (i == v) {
-                break;
-            }
-            if (visited.get(i) != -1) {
-                set.put(visited.get(i), i);
-            }
-        }
-        // removed rset
-        GG.printlnConsole(set.toString().replaceAll("=", "-->"));
-        glowMap.clear();
-        for (int i : set.keySet()) {
-            glowMap.put(i, set.get(i));
-        }
-        GG.graph();
-    }
+   
     //[0, 2, 19, 5, 7, 9, 14]
 
     public Queue getQueue() {
