@@ -137,6 +137,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnClearConsole = new javax.swing.JButton();
         jcbAlgo = new javax.swing.JComboBox<>();
         btnStart = new javax.swing.JButton();
+        txtQuery = new javax.swing.JTextField(20);
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -233,6 +234,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 btnStartActionPerformed(evt);
             }
         });
+        txtQuery.setToolTipText("Enter Query");
 
         mnuFile.setText("File");
 
@@ -302,6 +304,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(btnStart)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 315, Short.MAX_VALUE)
+                                        .addComponent(txtQuery)
                                         .addComponent(btnRandomize)
                                         .addComponent(btnPrintList))
                                 .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -325,6 +328,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(btnReset)
+                                .addComponent(txtQuery)
                                 .addComponent(btnRandomize)
                                 .addComponent(btnPrintList)
                                 .addComponent(btnClearConsole)
@@ -356,7 +360,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
             _dest = -1;
             
             Vertex remove = vertices.get(_selectedNode);
-            printlnConsole(" "+_selectedNode+" "+remove.label);
             Iterator<Vertex> v = vertices.values().iterator();
             while(v.hasNext()){
                 Vertex vert = v.next();
@@ -432,10 +435,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
     
     private void btnRandomizeActionPerformed(java.awt.event.ActionEvent evt){
-        _source = -1;
+        //_source = -1;
         _dest = -1;
         glowMap.clear();
-        String nodeNum = JOptionPane.showInputDialog(null, "Enter number of nodes");
+        String query = txtQuery.getText();
+        if(query.equalsIgnoreCase("people between age 20 to 50")){
+            alg.Bfs(vertices.get(_source));
+        }
+        //String nodeNum = JOptionPane.showInputDialog(null, "Enter number of nodes");
            // randomize(Integer.parseInt(nodeNum));
     }
 
@@ -490,6 +497,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {
         String x = String.valueOf(jcbAlgo.getSelectedItem());
+        String query = txtQuery.getText();
         glowMap.clear();
         alg.getGlowMap().clear();
         txtConsole.setText("");
@@ -501,15 +509,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         alg.getGreedyResult().clear();
         cutV.clear();
         alg.getCutV().clear();
-        if (x == "Bipartite") {
-            glowMap.clear();
-            txtConsole.setText("");
-            if (_source == -1) {
-                printlnConsole("Please choose a source by double clicking a node");
-                return;
-            }
-            alg.Bipartite(_source);
-        } else if (x == "DFS") {
+        if (x == "DFS") {
             txtConsole.setText("");
             if (_source == -1 || _dest == -1 || vertices.get(_source).vList().isEmpty() || vertices.get(_dest).vList().isEmpty()) {
                 if (_source == -1) {
@@ -519,7 +519,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
                 return;
             }
-            printlnConsole("Running Dfs...");
+            printlnConsole("Running Dfs..."); 
             alg.dfs(vertices.get(_source));
             alg.shortestPath(_source, _dest);
         } else if (x == "BFS") {
@@ -534,31 +534,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             alg.Bfs(vertices.get(_source));
             alg.shortestPath(_source, _dest);
-        }else if (x == "Make Tree"){
-            txtConsole.setText("");
-            if(_source == -1){
-                printlnConsole("Please choose a source by double clicking a node");
-                return;
-            }
-            alg.makeTree(_source);
-            graph();
-        }else if(x == "Double Graph"){
-            txtConsole.setText("");
-            if(_source == -1){
-                printlnConsole("Please choose a source by double clicking a node");
-                return;
-            }
-            alg.doubleGraph(_source);
-            graph();
-        }
-        else if(x == "Vertex Cover"){
-            txtConsole.setText("");
-            if(_source == -1){
-                printlnConsole("Please choose a source by double clicking a node");
-                return;
-            }
-            alg.vertexCover(_source);
-            graph();
         }
         else if (x == "Cut") {
             _source = -1;
@@ -566,16 +541,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
             alg.AP();
             cutV = alg.getCutV();
             graph();
-        } else if (x == "GColoring") {
-            glowMap.clear();
-            cutV.clear();
-            if (_source == -1) {
-                printlnConsole("Please select a source to begin ");
-                return;
-            }
-            alg.greedyColoring(2);
-            graph();
-            greedyresult.clear();
         } else if (x == "Connectedness") {
             txtConsole.setText("");
             if (_source == -1) {
@@ -599,6 +564,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 printlnConsole("Euler circuit does not exist");
             }
         } 
+        
+        
 
     }
 
@@ -642,14 +609,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         Integer key = Integer.parseInt(tokens[0]);
                         Integer x = Integer.parseInt(tokens[1]);
                         Integer y = Integer.parseInt(tokens[2]);
-                        HashSet<Integer> connections = new HashSet();
-                        for (int i = 3; i < tokens.length; i++) {
-                            connections.add(Integer.parseInt(tokens[i]));
-                        }
+                        HashSet<Vertex> connections = new HashSet();
                         Vertex v = new Vertex(key, "Vertex "+key, (int)(Math.random() * 50));
                         vertices.put(v.getId(), v);
-                        //nodes.put(key, connections);
                         locations.put(v.getId(), new Point(x, y));
+                        for (int i = 3; i < tokens.length; i++) {
+                            connections.add(vertices.get(Integer.parseInt(tokens[i])));
+                        }                        
+                        v.vList().addAll(connections);
+                        //nodes.put(key, connections);                        
                         id = key;
                     }
                     id++;
@@ -800,9 +768,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
             Iterator<Vertex> v = vertices.values().iterator();
             while(v.hasNext()){
                 Vertex n = v.next();
-                result += ","+n.vList();
+                Iterator<Vertex> next = n.vList().iterator();
+                while(next.hasNext()){
+                    Vertex nextCon = next.next();
+                    result += ","+nextCon.getId();
+                }
             }
             result += "\n";
+            printlnConsole(result);
         }
         return result;
     }
@@ -973,6 +946,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JButton btnRandomize;
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnStart;
+    private javax.swing.JTextField txtQuery;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox<String> jcbAlgo;

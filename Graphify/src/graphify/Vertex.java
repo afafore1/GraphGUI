@@ -38,8 +38,8 @@ public class Vertex {
 		this.vList = new HashSet<>();
 	}
 
-	public void getLabel() {
-		System.out.print(this.label+" ");
+	public String getLabel() {
+		return (this.label+" ");
 	}
 	
 	public String getName(){
