@@ -179,16 +179,14 @@ public class Algorithms {
  public void Bfs(Vertex source){
                 vertex = GraphifyGUI.getNode();
                 reset();
-		q = new LinkedList<>();
-		source.wasVisited = true;
-		q.add(source);
-		source.parent = source;
-		List<String> bAge = new LinkedList<>();
+		q = new LinkedList<>(); // FIFO
+		source.wasVisited = true; // marked as visited
+		q.add(source); // put into queue
+		source.parent = source; // set parent
                 conn = new ArrayList<>();
-		while(!q.isEmpty()){
-			Vertex current = q.poll();
+		while(!q.isEmpty()){ // source
+			Vertex current = q.poll(); // remove first 
                         conn.add(current.getId());
-			//GG.printlnConsole("Current vertex is "+current.getName());
 			Iterator<Vertex> currentList = current.vList().iterator();
 			while(currentList.hasNext()){
 				Vertex next = currentList.next();
@@ -197,16 +195,14 @@ public class Algorithms {
 					q.add(next);
 					next.parent = current;
 					GG.printlnConsole(next.getName()+" has type of "+next.getType());
-					if(next.getAge() >= 18 && next.getAge() <= 20){
-						bAge.add(next.getName());
-						GG.printlnConsole("Parents of "+next.getName()+" is "+next.getParent().getName());
-						GG.printlnConsole(next.getName()+" has an age of "+next.getAge());
-					}
+//					if(next.getAge() >= 18 && next.getAge() <= 20){
+//						GG.printlnConsole("Parents of "+next.getName()+" is "+next.getParent().getName());
+//						GG.printlnConsole(next.getName()+" has an age of "+next.getAge());
+//					}
 				}
 			}
 		}
                 GG.printlnConsole("Order is "+conn);
-		
 	}
  
   public void shortestPath(int v, int e) {

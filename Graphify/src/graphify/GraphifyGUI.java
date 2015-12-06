@@ -404,8 +404,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         //_source = -1;
         _dest = -1;
         glowMap.clear();
-        cutV.clear();
         String query = txtQuery.getText();
+        cutV.clear();
         printlnConsole(Commands.action(query, vertices.get(_source), vertices));
         cutV = Commands.cutV;
         graph();

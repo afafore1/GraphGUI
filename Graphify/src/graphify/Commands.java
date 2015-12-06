@@ -21,9 +21,6 @@ import java.util.Iterator;
     City
 }
 public class Commands {
-    static HashSet<Vertex> _peppz = new HashSet<>();
-    static HashSet<Vertex> _plaz = new HashSet<>();
-    static HashSet<Vertex> _citz = new HashSet<>();
     static ArrayList<Integer> cutV;
     
     static String action(String query, Vertex source, HashMap<Integer, Vertex> v){
@@ -45,54 +42,48 @@ public class Commands {
         String [] tokens = query.split(" ");
         String sec = tokens[1];
         String n = tokens[2];
+        cutV = new ArrayList<>();
         //String n2 = tokens[3];
         if(sec.equals("all")){
             if(n != null){
-                cutV = new ArrayList<>();
+                cutV.clear();
                 if(n.equals("people") || n.equals("places") || n.equals("cities")){
                     Iterator<Vertex> verts = v.values().iterator();
                     while(verts.hasNext()){
-                        int prev = s.getId();
                         Vertex next = verts.next();
                         if(next.getType().equals(Types.Person.toString()) && n.equals("people")){ // change to enumerable
-                            _peppz.add(next);
-                            //if(n2.isEmpty()){
-                            cutV.add(prev); cutV.add(next.getId());
-                             result += next.getLabel();   
+                            cutV.add(next.getId()); 
+                            result += next.getLabel();
                             //}else if(n2.equals("between")){
                                 
                             //}
                             
                         }else if(next.getType().equals(Types.City.toString()) && n.equals("cities")){
-                            _citz.add(next);
-                            cutV.add(prev); cutV.add(next.getId());
+                            cutV.add(next.getId());
                             result += next.getLabel();
                         }else if(next.getType().equals(Types.Place.toString()) && n.equals("places")){
-                            _plaz.add(next);
-                            cutV.add(prev); cutV.add(next.getId());
+                            cutV.add(next.getId());
                             result += next.getLabel();
                         }
-                        s = next;
                     }
                 }
             }
         }else if(sec.equals("my")){
             if(n!= null){
-                cutV = new ArrayList<>();
+                cutV.clear();
+                result = "";
                 if(n.equals("friends") || n.equals("places") || n.equals("cities")){
                     Iterator<Vertex> mine = s.vList().iterator();
                     while(mine.hasNext()){
-                        int prev = s.getId();
                         Vertex next = mine.next();
                         if(next.getType().equals(Types.Person.toString()) && n.equals("friends")){
-                            cutV.add(prev); cutV.add(next.getId());
-                            result+= " "+prev+" "+next.getId();
-                        }else if(next.getType().equals("City") && n.equals("cities")){
-                            cutV.add(prev); cutV.add(next.getId());
-                        }else if(next.getType().equals("Place") && n.equals("places")){
-                            cutV.add(prev); cutV.add(next.getId());
+                            cutV.add(next.getId());
+                        }else if(next.getType().equals(Types.City.toString()) && n.equals("cities")){
+                            cutV.add(next.getId());
+                            
+                        }else if(next.getType().equals(Types.Place.toString()) && n.equals("places")){
+                             cutV.add(next.getId());                            
                         }
-                        s = next;
                     }
                 }
             }
