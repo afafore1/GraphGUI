@@ -679,9 +679,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
             }
 
-            if (cutV.contains(keys.get(i))) {
+            if(!cutV.isEmpty()){
+                if (cutV.contains(keys.get(i))) {
                 bufferGraphic.setColor(Color.green);
             }
+            }
+            
 
             bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
