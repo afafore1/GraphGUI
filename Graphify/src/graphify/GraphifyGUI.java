@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
@@ -74,7 +75,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     double dotOffset = 0.0;
     Algorithms alg;
     Vertex ver;
-    
+
     private static HashMap<Integer, Vertex> vertices;
     private HashSet<Edge> edges;
 
@@ -185,25 +186,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
         );
 
         btnReset.setText("Reset");
-        btnReset.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetActionPerformed(evt);
-            }
-        });
+        btnReset.addActionListener(this::btnResetActionPerformed);
 
         btnPrintList.setText("Print List");
-        btnPrintList.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrintListActionPerformed(evt);
-            }
-        });
-        
-        btnRandomize.setText("Randomize");
-        btnRandomize.addActionListener(new java.awt.event.ActionListener(){
-            public void actionPerformed(java.awt.event.ActionEvent evt){
-                btnRandomizeActionPerformed(evt);
-            }
-        });
+        btnPrintList.addActionListener(new ActionListenerImpl());
+
+        btnRandomize.setText("Run Query");
+        btnRandomize.addActionListener(this::btnRandomizeActionPerformed);
 
         lblInfo.setText("Source: None - Destination: None");
 
@@ -214,72 +203,45 @@ public class GraphifyGUI extends javax.swing.JFrame {
         jScrollPane1.setViewportView(txtConsole);
 
         btnClearConsole.setText("Clear Console");
-        btnClearConsole.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClearConsoleActionPerformed(evt);
-            }
-        });
+        btnClearConsole.addActionListener(this::btnClearConsoleActionPerformed);
 
         jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Make Tree", "Double Graph", "Vertex Cover", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness"}));
-        jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jcbAlgoActionPerformed(evt);
-            }
-        });
+        jcbAlgo.addActionListener(this::jcbAlgoActionPerformed);
 
         btnStart.setText("Start");
-        btnStart.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnStartActionPerformed(evt);
+        btnStart.addActionListener(this::btnStartActionPerformed);
+        txtQuery.setToolTipText("Enter Query");
+        txtQuery.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                commandExecute();
             }
         });
-        txtQuery.setToolTipText("Enter Query");
-
         mnuFile.setText("File");
 
         mnuNew.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
         mnuNew.setText("New");
-        mnuNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuNewActionPerformed(evt);
-            }
-        });
+        mnuNew.addActionListener(this::mnuNewActionPerformed);
         mnuFile.add(mnuNew);
 
         mnuOpen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         mnuOpen.setText("Open");
-        mnuOpen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuOpenActionPerformed(evt);
-            }
-        });
+        mnuOpen.addActionListener(this::mnuOpenActionPerformed);
         mnuFile.add(mnuOpen);
 
         mnuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
         mnuSave.setText("Save");
-        mnuSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSaveActionPerformed(evt);
-            }
-        });
+        mnuSave.addActionListener(this::mnuSaveActionPerformed);
         mnuFile.add(mnuSave);
 
         mnuSaveAs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
         mnuSaveAs.setText("Save as...");
-        mnuSaveAs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSaveAsActionPerformed(evt);
-            }
-        });
+        mnuSaveAs.addActionListener(this::mnuSaveAsActionPerformed);
         mnuFile.add(mnuSaveAs);
 
         mnuQuit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
         mnuQuit.setText("Quit");
-        mnuQuit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuQuitActionPerformed(evt);
-            }
-        });
+        mnuQuit.addActionListener(this::mnuQuitActionPerformed);
         mnuFile.add(mnuQuit);
 
         jMenuBar1.add(mnuFile);
@@ -341,11 +303,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {
         _selectedNode = nodeSelected(evt.getX(), evt.getY());
+        String[] types = new String[]{"Person", "City", "Place"};
         if (_selectedNode < 0 && SwingUtilities.isLeftMouseButton(evt)) {
             changesMade = true;
             //nodes.put(id, new HashSet());
-            Vertex v = new Vertex(id, String.valueOf(id), (int)(Math.random() * 50 ));
-            vertices.put(v.getId(),v);
+            Vertex v = new Vertex(id, String.valueOf(id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
+            vertices.put(v.getId(), v);
             locations.put(v.getId(), new Point(evt.getX(), evt.getY()));
             id++;
         } else if (SwingUtilities.isLeftMouseButton(evt)) {
@@ -357,12 +320,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
             _colors2.clear();
             _source = -1;
             _dest = -1;
-            
+
             Vertex remove = vertices.get(_selectedNode);
             Iterator<Vertex> v = vertices.values().iterator();
-            while(v.hasNext()){
+            while (v.hasNext()) {
                 Vertex vert = v.next();
-                if(vert.vList().contains(remove)){
+                if (vert.vList().contains(remove)) {
                     vert.vList().remove(remove);
                 }
             }
@@ -419,30 +382,35 @@ public class GraphifyGUI extends javax.swing.JFrame {
         graph();
     }
 
-    
-    private void addEdge(String edgeId, int sourceid, int destid, final int weight){
+    private void addEdge(String edgeId, int sourceid, int destid, final int weight) {
         Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), weight);
-		edges.add(newEdge);
-		vertices.get(sourceid).vList().add(vertices.get(destid));
-		vertices.get(destid).vList().add(vertices.get(sourceid));
+        edges.add(newEdge);
+        vertices.get(sourceid).vList().add(vertices.get(destid));
+        vertices.get(destid).vList().add(vertices.get(sourceid));
     }
+
     private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {
         for (int i = 0; i < vertices.size(); i++) {
             printlnConsole(vertices.get(i) + "->" + vertices.get(i).vList());
         }
         printlnConsole("Source is: " + _source);
     }
-    
-    private void btnRandomizeActionPerformed(java.awt.event.ActionEvent evt){
+
+    private void btnRandomizeActionPerformed(java.awt.event.ActionEvent evt) {
+        commandExecute();
+    }
+
+    private void commandExecute() {
         //_source = -1;
         _dest = -1;
         glowMap.clear();
+        cutV.clear();
         String query = txtQuery.getText();
-        if(query.equalsIgnoreCase("people between age 20 to 50")){
-            alg.Bfs(vertices.get(_source));
-        }
+        printlnConsole(Commands.action(query, vertices.get(_source), vertices));
+        cutV = Commands.cutV;
+        graph();
         //String nodeNum = JOptionPane.showInputDialog(null, "Enter number of nodes");
-           // randomize(Integer.parseInt(nodeNum));
+        // randomize(Integer.parseInt(nodeNum));        
     }
 
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {
@@ -473,9 +441,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
         vertices = new HashMap();
         locations = new HashMap();
         id = 0;
-        cutV = new ArrayList<Integer>();
+        cutV = new ArrayList<>();
         alg.getCutV().clear();
-        _colors2 = new HashSet<Integer>();
+        _colors2 = new HashSet<>();
         alg.getColors2().clear();
         glowMap.clear();
         alg.getGlowMap().clear();
@@ -496,7 +464,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {
         String x = String.valueOf(jcbAlgo.getSelectedItem());
-        String query = txtQuery.getText();
         glowMap.clear();
         alg.getGlowMap().clear();
         txtConsole.setText("");
@@ -518,7 +485,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
                 return;
             }
-            printlnConsole("Running Dfs..."); 
+            printlnConsole("Running Dfs...");
             alg.dfs(vertices.get(_source));
             alg.shortestPath(_source, _dest);
         } else if (x == "BFS") {
@@ -533,8 +500,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             alg.Bfs(vertices.get(_source));
             alg.shortestPath(_source, _dest);
-        }
-        else if (x == "Cut") {
+        } else if (x == "Cut") {
             _source = -1;
             _dest = -1;
             alg.AP();
@@ -562,9 +528,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             } else {
                 printlnConsole("Euler circuit does not exist");
             }
-        } 
-        
-        
+        }
 
     }
 
@@ -591,7 +555,22 @@ public class GraphifyGUI extends javax.swing.JFrame {
         saveAs();
     }
 
-    private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) {
+    void getLoadInfo(File f, HashMap<Integer, Vertex> verts, HashMap<Integer, Point> locs) throws FileNotFoundException {
+        String[] types = new String[]{"Person", "City", "Place"};
+        Scanner sc = new Scanner(f);
+        while (sc.hasNext()) {
+            String c = sc.nextLine();
+            String[] tokens = c.split(",");
+            int key = Integer.parseInt(tokens[0]);
+            Integer x = Integer.parseInt(tokens[1]); // locations x and y
+            Integer y = Integer.parseInt(tokens[2]);
+            Vertex v = new Vertex(key, "Vertex " + key, types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
+            verts.put(key, v);
+            locs.put(key, new Point(x, y));
+        }
+    }
+
+    private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) { // needs to be changed to get correct info
         if (checkForChange()) {
             JFileChooser theChooser = new JFileChooser();
             theChooser.setFileFilter(new FileNameExtensionFilter("GraphifyGUI files", "sgf"));
@@ -602,20 +581,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     currentProject = theChooser.getSelectedFile().getPath();
                     File theFile = new File(currentProject);
                     Scanner scanner = new Scanner(theFile);
+                    getLoadInfo(theFile, vertices, locations);
                     while (scanner.hasNext()) {
                         String currentLine = scanner.nextLine();
                         String[] tokens = currentLine.split(",");
                         int key = Integer.parseInt(tokens[0]); // vertex id
-                        Integer x = Integer.parseInt(tokens[1]); // locations x and y
-                        Integer y = Integer.parseInt(tokens[2]);
-                        Vertex v = new Vertex(key, "Vertex "+key, (int) (Math.random() * 50));
-                        vertices.put(key, v);
-                        locations.put(key, new Point(x, y));
+                        Vertex v = vertices.get(key); // get this vertex
                         for (int i = 3; i < tokens.length; i++) {
                             int e = Integer.parseInt(tokens[i]);
-                            Vertex d = new Vertex(e, "Vertex "+e, (int) (Math.random() * 50));
+                            Vertex d = vertices.get(e);
                             v.vList().add(d);
-                        }                       
+                        }
                         id = key;
                     }
                     id++;
@@ -643,17 +619,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
         // Regular connections
         bufferGraphic.setColor(Color.black);
         bufferGraphic.setStroke(new BasicStroke(2));
-        
+
         Iterator<Integer> locs = locations.keySet().iterator();
-        while(locs.hasNext()){
+        while (locs.hasNext()) {
             int next = locs.next();
             int sourceKey = vertices.get(next).getId();
             Point thePoint = locations.get(next);
-            for(Vertex destKey : vertices.get(next).vList()){
-                if(!(connectionCache.containsKey(sourceKey)
+            for (Vertex destKey : vertices.get(next).vList()) {
+                if (!(connectionCache.containsKey(sourceKey)
                         && connectionCache.get(sourceKey) == destKey.getId()
                         || connectionCache.containsKey(destKey.getId())
-                        && connectionCache.get(destKey.getId()) == sourceKey)){
+                        && connectionCache.get(destKey.getId()) == sourceKey)) {
                     Point destPoint = locations.get(destKey.getId());
                     bufferGraphic.drawLine(thePoint.x, thePoint.y, destPoint.x, destPoint.y);
                 }
@@ -673,6 +649,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
 
         // Nodes - red circles.
+        List keys = new ArrayList(locations.keySet());
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
 
@@ -702,8 +679,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
             }
 
-            if (cutV.contains(locations.keySet().toArray()[i])) {
-                bufferGraphic.setColor(Color.gray);
+            if (cutV.contains(keys.get(i))) {
+                bufferGraphic.setColor(Color.green);
             }
 
             bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
@@ -736,7 +713,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private int nodeSelected(int x, int y) {
         Iterator<Integer> loc = locations.keySet().iterator();
-        while(loc.hasNext()){
+        while (loc.hasNext()) {
             int next = loc.next();
             Point thePoint = locations.get(next);
             int deltaX = x - (thePoint.x - _SIZE_OF_NODE / 2);
@@ -749,7 +726,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         return -1;
     }
 
-    private void printConsole(String string) {
+    public void printConsole(String string) {
         txtConsole.append(string);
     }
 
@@ -762,12 +739,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
         for (int i = 0; i < vertices.size(); i++) {
             Vertex key = vertices.get(i); // get the vertex
             int keyId = key.getId();
-            result += keyId+",";
+            result += keyId + ",";
             result += locations.get(key.getId()).x + "," + locations.get(key.getId()).y; // get locations
             Iterator<Vertex> v = key.vList().iterator();
-            while(v.hasNext()){
+            while (v.hasNext()) {
                 Vertex n = v.next();
-                result+=","+n.getId();
+                result += "," + n.getId();
             }
             result += "\n";
         }
@@ -840,7 +817,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
 //        graph();
 //        //return result;
 //    }
-
     private void save(String path) {
         try {
             File fileToSave = new File(path);
@@ -955,5 +931,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JPanel pnlGraph;
     private javax.swing.JTextArea txtConsole;
     // End of variables declaration             
+
+    private class ActionListenerImpl implements ActionListener {
+
+        public ActionListenerImpl() {
+        }
+
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            btnPrintListActionPerformed(evt);
+        }
+    }
 
 }

@@ -33,7 +33,7 @@ public class Algorithms {
     
     private Stack<Vertex> stack;
     private HashMap<Integer, Integer> distTo;
-    private HashMap<Integer, Integer> set = new HashMap<Integer, Integer>();
+    private HashMap<Integer, Integer> set = new HashMap<>();
     private HashMap<Integer, Integer> visited;
     private HashMap<Integer, Vertex> color;
     private HashMap<Integer, Integer> greedyresult;
@@ -196,11 +196,11 @@ public class Algorithms {
 					next.wasVisited = true;
 					q.add(next);
 					next.parent = current;
-					//System.out.println("Adding "+next.getName()+" to the queue. Parent is "+next.getParent().getName());
+					GG.printlnConsole(next.getName()+" has type of "+next.getType());
 					if(next.getAge() >= 18 && next.getAge() <= 20){
 						bAge.add(next.getName());
-						System.out.println("Parents of "+next.getName()+" is "+next.getParent());
-						System.out.println(next.getName()+" has an age of "+next.getAge());
+						GG.printlnConsole("Parents of "+next.getName()+" is "+next.getParent().getName());
+						GG.printlnConsole(next.getName()+" has an age of "+next.getAge());
 					}
 				}
 			}

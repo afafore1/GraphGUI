@@ -24,14 +24,16 @@ public class Vertex {
 	public Vertex parent;
 	private HashSet <Vertex> vList;
 	private int id;
-	public int age;
+	private int age;
+        private String type;
 
         public Vertex(GraphifyGUI GG){
             
         }
-	public Vertex(int id, String vertexLabel, int age) {
+	public Vertex(int id, String vertexLabel,String type, int age) {
 		this.label = vertexLabel;
 		this.wasVisited = false;
+                this.type = type;
 		this.parent = this; // change this to vertex
 		this.id = id;
 		this.age = age;
@@ -45,6 +47,10 @@ public class Vertex {
 	public String getName(){
 		return this.label;
 	}
+        
+        public String getType(){
+            return this.type;
+        }
 	
 	public int getId(){
 		return this.id;
@@ -57,6 +63,10 @@ public class Vertex {
 	public int getAge(){
 		return this.age;
 	}
+        
+        void setAge(int age){
+            this.age = age;
+        }
         
         public Vertex getVertex(int id){
             return this;
