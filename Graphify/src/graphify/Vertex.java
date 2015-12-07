@@ -22,19 +22,19 @@ public class Vertex {
 	public Vertex parent;
 	private HashSet <Vertex> vList;
 	private int id;
-	private int age;
+	private int rating;
         private String type;
 
         public Vertex(GraphifyGUI GG){
             
         }
-	public Vertex(int id, String vertexLabel,String type, int age) {
+	public Vertex(int id, String vertexLabel,String type, int rating) {
 		this.label = vertexLabel;
 		this.wasVisited = false;
                 this.type = type;
 		this.parent = this; // change this to vertex
 		this.id = id;
-		this.age = age;
+		this.rating = rating;
 		this.vList = new HashSet<>();
 	}
 
@@ -59,11 +59,11 @@ public class Vertex {
         }
 	
 	public int getAge(){
-		return this.age;
+		return this.rating;
 	}
         
         void setAge(int age){
-            this.age = age;
+            this.rating = age;
         }
         
         public Vertex getVertex(int id){

@@ -23,14 +23,14 @@ import java.util.Stack;
  */
 public class Algorithms {
 
-    private GraphifyGUI GG;
-    private HashMap<Integer, Vertex> vertex;
-    private Queue<Vertex> q;
+    private static GraphifyGUI GG;
+    private static HashMap<Integer, Vertex> vertex;
+    private static Queue<Vertex> q;
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     private HashMap<Integer, Integer> glowMap = new HashMap<>();
     HashMap<Integer, HashSet<Integer>> nodes;
     private Queue<Integer> queue;
-    
+
     private Stack<Vertex> stack;
     private HashMap<Integer, Integer> distTo;
     private HashMap<Integer, Integer> set = new HashMap<>();
@@ -38,8 +38,8 @@ public class Algorithms {
     private HashMap<Integer, Vertex> color;
     private HashMap<Integer, Integer> greedyresult;
     private HashSet<Integer> _colors2;
-    private ArrayList<Integer> conn;
-    private ArrayList<Vertex> bconn;
+    private static ArrayList<Integer> conn;
+    private HashSet<Vertex> bconn;
     private ArrayList<Integer> cutV;
     private Color[] vertexColors;
     int _selectedNode = -1;
@@ -70,7 +70,6 @@ public class Algorithms {
         vertex = GraphifyGUI.getNode();
         return vertex.get(source).vList();
     }
-    
 
     void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
         int children = 0;
@@ -143,28 +142,25 @@ public class Algorithms {
         }
     }
 
-    void dfs(Vertex source) {
+    public void Dfs(Vertex source) {
         vertex = GraphifyGUI.getNode();
         reset();
-       // distTo = new HashMap<>();
-        bconn = new ArrayList<>();
+        stack = new Stack<>();
+        bconn = new HashSet<>();
         source.wasVisited = true;
         source.parent = source;
         stack.push(source);
         while (!stack.isEmpty()) {
             Vertex current = stack.peek();
             GG.printlnConsole("Considering element " + current.getName());
-            if (!bconn.contains(current)) {
-                bconn.add(current);
-            }
+            bconn.add(current);
             Iterator<Vertex> currentList = current.vList().iterator();
             while (currentList.hasNext()) {
                 Vertex next = currentList.next();
-                if (!next.wasVisited) {
+                if (!next.wasVisited) { // visited just one at a time
                     GG.printlnConsole("Pushing " + next.getName());
                     stack.push(next);
                     next.parent = current;
-                    //distTo.put(n, distTo.get(element) + 1);
                     break;
                 }
                 if (!currentList.hasNext()) {
@@ -176,36 +172,87 @@ public class Algorithms {
         GG.printlnConsole("order is " + bconn);
     }
 
- public void Bfs(Vertex source){
-                vertex = GraphifyGUI.getNode();
-                reset();
-		q = new LinkedList<>(); // FIFO
-		source.wasVisited = true; // marked as visited
-		q.add(source); // put into queue
-		source.parent = source; // set parent
-                conn = new ArrayList<>();
-		while(!q.isEmpty()){ // source
-			Vertex current = q.poll(); // remove first 
-                        conn.add(current.getId());
-			Iterator<Vertex> currentList = current.vList().iterator();
-			while(currentList.hasNext()){
-				Vertex next = currentList.next();
-				if(next.wasVisited == false){
-					next.wasVisited = true;
-					q.add(next);
-					next.parent = current;
-					GG.printlnConsole(next.getName()+" has type of "+next.getType());
+    public static void Bfs(Vertex source) {
+        vertex = GraphifyGUI.getNode();
+        reset();
+        q = new LinkedList<>(); // FIFO
+        source.wasVisited = true; // marked as visited
+        q.add(source); // put into queue
+        source.parent = source; // set parent
+        conn = new ArrayList<>();
+        while (!q.isEmpty()) { // source
+            Vertex current = q.poll(); // remove first 
+            conn.add(current.getId());
+            Iterator<Vertex> currentList = current.vList().iterator();
+            while (currentList.hasNext()) {
+                Vertex next = currentList.next();
+                if (next.wasVisited == false) {
+                    next.wasVisited = true;
+                    q.add(next);
+                    next.parent = current;
+                    GG.printlnConsole(next.getName() + " has type of " + next.getType());
 //					if(next.getAge() >= 18 && next.getAge() <= 20){
 //						GG.printlnConsole("Parents of "+next.getName()+" is "+next.getParent().getName());
 //						GG.printlnConsole(next.getName()+" has an age of "+next.getAge());
 //					}
-				}
-			}
-		}
-                GG.printlnConsole("Order is "+conn);
-	}
- 
-  public void shortestPath(int v, int e) {
+                }
+            }
+        }
+        GG.printlnConsole("Order is " + conn);
+    }
+
+    public static ArrayList BfsSuggest(Vertex source, int num) {
+        vertex = GraphifyGUI.getNode();
+        reset();
+        q = new LinkedList<>(); // FIFO
+        source.wasVisited = true; // marked as visited
+        q.add(source); // put into queue
+        source.parent = source; // set parent
+        conn = new ArrayList<>();
+        while (!q.isEmpty()) { // source
+            Vertex current = q.poll(); // remove first 
+            Iterator<Vertex> currentList = current.vList().iterator();
+            while (currentList.hasNext()) {
+                Vertex next = currentList.next();
+                if (next.wasVisited == false) {
+                    next.wasVisited = true;
+                    q.add(next);
+                    next.parent = current;
+                    if (!source.vList().contains(next)) {
+                        switch (num) {
+                            case 0:
+                                if (next.getType().equals(Types.Person.toString())) {
+                                    if(conn.size() <= 5)
+                                    conn.add(next.getId());
+                                }
+                                break;
+                            case 1:
+                                if (next.getType().equals(Types.Place.toString())) {
+                                    if (conn.size() <= 5) {
+                                        conn.add(next.getId());
+                                    }
+                                }
+                                break;
+                            case 2:
+                                if (next.getType().equals(Types.City.toString())) {
+                                    if (conn.size() <= 5) {
+                                        conn.add(next.getId());
+                                    }
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+
+                    }
+                }
+            }
+        }
+
+        return conn;
+    }
+
+    public void shortestPath(int v, int e) {
         if (e == v) {
             GG.printlnConsole(v + "-->" + v);
             return;
@@ -227,14 +274,14 @@ public class Algorithms {
         GG.graph();
     }
 
-  void reset(){
-      vertex = GraphifyGUI.getNode();
-      Iterator<Vertex> vert = vertex.values().iterator();
-      while(vert.hasNext()){
-          Vertex v = vert.next();
-          v.wasVisited = false;
-      }
-  }
+    static void reset() {
+        vertex = GraphifyGUI.getNode();
+        Iterator<Vertex> vert = vertex.values().iterator();
+        while (vert.hasNext()) {
+            Vertex v = vert.next();
+            v.wasVisited = false;
+        }
+    }
 
     boolean isConnected() {
         Vertex s = (Vertex) GraphifyGUI.getNode().get(_source);
@@ -242,7 +289,9 @@ public class Algorithms {
         Iterator<Vertex> vert = vertex.values().iterator();
         while (vert.hasNext()) {
             Vertex key = vert.next();
-            if(!key.wasVisited)return false;
+            if (!key.wasVisited) {
+                return false;
+            }
         }
         return true;
     }
@@ -278,9 +327,7 @@ public class Algorithms {
         return distTo.get(v);
     }
 
-   
     //[0, 2, 19, 5, 7, 9, 14]
-
     public Queue getQueue() {
         return this.queue;
     }
@@ -321,7 +368,7 @@ public class Algorithms {
         return this.conn;
     }
 
-    public ArrayList getBConn() {
+    public HashSet getBConn() {
         return this.bconn;
     }
 

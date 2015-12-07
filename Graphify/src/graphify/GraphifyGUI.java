@@ -56,8 +56,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
     HashMap<Integer, Integer> greedyresult;
     HashSet<Integer> _colors2;
     HashSet<Integer> randomKeys;
-    ArrayList<Integer> conn;
-    ArrayList<Integer> bconn;
     ArrayList<Integer> cutV;
     Color[] vertexColors;
     int _selectedNode = -1;
@@ -405,6 +403,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         _dest = -1;
         glowMap.clear();
         String query = txtQuery.getText();
+        query = query.toLowerCase(); // perform all operations in lower case
         cutV.clear();
         printlnConsole(Commands.action(query, vertices.get(_source), vertices));
         cutV = Commands.cutV;
@@ -475,7 +474,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         alg.getGreedyResult().clear();
         cutV.clear();
         alg.getCutV().clear();
-        if (x == "DFS") {
+        if (x.equals("DFS")) {
             txtConsole.setText("");
             if (_source == -1 || _dest == -1 || vertices.get(_source).vList().isEmpty() || vertices.get(_dest).vList().isEmpty()) {
                 if (_source == -1) {
@@ -486,7 +485,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 return;
             }
             printlnConsole("Running Dfs...");
-            alg.dfs(vertices.get(_source));
+            alg.Dfs(vertices.get(_source));
             alg.shortestPath(_source, _dest);
         } else if (x == "BFS") {
             txtConsole.setText("");

@@ -15,7 +15,7 @@ import java.util.Iterator;
  * @author Ayomitunde
  */
 
- enum Types{
+  enum Types{
     Person,
     Place,
     City
@@ -38,10 +38,12 @@ public class Commands {
     
     static String find(String query, HashMap<Integer, Vertex> v,Vertex s){
         String result = "";
-        
         String [] tokens = query.split(" ");
         String sec = tokens[1];
-        String n = tokens[2];
+        String n = null;
+        if(query.indexOf(sec.length()) < query.length()){
+            n = tokens[2];
+        }        
         cutV = new ArrayList<>();
         //String n2 = tokens[3];
         if(sec.equals("all")){
@@ -56,8 +58,7 @@ public class Commands {
                             result += next.getLabel();
                             //}else if(n2.equals("between")){
                                 
-                            //}
-                            
+                            //}   
                         }else if(next.getType().equals(Types.City.toString()) && n.equals("cities")){
                             cutV.add(next.getId());
                             result += next.getLabel();
@@ -67,6 +68,8 @@ public class Commands {
                         }
                     }
                 }
+            }else{
+                // do nothing for now 
             }
         }else if(sec.equals("my")){
             if(n!= null){
@@ -86,6 +89,18 @@ public class Commands {
                         }
                     }
                 }
+            }
+        }else if(sec.equals("friends") || sec.equals("places") || sec.equals("cities")){
+            if(n!= null){
+                cutV.clear();
+                result = "";
+                    if(sec.equals("friends")){
+                        cutV = Algorithms.BfsSuggest(s, 0);
+                    }else if(sec.equals("places")){
+                        cutV = Algorithms.BfsSuggest(s, 1);
+                    }else if(sec.equals("cities")){
+                        cutV = Algorithms.BfsSuggest(s, 2);
+                    }
             }
         }
         return result;
