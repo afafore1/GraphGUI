@@ -58,7 +58,7 @@ public class Vertex {
             this.id = id;
         }
 	
-	public int getAge(){
+	public int getRating(){
 		return this.rating;
 	}
         

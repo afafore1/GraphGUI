@@ -7,6 +7,7 @@ package graphify;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -222,8 +223,9 @@ public class Algorithms {
                         switch (num) {
                             case 0:
                                 if (next.getType().equals(Types.Person.toString())) {
-                                    if(conn.size() <= 5)
-                                    conn.add(next.getId());
+                                    if (conn.size() <= 5) {
+                                        conn.add(next.getId());
+                                    }
                                 }
                                 break;
                             case 1:
@@ -240,6 +242,23 @@ public class Algorithms {
                                     }
                                 }
                                 break;
+                            case 3:
+                                if (next.getType().equals(Types.Place.toString())) {
+                                    if (conn.isEmpty()) { // keep sorted always
+                                        GG.printlnConsole("adding " + next.getId());
+                                        conn.add(next.getId());
+                                    }else{
+                                        conn.add(next.getId());
+                                        for(int i = 1; i < conn.size(); i++){
+                                            for(int j = i; j > 0; j--){
+                                                if(vertex.get(conn.get(j)).getRating() < vertex.get(conn.get(j-1)).getRating()){
+                                                    conn.add(j, conn.get(j-1));
+                                                    conn.add(j-1, conn.get(j));
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             default:
                                 break;
                         }
