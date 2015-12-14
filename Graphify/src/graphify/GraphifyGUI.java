@@ -61,6 +61,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     int _selectedNode = -1;
     int _SIZE_OF_NODE = 20;
     int id = 0;
+    int Edgeid = 0;
     int time = 0;
     Integer maxColors = 0;
     int _source = -1;
@@ -75,7 +76,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     Vertex ver;
 
     private static HashMap<Integer, Vertex> vertices;
-    private HashSet<Edge> edges;
+    private static HashSet<Edge> edges;
 
     public GraphifyGUI() {
         initComponents();
@@ -84,7 +85,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         this.alg = new Algorithms(this);
         this.ver = new Vertex(this);
         vertices = new HashMap<>();
-        edges = new HashSet<Edge>();
+        edges = new HashSet<>();
         queue = alg.getQueue();
         stack = alg.getStack();
         cutV = alg.getCutV();
@@ -120,6 +121,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     public static HashMap getNode() {
         return GraphifyGUI.vertices;
+    }
+    
+    public static HashSet getEdges(){
+        return GraphifyGUI.edges;
     }
 
     @SuppressWarnings("unchecked")
@@ -372,17 +377,19 @@ public class GraphifyGUI extends javax.swing.JFrame {
         if (_selectedNode >= 0) {
             int destination = nodeSelected(evt.getX(), evt.getY());
             if (destination >= 0 && destination != _selectedNode) {
-                addEdge(String.valueOf(id), _selectedNode, destination, 0);
+                addEdge(String.valueOf(Edgeid), _selectedNode, destination, (int)(Math.random() * 100));
                 _selectedNode = -1;
                 changesMade = true;
+                Edgeid++;
             }
         }
         graph();
     }
 
     private void addEdge(String edgeId, int sourceid, int destid, final int weight) {
-        Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), weight);
+        Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), 0, weight);
         edges.add(newEdge);
+        //printlnConsole(newEdge.getId()+" "+newEdge.getSource().getName()+" "+newEdge.getDest().getName()+" "+newEdge.getWeight());
         vertices.get(sourceid).vList().add(vertices.get(destid));
         vertices.get(destid).vList().add(vertices.get(sourceid));
     }

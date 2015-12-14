@@ -113,11 +113,13 @@ class Edge{
 	private final Vertex source;
 	private final Vertex dest;
 	private final int weight;
+        private final int pheromoneAmount;
 	
-	public Edge(String id, Vertex source, Vertex dest, int weight){
+	public Edge(String id, Vertex source, Vertex dest, int pAmount, int weight){
 		this.id = id;
 		this.source = source;
 		this.dest = dest;
+                this.pheromoneAmount = pAmount;
 		this.weight = weight;
 	}
 	
@@ -132,6 +134,10 @@ class Edge{
 	public Vertex getSource(){
 		return source;
 	}
+        
+        public int getpheromoneAmount(){
+            return pheromoneAmount;
+        }
 	
 	public int getWeight(){
 		return weight;

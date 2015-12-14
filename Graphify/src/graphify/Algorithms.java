@@ -26,6 +26,7 @@ public class Algorithms {
 
     private static GraphifyGUI GG;
     private static HashMap<Integer, Vertex> vertex;
+    private static HashSet<Edge> edges;
     private static Queue<Vertex> q;
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     private HashMap<Integer, Integer> glowMap = new HashMap<>();
@@ -53,7 +54,8 @@ public class Algorithms {
 
     public Algorithms(GraphifyGUI GG) {
         this.GG = GG;
-        this.vertex = new HashMap<>();
+        Algorithms.vertex = new HashMap<>();
+        Algorithms.edges = new HashSet<>();
         this.nodes = new HashMap<>();
         this.queue = new LinkedList<>();
         this.stack = new Stack<>();
@@ -175,6 +177,7 @@ public class Algorithms {
 
     public static void Bfs(Vertex source) {
         vertex = GraphifyGUI.getNode();
+        edges = GraphifyGUI.getEdges();
         reset();
         q = new LinkedList<>(); // FIFO
         source.wasVisited = true; // marked as visited
@@ -191,11 +194,7 @@ public class Algorithms {
                     next.wasVisited = true;
                     q.add(next);
                     next.parent = current;
-                    GG.printlnConsole(next.getName() + " has type of " + next.getType());
-//					if(next.getAge() >= 18 && next.getAge() <= 20){
-//						GG.printlnConsole("Parents of "+next.getName()+" is "+next.getParent().getName());
-//						GG.printlnConsole(next.getName()+" has an age of "+next.getAge());
-//					}
+                   // GG.printlnConsole(next.getName() + " has type of " + next.getType());
                 }
             }
         }
