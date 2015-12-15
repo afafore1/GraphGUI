@@ -670,18 +670,27 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             if (greedyresult.size() > 0) {
                 Integer k = vertices.get(i).getId();
-                if (greedyresult.get(k) == 0) {
-                    bufferGraphic.setColor(vertexColors[0]);
-                } else if (greedyresult.get(k) == 1) {
-                    bufferGraphic.setColor(vertexColors[1]);
-                } else if (greedyresult.get(k) == 2) {
-                    bufferGraphic.setColor(vertexColors[2]);
-                } else if (greedyresult.get(k) == 3) {
-                    bufferGraphic.setColor(vertexColors[3]);
-                } else if (greedyresult.get(k) == 4) {
-                    bufferGraphic.setColor(vertexColors[4]);
-                } else if (greedyresult.get(k) == 5) {
-                    bufferGraphic.setColor(vertexColors[5]);
+                if (null != greedyresult.get(k)) switch (greedyresult.get(k)) {
+                    case 0:
+                        bufferGraphic.setColor(vertexColors[0]);
+                        break;
+                    case 1:
+                        bufferGraphic.setColor(vertexColors[1]);
+                        break;
+                    case 2:
+                        bufferGraphic.setColor(vertexColors[2]);
+                        break;
+                    case 3:
+                        bufferGraphic.setColor(vertexColors[3]);
+                        break;
+                    case 4:
+                        bufferGraphic.setColor(vertexColors[4]);
+                        break;
+                    case 5:
+                        bufferGraphic.setColor(vertexColors[5]);
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -701,7 +710,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
             bufferGraphic.drawString("V " + locations.keySet().toArray()[i],
-                    thePoint.x + _SIZE_OF_NODE + 4, thePoint.y + _SIZE_OF_NODE + 4);
+                    thePoint.x - _SIZE_OF_NODE / 2,
+                    thePoint.y - _SIZE_OF_NODE / 2);
         }
         pnlGraph.getGraphics().drawImage(bufferImage, 1, 1, this);
         lblInfo.setText("Source: " + getNodeInfo(_source)
