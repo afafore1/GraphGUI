@@ -66,6 +66,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
     int _SIZE_OF_NODE = 20;
     int id = 0;
     int Edgeid = 0;
+    int weight = 0;
+    List<Integer> edgeWeights; // store weights here
     int time = 0;
     Integer maxColors = 0;
     int _source = -1;
@@ -88,6 +90,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
         this.alg = new Algorithms(this);
         this.ver = new Vertex(this);
+        edgeWeights = new ArrayList<>();
         vertices = new HashMap<>();
         edges = new ArrayList<>();
         queue = alg.getQueue();
@@ -101,15 +104,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
         set = alg.getSet();
         distTo = alg.distTo();
         vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
-        randomKeys = new HashSet<Integer>();
-        Timer animationTimer = new Timer(30, new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (glowMap.size() > 0) {
-                    dotOffset = (dotOffset + .07) % 1;
-                    graph();
-                }
+        randomKeys = new HashSet<>();
+        Timer animationTimer = new Timer(30, (ActionEvent e) -> {
+            if (glowMap.size() > 0) {
+                dotOffset = (dotOffset + .07) % 1;
+                graph();
             }
         });
         animationTimer.start();
@@ -126,8 +125,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
     public static HashMap getNode() {
         return GraphifyGUI.vertices;
     }
-    
-    public static ArrayList getEdges(){
+
+    public static ArrayList getEdges() {
         return GraphifyGUI.edges;
     }
 
@@ -158,24 +157,29 @@ public class GraphifyGUI extends javax.swing.JFrame {
         pnlGraph.setBackground(new java.awt.Color(255, 255, 255));
         pnlGraph.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         pnlGraph.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 pnlGraphMouseDragged(evt);
             }
         });
         pnlGraph.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 pnlGraphMouseClicked(evt);
             }
 
+            @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 pnlGraphMousePressed(evt);
             }
 
+            @Override
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 pnlGraphMouseReleased(evt);
             }
         });
         pnlGraph.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
             public void componentResized(java.awt.event.ComponentEvent evt) {
                 pnlGraphComponentResized(evt);
             }
@@ -218,11 +222,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnStart.setText("Start");
         btnStart.addActionListener(this::btnStartActionPerformed);
         txtQuery.setToolTipText("Enter Query");
-        txtQuery.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                commandExecute();
-            }
+        txtQuery.addActionListener((ActionEvent e) -> {
+            commandExecute();
         });
         mnuFile.setText("File");
 
@@ -354,19 +355,20 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     void drawArrow(Graphics g1, int x1, int y1, int x2, int y2) {
-                Graphics2D g = (Graphics2D) g1.create();
-                double dx = x2 - x1, dy = y2 - y1;
-                double angle = Math.atan2(dy, dx);
-                int len = (int) Math.sqrt(dx*dx + dy*dy);
-                AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
-                at.concatenate(AffineTransform.getRotateInstance(angle));
-                g.transform(at);
+        Graphics2D g = (Graphics2D) g1.create();
+        double dx = x2 - x1, dy = y2 - y1;
+        double angle = Math.atan2(dy, dx);
+        int len = (int) Math.sqrt(dx * dx + dy * dy);
+        AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
+        at.concatenate(AffineTransform.getRotateInstance(angle));
+        g.transform(at);
 
-                // Draw horizontal arrow starting in (0, 0)
-                g.drawLine(0, 0, len, 0);
-                g.fillPolygon(new int[] {len, len-ARR_SIZE, len-ARR_SIZE, len},
-                              new int[] {0, -ARR_SIZE, ARR_SIZE, 0}, 4);
-            }
+        // Draw horizontal arrow starting in (0, 0)
+        g.drawLine(0, 0, len, 0);
+        g.fillPolygon(new int[]{len, len - ARR_SIZE, len - ARR_SIZE, len},
+                new int[]{0, -ARR_SIZE, ARR_SIZE, 0}, 4);
+    }
+
     private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {
         if (_selectedNode >= 0) {
             if (SwingUtilities.isLeftMouseButton(evt)) {
@@ -375,10 +377,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 buffG.drawImage(bufferImage, 0, 0, this);
                 Point source = locations.get(_selectedNode);
                 //buffG.drawLine(source.x, source.y,
-                        //evt.getX(), evt.getY());
+                //evt.getX(), evt.getY());
                 drawArrow(buffG, source.x, source.y, evt.getX(), evt.getY());
                 pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
-                
             } else if (SwingUtilities.isMiddleMouseButton(evt)) {
                 locations.get(_selectedNode).x = evt.getX();
                 locations.get(_selectedNode).y = evt.getY();
@@ -394,10 +395,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     private void pnlGraphMouseReleased(java.awt.event.MouseEvent evt) {
+        weight = 0;
         if (_selectedNode >= 0) {
             int destination = nodeSelected(evt.getX(), evt.getY());
             if (destination >= 0 && destination != _selectedNode) {
-                addEdge(Edgeid, _selectedNode, destination, (int)(Math.random() * 100));
+                weight = (int) (Math.random() * 100);
+                addEdge(Edgeid, _selectedNode, destination, weight);
+                edgeWeights.add(weight);
                 _selectedNode = -1;
                 changesMade = true;
                 Edgeid++;
@@ -409,7 +413,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private void addEdge(int edgeId, int sourceid, int destid, final int weight) {
         Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), 0, weight);
         edges.add(newEdge);
-        printlnConsole(newEdge.getId()+" "+newEdge.getSource().getName()+" "+newEdge.getDest().getName()+" "+newEdge.getWeight());
+        //printlnConsole(newEdge.getId() + " " + newEdge.getSource().getName() + " " + newEdge.getDest().getName() + " " + newEdge.getWeight());
         vertices.get(sourceid).vList().add(vertices.get(destid));
         vertices.get(destid).vList().add(vertices.get(sourceid));
     }
@@ -524,9 +528,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
                 return;
             }
-            alg.Bfs(vertices.get(_source));
+            Algorithms.Bfs(vertices.get(_source));
             alg.shortestPath(_source, _dest);
-        }else if(x == "Dijkstra"){
+        } else if (x == "Dijkstra") {
             txtConsole.setText("");
             if (_source == -1 || _dest == -1 || vertices.get(_source).vList().isEmpty() || vertices.get(_dest).vList().isEmpty()) {
                 if (_source == -1) {
@@ -538,7 +542,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             alg.execute(vertices.get(_source));
             alg.shortestPath(_source, _dest);
-        }else if (x == "Cut") {
+        } else if (x == "Cut") {
             _source = -1;
             _dest = -1;
             alg.AP();
@@ -648,21 +652,33 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
         return "" + nodeId;
     }
+    
+    private int getWeight(Vertex s, Vertex d){
+        for(Edge e : edges){
+            if(e.getSource().equals(s) && e.getDest().equals(d)){
+                printlnConsole(""+e.getWeight());
+                return e.getWeight();
+            }
+        }
+        return -1; // edge does not exist then
+    }
 
     public void graph() {
         bufferGraphic.setColor(Color.white);
         bufferGraphic.fillRect(0, 0, pnlGraph.getWidth(), pnlGraph.getHeight());
         connectionCache.clear();
-
         // Regular connections
         bufferGraphic.setColor(Color.black);
         bufferGraphic.setStroke(new BasicStroke(2));
-
+        int xmid = 0;
+        int ymid = 0;
         Iterator<Integer> locs = locations.keySet().iterator();
         while (locs.hasNext()) {
             int next = locs.next();
+            Vertex source = vertices.get(next);
             int sourceKey = vertices.get(next).getId();
             Point thePoint = locations.get(next);
+            
             for (Vertex destKey : vertices.get(next).vList()) {
                 if (!(connectionCache.containsKey(sourceKey)
                         && connectionCache.get(sourceKey) == destKey.getId()
@@ -670,13 +686,19 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         && connectionCache.get(destKey.getId()) == sourceKey)) {
                     Point destPoint = locations.get(destKey.getId());
                     bufferGraphic.drawLine(thePoint.x, thePoint.y, destPoint.x, destPoint.y);
+                    xmid = (thePoint.x + destPoint.x)/2 + 3;
+                    ymid = (thePoint.y + destPoint.y)/2 + 3;
+                    int edgeWeight = getWeight(source, destKey);
+                    if(!(edgeWeight == -1)){
+                        bufferGraphic.drawString(String.valueOf(edgeWeight), xmid, ymid);
+                    }
                 }
             }
         }
 
         // Glowing connections
         bufferGraphic.setColor(new Color(10, 230, 40));
-        bufferGraphic.setStroke(new BasicStroke(8));
+        bufferGraphic.setStroke(new BasicStroke(6));
         if (!btnReset.isSelected()) {
             for (int sourceKey : glowMap.keySet()) {
                 int destKey = glowMap.get(sourceKey);
@@ -702,36 +724,37 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             if (greedyresult.size() > 0) {
                 Integer k = vertices.get(i).getId();
-                if (null != greedyresult.get(k)) switch (greedyresult.get(k)) {
-                    case 0:
-                        bufferGraphic.setColor(vertexColors[0]);
-                        break;
-                    case 1:
-                        bufferGraphic.setColor(vertexColors[1]);
-                        break;
-                    case 2:
-                        bufferGraphic.setColor(vertexColors[2]);
-                        break;
-                    case 3:
-                        bufferGraphic.setColor(vertexColors[3]);
-                        break;
-                    case 4:
-                        bufferGraphic.setColor(vertexColors[4]);
-                        break;
-                    case 5:
-                        bufferGraphic.setColor(vertexColors[5]);
-                        break;
-                    default:
-                        break;
+                if (null != greedyresult.get(k)) {
+                    switch (greedyresult.get(k)) {
+                        case 0:
+                            bufferGraphic.setColor(vertexColors[0]);
+                            break;
+                        case 1:
+                            bufferGraphic.setColor(vertexColors[1]);
+                            break;
+                        case 2:
+                            bufferGraphic.setColor(vertexColors[2]);
+                            break;
+                        case 3:
+                            bufferGraphic.setColor(vertexColors[3]);
+                            break;
+                        case 4:
+                            bufferGraphic.setColor(vertexColors[4]);
+                            break;
+                        case 5:
+                            bufferGraphic.setColor(vertexColors[5]);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 
-            if(!cutV.isEmpty()){
+            if (!cutV.isEmpty()) {
                 if (cutV.contains(keys.get(i))) {
-                bufferGraphic.setColor(Color.green);
+                    bufferGraphic.setColor(Color.green);
+                }
             }
-            }
-            
 
             bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
@@ -741,7 +764,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         bufferGraphic.setColor(Color.blue);
         for (int i = 0; i < locations.size(); i++) {
             Point thePoint = (Point) locations.values().toArray()[i];
-            bufferGraphic.drawString("V " + locations.keySet().toArray()[i],
+            bufferGraphic.drawString("" + locations.keySet().toArray()[i],
                     thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2);
         }

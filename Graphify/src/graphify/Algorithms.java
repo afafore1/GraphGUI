@@ -287,16 +287,7 @@ public class Algorithms {
             return distance;
         }
     }
-    
-    public void findPath(Vertex dest){
-        set.clear();
-        Vertex s = dest;
-        if(parents.get(s) == null){
-            GG.printlnConsole("No path exist");
-            return;
-        }
-        
-    }
+
     public static ArrayList BfsSuggest(Vertex source, int num) {
         vertex = GraphifyGUI.getNode();
         reset();
