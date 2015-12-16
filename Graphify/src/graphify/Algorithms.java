@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -26,7 +27,7 @@ public class Algorithms {
 
     private static GraphifyGUI GG;
     private static HashMap<Integer, Vertex> vertex;
-    private static HashSet<Edge> edges;
+    private static ArrayList<Edge> edges;
     private static Queue<Vertex> q;
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     private HashMap<Integer, Integer> glowMap = new HashMap<>();
@@ -51,11 +52,16 @@ public class Algorithms {
     Integer maxColors = 0;
     int _source;
     int _dest;
+    //for dijkstra
+    private HashSet<Vertex> uSNodes; // unsettled
+    private HashSet<Vertex> sNodes; // settled
+    private HashMap<Vertex, Vertex> parents;
+    private HashMap<Vertex, Integer> dist; // distance
 
     public Algorithms(GraphifyGUI GG) {
         this.GG = GG;
         Algorithms.vertex = new HashMap<>();
-        Algorithms.edges = new HashSet<>();
+        Algorithms.edges = new ArrayList<>();
         this.nodes = new HashMap<>();
         this.queue = new LinkedList<>();
         this.stack = new Stack<>();
@@ -72,6 +78,15 @@ public class Algorithms {
     public HashSet<Vertex> getEdge(int source) {
         vertex = GraphifyGUI.getNode();
         return vertex.get(source).vList();
+    }
+    
+    private int getWeight(Vertex s, Vertex d){
+        for(Edge e : edges){
+            if(e.getSource().equals(s) && e.getDest().equals(d)){
+                return e.getWeight();
+            }
+        }
+        return -1; // edge does not exist then
     }
 
     void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
@@ -147,6 +162,7 @@ public class Algorithms {
 
     public void Dfs(Vertex source) {
         vertex = GraphifyGUI.getNode();
+        edges = GraphifyGUI.getEdges();
         reset();
         stack = new Stack<>();
         bconn = new HashSet<>();
@@ -200,7 +216,87 @@ public class Algorithms {
         }
         GG.printlnConsole("Order is " + conn);
     }
+    
+    //dijsktra
+    public void execute(Vertex source){
+        vertex = GraphifyGUI.getNode();
+        edges = GraphifyGUI.getEdges();
+        reset();
+        sNodes = new HashSet<>();
+        uSNodes = new HashSet<>();
+        dist = new HashMap<>();
+        parents = new HashMap<>();
+        dist.put(source, 0);
+        uSNodes.add(source);
+        while(uSNodes.size()> 0){
+            Vertex v = getMin(uSNodes);
+            sNodes.add(v);
+            uSNodes.remove(v);
+            findMinDist(v);
+        }
+    }
 
+    //settled nodes
+    private boolean isSettled(Vertex v){
+        return sNodes.contains(v);
+    }
+    //getNeighbors
+    private List<Vertex> getNeighbors(Vertex v){
+        List<Vertex> neighbors = new ArrayList<>();
+        HashSet<Vertex> n = getEdge(v.getId());
+        Iterator<Vertex> neighb = n.iterator();
+        while(neighb.hasNext()){
+            Vertex next = neighb.next();
+            if(!isSettled(next)){
+                neighbors.add(next);
+            }
+        }
+        return neighbors;
+    }
+    // find min distance
+    private void findMinDist(Vertex v){
+        List<Vertex> neighbors = getNeighbors(v);
+        for(Vertex t : neighbors){
+            if(GSD(t) > GSD(v)+ getWeight(v,t)){
+                dist.put(t, GSD(v) + getWeight(v,t));
+                t.parent = v;
+                uSNodes.add(t);
+            }
+        }
+    }
+    
+    private Vertex getMin(HashSet<Vertex> v){
+        Vertex min = null;
+        for(Vertex vert : v){
+            if(min == null){
+                min = vert;
+            }else{
+                if(GSD(vert) < GSD(min)){
+                    min = vert;
+                }
+            }
+        }
+        return min;
+    }
+    
+    private int GSD(Vertex d){
+        Integer distance = dist.get(d);
+        if(distance == null){
+            return Integer.MAX_VALUE;
+        }else{
+            return distance;
+        }
+    }
+    
+    public void findPath(Vertex dest){
+        set.clear();
+        Vertex s = dest;
+        if(parents.get(s) == null){
+            GG.printlnConsole("No path exist");
+            return;
+        }
+        
+    }
     public static ArrayList BfsSuggest(Vertex source, int num) {
         vertex = GraphifyGUI.getNode();
         reset();
@@ -289,6 +385,7 @@ public class Algorithms {
         for (int i : set.keySet()) {
             glowMap.put(i, set.get(i));
         }
+        GG.printlnConsole(glowMap.toString());
         GG.graph();
     }
 

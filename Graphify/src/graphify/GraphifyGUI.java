@@ -7,6 +7,7 @@ package graphify;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -76,7 +77,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     Vertex ver;
 
     private static HashMap<Integer, Vertex> vertices;
-    private static HashSet<Edge> edges;
+    private static ArrayList<Edge> edges;
 
     public GraphifyGUI() {
         initComponents();
@@ -85,7 +86,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         this.alg = new Algorithms(this);
         this.ver = new Vertex(this);
         vertices = new HashMap<>();
-        edges = new HashSet<>();
+        edges = new ArrayList<>();
         queue = alg.getQueue();
         stack = alg.getStack();
         cutV = alg.getCutV();
@@ -123,7 +124,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         return GraphifyGUI.vertices;
     }
     
-    public static HashSet getEdges(){
+    public static ArrayList getEdges(){
         return GraphifyGUI.edges;
     }
 
@@ -208,7 +209,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnClearConsole.setText("Clear Console");
         btnClearConsole.addActionListener(this::btnClearConsoleActionPerformed);
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Make Tree", "Double Graph", "Vertex Cover", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness"}));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Dijkstra", "Double Graph", "Vertex Cover", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness"}));
         jcbAlgo.addActionListener(this::jcbAlgoActionPerformed);
 
         btnStart.setText("Start");
@@ -359,6 +360,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 buffG.drawLine(source.x, source.y,
                         evt.getX(), evt.getY());
                 pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
+                
             } else if (SwingUtilities.isMiddleMouseButton(evt)) {
                 locations.get(_selectedNode).x = evt.getX();
                 locations.get(_selectedNode).y = evt.getY();
@@ -377,7 +379,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         if (_selectedNode >= 0) {
             int destination = nodeSelected(evt.getX(), evt.getY());
             if (destination >= 0 && destination != _selectedNode) {
-                addEdge(String.valueOf(Edgeid), _selectedNode, destination, (int)(Math.random() * 100));
+                addEdge(Edgeid, _selectedNode, destination, (int)(Math.random() * 100));
                 _selectedNode = -1;
                 changesMade = true;
                 Edgeid++;
@@ -386,10 +388,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         graph();
     }
 
-    private void addEdge(String edgeId, int sourceid, int destid, final int weight) {
+    private void addEdge(int edgeId, int sourceid, int destid, final int weight) {
         Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), 0, weight);
         edges.add(newEdge);
-        //printlnConsole(newEdge.getId()+" "+newEdge.getSource().getName()+" "+newEdge.getDest().getName()+" "+newEdge.getWeight());
+        printlnConsole(newEdge.getId()+" "+newEdge.getSource().getName()+" "+newEdge.getDest().getName()+" "+newEdge.getWeight());
         vertices.get(sourceid).vList().add(vertices.get(destid));
         vertices.get(destid).vList().add(vertices.get(sourceid));
     }
@@ -506,7 +508,19 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             alg.Bfs(vertices.get(_source));
             alg.shortestPath(_source, _dest);
-        } else if (x == "Cut") {
+        }else if(x == "Dijkstra"){
+            txtConsole.setText("");
+            if (_source == -1 || _dest == -1 || vertices.get(_source).vList().isEmpty() || vertices.get(_dest).vList().isEmpty()) {
+                if (_source == -1) {
+                    printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
+                } else {
+                    printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
+                }
+                return;
+            }
+            alg.execute(vertices.get(_source));
+            alg.shortestPath(_source, _dest);
+        }else if (x == "Cut") {
             _source = -1;
             _dest = -1;
             alg.AP();
@@ -921,12 +935,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                GraphifyGUI theGraph = new GraphifyGUI();
-                theGraph.setLocationRelativeTo(null);
-                theGraph.show();
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            GraphifyGUI theGraph = new GraphifyGUI();
+            theGraph.setLocationRelativeTo(null);
+            theGraph.show();
         });
     }
 
