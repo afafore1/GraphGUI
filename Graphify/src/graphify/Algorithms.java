@@ -95,10 +95,10 @@ public class Algorithms {
         time = ++time;
         disc.put(u, time);
         low.put(u, time);
-        Iterator<Integer> i = getEdge(u).iterator();
+        Iterator<Vertex> i = getEdge(u).iterator();
 
         while (i.hasNext()) {
-            int v = i.next(); // v is current adj to u
+            int v = i.next().getId(); // v is current adj to u
             if (visited.get(v) == -1) {
                 children++;
                 parent.put(v, u);

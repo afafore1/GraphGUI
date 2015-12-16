@@ -12,10 +12,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -60,6 +62,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     ArrayList<Integer> cutV;
     Color[] vertexColors;
     int _selectedNode = -1;
+    final int ARR_SIZE = 4;
     int _SIZE_OF_NODE = 20;
     int id = 0;
     int Edgeid = 0;
@@ -350,6 +353,20 @@ public class GraphifyGUI extends javax.swing.JFrame {
         graph();
     }
 
+    void drawArrow(Graphics g1, int x1, int y1, int x2, int y2) {
+                Graphics2D g = (Graphics2D) g1.create();
+                double dx = x2 - x1, dy = y2 - y1;
+                double angle = Math.atan2(dy, dx);
+                int len = (int) Math.sqrt(dx*dx + dy*dy);
+                AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
+                at.concatenate(AffineTransform.getRotateInstance(angle));
+                g.transform(at);
+
+                // Draw horizontal arrow starting in (0, 0)
+                g.drawLine(0, 0, len, 0);
+                g.fillPolygon(new int[] {len, len-ARR_SIZE, len-ARR_SIZE, len},
+                              new int[] {0, -ARR_SIZE, ARR_SIZE, 0}, 4);
+            }
     private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {
         if (_selectedNode >= 0) {
             if (SwingUtilities.isLeftMouseButton(evt)) {
@@ -357,8 +374,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 Graphics buffG = buff.getGraphics();
                 buffG.drawImage(bufferImage, 0, 0, this);
                 Point source = locations.get(_selectedNode);
-                buffG.drawLine(source.x, source.y,
-                        evt.getX(), evt.getY());
+                //buffG.drawLine(source.x, source.y,
+                        //evt.getX(), evt.getY());
+                drawArrow(buffG, source.x, source.y, evt.getX(), evt.getY());
                 pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
                 
             } else if (SwingUtilities.isMiddleMouseButton(evt)) {
