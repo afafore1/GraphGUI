@@ -126,13 +126,15 @@ class Edge{
 	private final Vertex dest;
 	private final int weight;
         private final int pheromoneAmount;
+        private boolean fail;
 	
-	public Edge(int id, Vertex source, Vertex dest, int pAmount, int weight){
+	public Edge(int id, Vertex source, Vertex dest, int pAmount, int weight, boolean fail){
 		this.id = id;
 		this.source = source;
 		this.dest = dest;
                 this.pheromoneAmount = pAmount;
 		this.weight = weight;
+                this.fail = fail;
 	}
 	
 	public int getId(){
@@ -158,10 +160,18 @@ class Edge{
 	public String getConnections(){
 		return source.getId()+","+dest.getId();
 	}
+        
+        public boolean isFailed(){
+            return this.fail;
+        }
+        
+        public void setFailed(boolean bool){
+            this.fail = bool;
+        }
 	
 	@Override
 	public String toString(){
-		return source +" "+dest;
+		return this.getId()+" "+ source.getName() +" "+dest.getName()+" "+this.getWeight()+" "+this.isFailed();
 	}
 }
 

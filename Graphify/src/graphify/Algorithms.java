@@ -172,17 +172,21 @@ public class Algorithms {
             Iterator<Edge> currentList = current.eList().iterator();
             while (currentList.hasNext()) {
                 Edge t = currentList.next();
-                Vertex next = getConn(current, t);
-                if (!next.wasVisited) { // visited just one at a time
-                    GG.printlnConsole("Pushing " + next.getName());
-                    stack.push(next);
-                    next.parent = current;
-                    next.wasVisited = true;
-                    break;
-                }
-                if (!currentList.hasNext()) {
-                    Vertex backEdge = stack.pop();
-                    GG.printlnConsole("Back edge " + backEdge.getName());
+                if (!t.isFailed()) {
+                    Vertex next = getConn(current, t);
+                    if (!next.wasVisited) { // visited just one at a time
+                        GG.printlnConsole("Pushing " + next.getName());
+                        stack.push(next);
+                        next.parent = current;
+                        next.wasVisited = true;
+                        break;
+                    }
+                    if (!currentList.hasNext()) {
+                        Vertex backEdge = stack.pop();
+                        GG.printlnConsole("Back edge " + backEdge.getName());
+                    }
+                } else {
+                    stack.pop();
                 }
             }
         }
@@ -204,25 +208,27 @@ public class Algorithms {
             Iterator<Edge> currentList = current.eList().iterator();
             while (currentList.hasNext()) {
                 Edge t = currentList.next();
-                Vertex next = getConn(current, t);
-                if (next.wasVisited == false) {
-                    next.wasVisited = true;
-                    q.add(next);
-                    next.parent = current;
-                    // GG.printlnConsole(next.getName() + " has type of " + next.getType());
+                if (!t.isFailed()) {
+                    Vertex next = getConn(current, t);
+                    if (next.wasVisited == false) {
+                        next.wasVisited = true;
+                        q.add(next);
+                        next.parent = current;
+                    }
                 }
             }
         }
         GG.printlnConsole("Order is " + conn);
     }
 
-    static Vertex getConn(Vertex s, Edge e){
-        if(s == e.getSource()){
+    static Vertex getConn(Vertex s, Edge e) {
+        if (s == e.getSource()) {
             return e.getDest();
-        }else{
+        } else {
             return e.getSource();
         }
     }
+
     //dijsktra
     public void execute(Vertex source) {
         // get vertices and edges from GUI
@@ -255,9 +261,11 @@ public class Algorithms {
         Iterator<Edge> neighb = n.iterator();
         while (neighb.hasNext()) {
             Edge t = neighb.next();
-            Vertex next = getConn(v,t);
-            if (!isSettled(next)) {
-                neighbors.add(next);
+            if (!t.isFailed()) {
+                Vertex next = getConn(v, t);
+                if (!isSettled(next)) {
+                    neighbors.add(next);
+                }
             }
         }
         return neighbors;
@@ -389,7 +397,6 @@ public class Algorithms {
         for (int i : set.keySet()) {
             glowMap.put(i, set.get(i));
         }
-        GG.printlnConsole(glowMap.toString());
         GG.graph();
     }
 

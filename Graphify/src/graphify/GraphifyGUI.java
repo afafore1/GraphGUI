@@ -48,7 +48,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     //private static HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
     Queue<Integer> queue;
     Stack<Integer> stack;
-    //HashMap<Integer, Point> locations = new HashMap();
+    String sim = null;
     HashMap<Integer, Integer> distTo;
     Map<Integer, Integer> set;
     HashMap<Integer, Integer> visited;
@@ -317,6 +317,28 @@ public class GraphifyGUI extends javax.swing.JFrame {
             vertices.put(v.getId(), v);
             id++;
         } else if (SwingUtilities.isLeftMouseButton(evt)) {
+            if (evt.isControlDown() && evt.isShiftDown()) { // control shift to fail all edges leading out of a vertex
+                Vertex fail = vertices.get(_selectedNode);
+                Iterator<Edge> e = fail.eList().iterator();
+                while (e.hasNext()) {
+                    Edge next = e.next();
+                    next.setFailed(!next.isFailed()); //set it to opposite of what it is
+                }
+                alg.getVisited().clear();
+                alg.getGlowMap().clear(); 
+                alg.getSet().clear();
+                if(sim == "DFS"){
+                    alg.Dfs(vertices.get(_source));
+                    alg.shortestPath(_source, _dest);
+                }else if(sim == "BFS"){
+                    Algorithms.Bfs(vertices.get(_source));
+                    alg.shortestPath(_source, _dest);
+                }else if(sim == "Dijkstra"){
+                    alg.execute(vertices.get(_source));
+                    alg.shortestPath(_source, _dest);
+                }
+                changesMade = true;
+            }
         } else if (SwingUtilities.isRightMouseButton(evt)) {
             changesMade = true;
             glowMap.clear();
@@ -374,8 +396,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 Graphics buffG = buff.getGraphics();
                 buffG.drawImage(bufferImage, 0, 0, this);
                 Point source = vertices.get(_selectedNode).getLocation();
-                //buffG.drawLine(source.x, source.y,
-                //evt.getX(), evt.getY());
                 drawArrow(buffG, source.x, source.y, evt.getX(), evt.getY());
                 pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
             } else if (SwingUtilities.isMiddleMouseButton(evt)) {
@@ -409,7 +429,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     private void addEdge(int edgeId, int sourceid, int destid, final int weight) {
-        Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), 0, weight);
+        Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), 0, weight, false);
         edges.add(newEdge);
         //printlnConsole(newEdge.getId() + " " + newEdge.getSource().getName() + " " + newEdge.getDest().getName() + " " + newEdge.getWeight());
         vertices.get(sourceid).eList().add(newEdge);
@@ -468,8 +488,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     private void reset() {
-        //nodes = new HashMap();
         vertices = new HashMap();
+        edges = new ArrayList();
         id = 0;
         cutV = new ArrayList<>();
         alg.getCutV().clear();
@@ -494,6 +514,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {
         String x = String.valueOf(jcbAlgo.getSelectedItem());
+        sim = x;
         glowMap.clear();
         alg.getGlowMap().clear();
         txtConsole.setText("");
@@ -515,7 +536,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
                 return;
             }
-            printlnConsole("Running Dfs...");
             alg.Dfs(vertices.get(_source));
             alg.shortestPath(_source, _dest);
         } else if (x == "BFS") {
@@ -584,32 +604,32 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Scanner sc = new Scanner(f);
         int mode = 0;
         while (sc.hasNext()) {
-           String line = sc.nextLine();
-           if(line.startsWith("Vertices:")){
-               mode = 0;
-               continue;
-           }
-           if(line.startsWith("Edges:")){
-               mode = 1;
-               continue;
-           }
-           String [] tokens = line.split(",");
-           if(mode == 0){
-               int newId = Integer.parseInt(tokens[0]);
-               Point newPoint = new Point(Integer.parseInt(tokens[3]), Integer.parseInt(tokens[4]));
-               Vertex v = new Vertex(newId, newPoint, tokens[1], tokens[2], 0);
-               vertices.put(newId, v);
-               id = newId;
-           }else if(mode == 1){
-               int newId = Integer.parseInt(tokens[0]);
-               int sourceKey = Integer.parseInt(tokens[1]);
-               int destKey = Integer.parseInt(tokens[2]);
-               int weight = Integer.parseInt(tokens[3]);
-               Edge e = new Edge(newId, vertices.get(sourceKey), vertices.get(destKey), 0, weight);
-               edges.add(e);
-               vertices.get(sourceKey).eList().add(e);
-               vertices.get(destKey).eList().add(e);
-           }
+            String line = sc.nextLine();
+            if (line.startsWith("Vertices:")) {
+                mode = 0;
+                continue;
+            }
+            if (line.startsWith("Edges:")) {
+                mode = 1;
+                continue;
+            }
+            String[] tokens = line.split(",");
+            if (mode == 0) {
+                int newId = Integer.parseInt(tokens[0]);
+                Point newPoint = new Point(Integer.parseInt(tokens[3]), Integer.parseInt(tokens[4]));
+                Vertex v = new Vertex(newId, newPoint, tokens[1], tokens[2], 0);
+                vertices.put(newId, v);
+                id = newId;
+            } else if (mode == 1) {
+                int newId = Integer.parseInt(tokens[0]);
+                int sourceKey = Integer.parseInt(tokens[1]);
+                int destKey = Integer.parseInt(tokens[2]);
+                int weight = Integer.parseInt(tokens[3]);
+                Edge e = new Edge(newId, vertices.get(sourceKey), vertices.get(destKey), 0, weight, false);
+                edges.add(e);
+                vertices.get(sourceKey).eList().add(e);
+                vertices.get(destKey).eList().add(e);
+            }
         }
         id++;
     }
@@ -684,13 +704,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
 
         // Nodes - red circles.
-        for (Vertex v: vertices.values()) {
+        for (Vertex v : vertices.values()) {
             Point thePoint = v.getLocation();
             if (v.getId() == _source) {
                 bufferGraphic.setColor(Color.green);
-            } else if (v.getId() ==  _dest) {
+            } else if (v.getId() == _dest) {
                 bufferGraphic.setColor(Color.blue);
-            } else if (v.getId() ==  _selectedNode) {
+            } else if (v.getId() == _selectedNode) {
                 bufferGraphic.setColor(Color.orange);
             } else {
                 bufferGraphic.setColor(Color.red);
@@ -732,7 +752,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     private int nodeSelected(int x, int y) {
-        for(Vertex v : vertices.values()) {
+        for (Vertex v : vertices.values()) {
             Point thePoint = v.getLocation();
             int deltaX = x - (thePoint.x - _SIZE_OF_NODE / 2);
             int deltaY = y - (thePoint.y - _SIZE_OF_NODE / 2);
@@ -762,13 +782,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private String getSaveString() {
         String result = "Vertices:\n";
-        for (Vertex v: vertices.values()) {
-            result+= v.getId()+","+v.getName()+","+v.getType()+","+v.getLocation().x+","+v.getLocation().y;            
+        for (Vertex v : vertices.values()) {
+            result += v.getId() + "," + v.getName() + "," + v.getType() + "," + v.getLocation().x + "," + v.getLocation().y;
             result += "\n";
         }
-        result+= "Edges:\n";
-        for(Edge e: edges){
-            result+= e.getId()+","+e.getConnections()+","+e.getWeight()+"\n";
+        result += "Edges:\n";
+        for (Edge e : edges) {
+            result += e.getId() + "," + e.getConnections() + "," + e.getWeight() + "\n";
         }
         return result;
     }
