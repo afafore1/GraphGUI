@@ -2,20 +2,13 @@
 ##Purpose
 **To implement several graph algorithms with the use of visualization**
 
-App is written in *java programming language - compile with Netbeans*, please suggest changes if you think any should be made.
+Application is written in *java programming language - compile with Netbeans*, please suggest changes if you think any should be made.
 We are working on running several algorithms and making an efficient way to visualize how they work.
 
 **Algorithms covered so far:** 
 - Bfs
 - Dfs
-- You can find all cut vertices (Using Dfs)
-- Check if graph is bipartite (Using Bfs)
-- Make tree from graph/Check if graph is a tree
-- Given Graph G, double the graph (G^2)
-- Graph Coloring
-- Check connectedness
-- Find Euler path
-- Find Euler Cycle
+- Dijkstra
 
 **How to Use**
 - Clone source (Note: you can only compile with Netbeans)
@@ -30,6 +23,7 @@ We are working on running several algorithms and making an efficient way to visu
 - Double click to choose start vertex and destination vertex (Colors and label will be updated).
 - Click dropdown to select an algorithm to run
 - Click start
+- CTRL SHIFT Left Click on node to fail node
 - CTRL O to open
 - CTRL N for new file
 - CTRL S to save
@@ -47,11 +41,7 @@ We are working on running several algorithms and making an efficient way to visu
 *dfs*
 ![ScreenShot for bfs](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/dfs.PNG)
 
-*Graph Coloring*
-![ScreenShot for Graph Coloring](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/VColoring.PNG)
 
-*Cut*
-![ScreenShot for Cut vertices](https://github.com/afafore1/GraphGUI/blob/master/SSandTestfile/cut.jpg)
 
 
 
