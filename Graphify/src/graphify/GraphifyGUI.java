@@ -58,6 +58,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     HashSet<Integer> _colors2;
     HashSet<Integer> randomKeys;
     ArrayList<Integer> cutV;
+    ArrayList<Vertex> failed;
     Color[] vertexColors;
     int _selectedNode = -1;
     final int ARR_SIZE = 4;
@@ -94,6 +95,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         queue = alg.getQueue();
         stack = alg.getStack();
         cutV = alg.getCutV();
+        failed = new ArrayList<>();
         color = alg.getColor();
         _colors2 = alg.getColors2();
         visited = alg.getVisited();
@@ -319,6 +321,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
         } else if (SwingUtilities.isLeftMouseButton(evt)) {
             if (evt.isControlDown() && evt.isShiftDown()) { // control shift to fail all edges leading out of a vertex
                 Vertex fail = vertices.get(_selectedNode);
+                if(failed.contains(fail)){
+                    failed.remove(fail);
+                }else{
+                    failed.add(fail);
+                }
                 Iterator<Edge> e = fail.eList().iterator();
                 while (e.hasNext()) {
                     Edge next = e.next();
@@ -715,7 +722,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
             } else {
                 bufferGraphic.setColor(Color.red);
             }
-
+            if(!failed.isEmpty()){
+                if(failed.contains(v)){
+                    bufferGraphic.setColor(Color.gray);
+                }
+            }
             if (!cutV.isEmpty()) {
                 if (cutV.contains(v.getId())) {
                     bufferGraphic.setColor(Color.green);
