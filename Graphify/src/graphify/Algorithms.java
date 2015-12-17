@@ -82,7 +82,7 @@ public class Algorithms {
     
     private int getWeight(Vertex s, Vertex d){
         for(Edge e : edges){
-            if(e.getSource().equals(s) && e.getDest().equals(d)){
+            if(e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s ){
                 return e.getWeight();
             }
         }
@@ -219,20 +219,21 @@ public class Algorithms {
     
     //dijsktra
     public void execute(Vertex source){
+        // get vertices and edges from GUI
         vertex = GraphifyGUI.getNode();
         edges = GraphifyGUI.getEdges();
         reset();
-        sNodes = new HashSet<>();
-        uSNodes = new HashSet<>();
-        dist = new HashMap<>();
-        parents = new HashMap<>();
-        dist.put(source, 0);
-        uSNodes.add(source);
-        while(uSNodes.size()> 0){
-            Vertex v = getMin(uSNodes);
-            sNodes.add(v);
-            uSNodes.remove(v);
-            findMinDist(v);
+        sNodes = new HashSet<>(); // settled nodes will be placed in this set
+        uSNodes = new HashSet<>(); // unsettled nodes will be placed in this set
+        dist = new HashMap<>(); // distance to reach the node
+        parents = new HashMap<>(); // parent/nodes we came from
+        dist.put(source, 0); // first set source to 0
+        uSNodes.add(source); // add source to unsettled nodes
+        while(uSNodes.size()> 0){ // do this until no more unsettled nodes
+            Vertex v = getMin(uSNodes); // we use min node from unsettled nodes each time to process
+            sNodes.add(v); // add it to settled nodes
+            uSNodes.remove(v); // remove it
+            findMinDist(v); // find min distance
         }
     }
 
@@ -256,8 +257,12 @@ public class Algorithms {
     // find min distance
     private void findMinDist(Vertex v){
         List<Vertex> neighbors = getNeighbors(v);
-        for(Vertex t : neighbors){
-            if(GSD(t) > GSD(v)+ getWeight(v,t)){
+        Iterator<Vertex> vert = neighbors.iterator();
+        while(vert.hasNext()){
+            Vertex t = vert.next();
+            int combWeight = GSD(v)+ getWeight(v,t);
+            GG.printlnConsole(""+combWeight+" get weight "+getWeight(v,t)+" v is "+v.getName()+" t is "+t.getName());
+            if(GSD(t) > combWeight){
                 dist.put(t, GSD(v) + getWeight(v,t));
                 t.parent = v;
                 uSNodes.add(t);

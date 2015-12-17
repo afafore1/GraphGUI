@@ -656,7 +656,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private int getWeight(Vertex s, Vertex d){
         for(Edge e : edges){
             if(e.getSource().equals(s) && e.getDest().equals(d)){
-                printlnConsole(""+e.getWeight());
                 return e.getWeight();
             }
         }
@@ -686,8 +685,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         && connectionCache.get(destKey.getId()) == sourceKey)) {
                     Point destPoint = locations.get(destKey.getId());
                     bufferGraphic.drawLine(thePoint.x, thePoint.y, destPoint.x, destPoint.y);
-                    xmid = (thePoint.x + destPoint.x)/2 + 3;
-                    ymid = (thePoint.y + destPoint.y)/2 + 3;
+                    xmid = (thePoint.x + destPoint.x)/2 + 10;
+                    ymid = (thePoint.y + destPoint.y)/2 + 10;
                     int edgeWeight = getWeight(source, destKey);
                     if(!(edgeWeight == -1)){
                         bufferGraphic.drawString(String.valueOf(edgeWeight), xmid, ymid);
