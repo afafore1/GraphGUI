@@ -7,12 +7,10 @@ package graphify;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -50,7 +48,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     //private static HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
     Queue<Integer> queue;
     Stack<Integer> stack;
-    HashMap<Integer, Point> locations = new HashMap();
+    //HashMap<Integer, Point> locations = new HashMap();
     HashMap<Integer, Integer> distTo;
     Map<Integer, Integer> set;
     HashMap<Integer, Integer> visited;
@@ -315,9 +313,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         if (_selectedNode < 0 && SwingUtilities.isLeftMouseButton(evt)) {
             changesMade = true;
             //nodes.put(id, new HashSet());
-            Vertex v = new Vertex(id, String.valueOf(id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
+            Vertex v = new Vertex(id, new Point(evt.getX(), evt.getY()), String.valueOf(id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
             vertices.put(v.getId(), v);
-            locations.put(v.getId(), new Point(evt.getX(), evt.getY()));
             id++;
         } else if (SwingUtilities.isLeftMouseButton(evt)) {
         } else if (SwingUtilities.isRightMouseButton(evt)) {
@@ -330,15 +327,16 @@ public class GraphifyGUI extends javax.swing.JFrame {
             _dest = -1;
 
             Vertex remove = vertices.get(_selectedNode);
-            Iterator<Vertex> v = vertices.values().iterator();
-            while (v.hasNext()) {
-                Vertex vert = v.next();
-                if (vert.vList().contains(remove)) {
-                    vert.vList().remove(remove);
+            Iterator<Edge> e = edges.iterator();
+            while (e.hasNext()) {
+                Edge next = e.next();
+                if (next.getSource() == remove || next.getDest() == remove) {
+                    next.getSource().eList().remove(next);
+                    next.getDest().eList().remove(next);
+                    e.remove();
                 }
             }
             vertices.remove(_selectedNode);
-            locations.remove(_selectedNode);
 
             if (_selectedNode == _dest) {
                 _dest = -1;
@@ -375,14 +373,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 Image buff = createImage(pnlGraph.getWidth() - 1, pnlGraph.getHeight() - 1);
                 Graphics buffG = buff.getGraphics();
                 buffG.drawImage(bufferImage, 0, 0, this);
-                Point source = locations.get(_selectedNode);
+                Point source = vertices.get(_selectedNode).getLocation();
                 //buffG.drawLine(source.x, source.y,
                 //evt.getX(), evt.getY());
                 drawArrow(buffG, source.x, source.y, evt.getX(), evt.getY());
                 pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
             } else if (SwingUtilities.isMiddleMouseButton(evt)) {
-                locations.get(_selectedNode).x = evt.getX();
-                locations.get(_selectedNode).y = evt.getY();
+                vertices.get(_selectedNode).getLocation().x = evt.getX();
+                vertices.get(_selectedNode).getLocation().y = evt.getY();
                 graph();
                 changesMade = true;
             }
@@ -414,14 +412,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), 0, weight);
         edges.add(newEdge);
         //printlnConsole(newEdge.getId() + " " + newEdge.getSource().getName() + " " + newEdge.getDest().getName() + " " + newEdge.getWeight());
-        vertices.get(sourceid).vList().add(vertices.get(destid));
-        vertices.get(destid).vList().add(vertices.get(sourceid));
+        vertices.get(sourceid).eList().add(newEdge);
+        vertices.get(destid).eList().add(newEdge);
     }
 
     private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {
-        for (int i = 0; i < vertices.size(); i++) {
-            printlnConsole(vertices.get(i) + "->" + vertices.get(i).vList());
+        Iterator<Vertex> verts = vertices.values().iterator();
+        while (verts.hasNext()) {
+            Vertex next = verts.next();
+            printlnConsole(next.getName() + "->" + next.eList());
         }
+
         printlnConsole("Source is: " + _source);
     }
 
@@ -469,7 +470,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private void reset() {
         //nodes = new HashMap();
         vertices = new HashMap();
-        locations = new HashMap();
         id = 0;
         cutV = new ArrayList<>();
         alg.getCutV().clear();
@@ -507,7 +507,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         alg.getCutV().clear();
         if (x.equals("DFS")) {
             txtConsole.setText("");
-            if (_source == -1 || _dest == -1 || vertices.get(_source).vList().isEmpty() || vertices.get(_dest).vList().isEmpty()) {
+            if (_source == -1 || _dest == -1 || vertices.get(_source).eList().isEmpty() || vertices.get(_dest).eList().isEmpty()) {
                 if (_source == -1) {
                     printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
                 } else {
@@ -520,7 +520,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             alg.shortestPath(_source, _dest);
         } else if (x == "BFS") {
             txtConsole.setText("");
-            if (_source == -1 || _dest == -1 || vertices.get(_source).vList().isEmpty() || vertices.get(_dest).vList().isEmpty()) {
+            if (_source == -1 || _dest == -1 || vertices.get(_source).eList().isEmpty() || vertices.get(_dest).eList().isEmpty()) {
                 if (_source == -1) {
                     printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
                 } else {
@@ -532,7 +532,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             alg.shortestPath(_source, _dest);
         } else if (x == "Dijkstra") {
             txtConsole.setText("");
-            if (_source == -1 || _dest == -1 || vertices.get(_source).vList().isEmpty() || vertices.get(_dest).vList().isEmpty()) {
+            if (_source == -1 || _dest == -1 || vertices.get(_source).eList().isEmpty() || vertices.get(_dest).eList().isEmpty()) {
                 if (_source == -1) {
                     printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
                 } else {
@@ -558,17 +558,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 printlnConsole("Graph is Connected");
             } else {
                 printlnConsole("Graph is a disconnected Graph");
-            }
-        } else if (x == "isEulerian") {
-            txtConsole.setText("");
-            if (_source == -1) {
-                printlnConsole("Please select a source to begin");
-                return;
-            }
-            if (alg.isEulerian()) {
-                printlnConsole("There is an euler circuit");
-            } else {
-                printlnConsole("Euler circuit does not exist");
             }
         }
 
@@ -597,19 +586,38 @@ public class GraphifyGUI extends javax.swing.JFrame {
         saveAs();
     }
 
-    void getLoadInfo(File f, HashMap<Integer, Vertex> verts, HashMap<Integer, Point> locs) throws FileNotFoundException {
-        String[] types = new String[]{"Person", "City", "Place"};
+    void LoadVertices(File f) throws FileNotFoundException {
         Scanner sc = new Scanner(f);
+        int mode = 0;
         while (sc.hasNext()) {
-            String c = sc.nextLine();
-            String[] tokens = c.split(",");
-            int key = Integer.parseInt(tokens[0]);
-            Integer x = Integer.parseInt(tokens[1]); // locations x and y
-            Integer y = Integer.parseInt(tokens[2]);
-            Vertex v = new Vertex(key, "Vertex " + key, types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
-            verts.put(key, v);
-            locs.put(key, new Point(x, y));
+           String line = sc.nextLine();
+           if(line.startsWith("Vertices:")){
+               mode = 0;
+               continue;
+           }
+           if(line.startsWith("Edges:")){
+               mode = 1;
+               continue;
+           }
+           String [] tokens = line.split(",");
+           if(mode == 0){
+               int newId = Integer.parseInt(tokens[0]);
+               Point newPoint = new Point(Integer.parseInt(tokens[3]), Integer.parseInt(tokens[4]));
+               Vertex v = new Vertex(newId, newPoint, tokens[1], tokens[2], 0);
+               vertices.put(newId, v);
+               id = newId;
+           }else if(mode == 1){
+               int newId = Integer.parseInt(tokens[0]);
+               int sourceKey = Integer.parseInt(tokens[1]);
+               int destKey = Integer.parseInt(tokens[2]);
+               int weight = Integer.parseInt(tokens[3]);
+               Edge e = new Edge(newId, vertices.get(sourceKey), vertices.get(destKey), 0, weight);
+               edges.add(e);
+               vertices.get(sourceKey).eList().add(e);
+               vertices.get(destKey).eList().add(e);
+           }
         }
+        id++;
     }
 
     private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) { // needs to be changed to get correct info
@@ -622,21 +630,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     reset();
                     currentProject = theChooser.getSelectedFile().getPath();
                     File theFile = new File(currentProject);
-                    Scanner scanner = new Scanner(theFile);
-                    getLoadInfo(theFile, vertices, locations);
-                    while (scanner.hasNext()) {
-                        String currentLine = scanner.nextLine();
-                        String[] tokens = currentLine.split(",");
-                        int key = Integer.parseInt(tokens[0]); // vertex id
-                        Vertex v = vertices.get(key); // get this vertex
-                        for (int i = 3; i < tokens.length; i++) {
-                            int e = Integer.parseInt(tokens[i]);
-                            Vertex d = vertices.get(e);
-                            v.vList().add(d);
-                        }
-                        id = key;
-                    }
-                    id++;
+                    LoadVertices(theFile);
                     graph();
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -652,10 +646,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
         return "" + nodeId;
     }
-    
-    private int getWeight(Vertex s, Vertex d){
-        for(Edge e : edges){
-            if(e.getSource().equals(s) && e.getDest().equals(d)){
+
+    private int getWeight(Vertex s, Vertex d) {
+        for (Edge e : edges) {
+            if (e.getSource().equals(s) && e.getDest().equals(d)) {
                 return e.getWeight();
             }
         }
@@ -671,27 +665,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
         bufferGraphic.setStroke(new BasicStroke(2));
         int xmid = 0;
         int ymid = 0;
-        Iterator<Integer> locs = locations.keySet().iterator();
-        while (locs.hasNext()) {
-            int next = locs.next();
-            Vertex source = vertices.get(next);
-            int sourceKey = vertices.get(next).getId();
-            Point thePoint = locations.get(next);
-            
-            for (Vertex destKey : vertices.get(next).vList()) {
-                if (!(connectionCache.containsKey(sourceKey)
-                        && connectionCache.get(sourceKey) == destKey.getId()
-                        || connectionCache.containsKey(destKey.getId())
-                        && connectionCache.get(destKey.getId()) == sourceKey)) {
-                    Point destPoint = locations.get(destKey.getId());
-                    bufferGraphic.drawLine(thePoint.x, thePoint.y, destPoint.x, destPoint.y);
-                    xmid = (thePoint.x + destPoint.x)/2 + 10;
-                    ymid = (thePoint.y + destPoint.y)/2 + 10;
-                    int edgeWeight = getWeight(source, destKey);
-                    if(!(edgeWeight == -1)){
-                        bufferGraphic.drawString(String.valueOf(edgeWeight), xmid, ymid);
-                    }
-                }
+        for (Edge e : edges) {
+            Point source = e.getSource().getLocation();
+            Point dest = e.getDest().getLocation();
+            xmid = (source.x + dest.x) / 2 + 10;
+            ymid = (source.y + dest.y) / 2 + 10;
+            bufferGraphic.drawLine(source.x, source.y, dest.x, dest.y);
+            int edgeWeight = e.getWeight();
+            if (!(edgeWeight == -1)) {
+                bufferGraphic.drawString(String.valueOf(edgeWeight), xmid, ymid);
             }
         }
 
@@ -701,56 +683,27 @@ public class GraphifyGUI extends javax.swing.JFrame {
         if (!btnReset.isSelected()) {
             for (int sourceKey : glowMap.keySet()) {
                 int destKey = glowMap.get(sourceKey);
-                Point sourcePoint = (Point) locations.get(sourceKey);
-                Point destPoint = (Point) locations.get(destKey);
+                Point sourcePoint = vertices.get(sourceKey).getLocation();
+                Point destPoint = vertices.get(destKey).getLocation();
                 drawDottedLine(bufferGraphic, sourcePoint, destPoint, dotOffset);
             }
         }
 
         // Nodes - red circles.
-        List keys = new ArrayList(locations.keySet());
-        for (int i = 0; i < locations.size(); i++) {
-            Point thePoint = (Point) locations.values().toArray()[i];
-
-            if (locations.keySet().toArray()[i].equals((Integer) _source)) {
+        for (Vertex v: vertices.values()) {
+            Point thePoint = v.getLocation();
+            if (v.getId() == _source) {
                 bufferGraphic.setColor(Color.green);
-            } else if (locations.keySet().toArray()[i].equals((Integer) _dest)) {
+            } else if (v.getId() ==  _dest) {
                 bufferGraphic.setColor(Color.blue);
-            } else if (locations.keySet().toArray()[i].equals((Integer) _selectedNode)) {
+            } else if (v.getId() ==  _selectedNode) {
                 bufferGraphic.setColor(Color.orange);
             } else {
                 bufferGraphic.setColor(Color.red);
             }
-            if (greedyresult.size() > 0) {
-                Integer k = vertices.get(i).getId();
-                if (null != greedyresult.get(k)) {
-                    switch (greedyresult.get(k)) {
-                        case 0:
-                            bufferGraphic.setColor(vertexColors[0]);
-                            break;
-                        case 1:
-                            bufferGraphic.setColor(vertexColors[1]);
-                            break;
-                        case 2:
-                            bufferGraphic.setColor(vertexColors[2]);
-                            break;
-                        case 3:
-                            bufferGraphic.setColor(vertexColors[3]);
-                            break;
-                        case 4:
-                            bufferGraphic.setColor(vertexColors[4]);
-                            break;
-                        case 5:
-                            bufferGraphic.setColor(vertexColors[5]);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
 
             if (!cutV.isEmpty()) {
-                if (cutV.contains(keys.get(i))) {
+                if (cutV.contains(v.getId())) {
                     bufferGraphic.setColor(Color.green);
                 }
             }
@@ -761,9 +714,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
         // Node labels.
         bufferGraphic.setColor(Color.blue);
-        for (int i = 0; i < locations.size(); i++) {
-            Point thePoint = (Point) locations.values().toArray()[i];
-            bufferGraphic.drawString("" + locations.keySet().toArray()[i],
+        for (Vertex v : vertices.values()) {
+            Point thePoint = v.getLocation();
+            bufferGraphic.drawString("" + v.getId(),
                     thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2);
         }
@@ -785,15 +738,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     private int nodeSelected(int x, int y) {
-        Iterator<Integer> loc = locations.keySet().iterator();
-        while (loc.hasNext()) {
-            int next = loc.next();
-            Point thePoint = locations.get(next);
+        for(Vertex v : vertices.values()) {
+            Point thePoint = v.getLocation();
             int deltaX = x - (thePoint.x - _SIZE_OF_NODE / 2);
             int deltaY = y - (thePoint.y - _SIZE_OF_NODE / 2);
             if (Math.sqrt(deltaX * deltaX
                     + deltaY * deltaY) <= _SIZE_OF_NODE + 6) {
-                return next;
+                return v.getId();
             }
         }
         return -1;
@@ -807,19 +758,23 @@ public class GraphifyGUI extends javax.swing.JFrame {
         txtConsole.append(string + "\n");
     }
 
+    static Vertex getConn(Vertex s, Edge e) {
+        if (s == e.getSource()) {
+            return e.getDest();
+        } else {
+            return e.getSource();
+        }
+    }
+
     private String getSaveString() {
-        String result = "";
-        for (int i = 0; i < vertices.size(); i++) {
-            Vertex key = vertices.get(i); // get the vertex
-            int keyId = key.getId();
-            result += keyId + ",";
-            result += locations.get(key.getId()).x + "," + locations.get(key.getId()).y; // get locations
-            Iterator<Vertex> v = key.vList().iterator();
-            while (v.hasNext()) {
-                Vertex n = v.next();
-                result += "," + n.getId();
-            }
+        String result = "Vertices:\n";
+        for (Vertex v: vertices.values()) {
+            result+= v.getId()+","+v.getName()+","+v.getType()+","+v.getLocation().x+","+v.getLocation().y;            
             result += "\n";
+        }
+        result+= "Edges:\n";
+        for(Edge e: edges){
+            result+= e.getId()+","+e.getConnections()+","+e.getWeight()+"\n";
         }
         return result;
     }

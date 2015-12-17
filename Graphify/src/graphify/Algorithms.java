@@ -7,16 +7,12 @@ package graphify;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Objects;
 import java.util.Queue;
-import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -30,7 +26,7 @@ public class Algorithms {
     private static ArrayList<Edge> edges;
     private static Queue<Vertex> q;
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
-    private HashMap<Integer, Integer> glowMap = new HashMap<>();
+    private final HashMap<Integer, Integer> glowMap = new HashMap<>();
     HashMap<Integer, HashSet<Integer>> nodes;
     private Queue<Integer> queue;
 
@@ -75,14 +71,14 @@ public class Algorithms {
         this.vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
     }
 
-    public HashSet<Vertex> getEdge(int source) {
+    public HashSet<Edge> getEdge(int source) {
         vertex = GraphifyGUI.getNode();
-        return vertex.get(source).vList();
+        return vertex.get(source).eList();
     }
-    
-    private int getWeight(Vertex s, Vertex d){
-        for(Edge e : edges){
-            if(e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s ){
+
+    private int getWeight(Vertex s, Vertex d) {
+        for (Edge e : edges) {
+            if (e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s) {
                 return e.getWeight();
             }
         }
@@ -95,7 +91,7 @@ public class Algorithms {
         time = ++time;
         disc.put(u, time);
         low.put(u, time);
-        Iterator<Vertex> i = getEdge(u).iterator();
+        Iterator<Edge> i = getEdge(u).iterator();
 
         while (i.hasNext()) {
             int v = i.next().getId(); // v is current adj to u
@@ -173,13 +169,15 @@ public class Algorithms {
             Vertex current = stack.peek();
             GG.printlnConsole("Considering element " + current.getName());
             bconn.add(current);
-            Iterator<Vertex> currentList = current.vList().iterator();
+            Iterator<Edge> currentList = current.eList().iterator();
             while (currentList.hasNext()) {
-                Vertex next = currentList.next();
+                Edge t = currentList.next();
+                Vertex next = getConn(current, t);
                 if (!next.wasVisited) { // visited just one at a time
                     GG.printlnConsole("Pushing " + next.getName());
                     stack.push(next);
                     next.parent = current;
+                    next.wasVisited = true;
                     break;
                 }
                 if (!currentList.hasNext()) {
@@ -203,22 +201,30 @@ public class Algorithms {
         while (!q.isEmpty()) { // source
             Vertex current = q.poll(); // remove first 
             conn.add(current.getId());
-            Iterator<Vertex> currentList = current.vList().iterator();
+            Iterator<Edge> currentList = current.eList().iterator();
             while (currentList.hasNext()) {
-                Vertex next = currentList.next();
+                Edge t = currentList.next();
+                Vertex next = getConn(current, t);
                 if (next.wasVisited == false) {
                     next.wasVisited = true;
                     q.add(next);
                     next.parent = current;
-                   // GG.printlnConsole(next.getName() + " has type of " + next.getType());
+                    // GG.printlnConsole(next.getName() + " has type of " + next.getType());
                 }
             }
         }
         GG.printlnConsole("Order is " + conn);
     }
-    
+
+    static Vertex getConn(Vertex s, Edge e){
+        if(s == e.getSource()){
+            return e.getDest();
+        }else{
+            return e.getSource();
+        }
+    }
     //dijsktra
-    public void execute(Vertex source){
+    public void execute(Vertex source) {
         // get vertices and edges from GUI
         vertex = GraphifyGUI.getNode();
         edges = GraphifyGUI.getEdges();
@@ -229,7 +235,7 @@ public class Algorithms {
         parents = new HashMap<>(); // parent/nodes we came from
         dist.put(source, 0); // first set source to 0
         uSNodes.add(source); // add source to unsettled nodes
-        while(uSNodes.size()> 0){ // do this until no more unsettled nodes
+        while (uSNodes.size() > 0) { // do this until no more unsettled nodes
             Vertex v = getMin(uSNodes); // we use min node from unsettled nodes each time to process
             sNodes.add(v); // add it to settled nodes
             uSNodes.remove(v); // remove it
@@ -238,57 +244,58 @@ public class Algorithms {
     }
 
     //settled nodes
-    private boolean isSettled(Vertex v){
+    private boolean isSettled(Vertex v) {
         return sNodes.contains(v);
     }
+
     //getNeighbors
-    private List<Vertex> getNeighbors(Vertex v){
+    private List<Vertex> getNeighbors(Vertex v) {
         List<Vertex> neighbors = new ArrayList<>();
-        HashSet<Vertex> n = getEdge(v.getId());
-        Iterator<Vertex> neighb = n.iterator();
-        while(neighb.hasNext()){
-            Vertex next = neighb.next();
-            if(!isSettled(next)){
+        HashSet<Edge> n = getEdge(v.getId());
+        Iterator<Edge> neighb = n.iterator();
+        while (neighb.hasNext()) {
+            Edge t = neighb.next();
+            Vertex next = getConn(v,t);
+            if (!isSettled(next)) {
                 neighbors.add(next);
             }
         }
         return neighbors;
     }
+
     // find min distance
-    private void findMinDist(Vertex v){
+    private void findMinDist(Vertex v) {
         List<Vertex> neighbors = getNeighbors(v);
         Iterator<Vertex> vert = neighbors.iterator();
-        while(vert.hasNext()){
+        while (vert.hasNext()) {
             Vertex t = vert.next();
-            int combWeight = GSD(v)+ getWeight(v,t);
-            GG.printlnConsole(""+combWeight+" get weight "+getWeight(v,t)+" v is "+v.getName()+" t is "+t.getName());
-            if(GSD(t) > combWeight){
-                dist.put(t, GSD(v) + getWeight(v,t));
+            int combWeight = GSD(v) + getWeight(v, t);
+            GG.printlnConsole("" + combWeight + " get weight " + getWeight(v, t) + " v is " + v.getName() + " t is " + t.getName());
+            if (GSD(t) > combWeight) {
+                dist.put(t, GSD(v) + getWeight(v, t));
                 t.parent = v;
                 uSNodes.add(t);
             }
         }
     }
-    
-    private Vertex getMin(HashSet<Vertex> v){
+
+    private Vertex getMin(HashSet<Vertex> v) {
         Vertex min = null;
-        for(Vertex vert : v){
-            if(min == null){
+        for (Vertex vert : v) {
+            if (min == null) {
                 min = vert;
-            }else{
-                if(GSD(vert) < GSD(min)){
-                    min = vert;
-                }
+            } else if (GSD(vert) < GSD(min)) {
+                min = vert;
             }
         }
         return min;
     }
-    
-    private int GSD(Vertex d){
+
+    private int GSD(Vertex d) {
         Integer distance = dist.get(d);
-        if(distance == null){
+        if (distance == null) {
             return Integer.MAX_VALUE;
-        }else{
+        } else {
             return distance;
         }
     }
@@ -303,9 +310,10 @@ public class Algorithms {
         conn = new ArrayList<>();
         while (!q.isEmpty()) { // source
             Vertex current = q.poll(); // remove first 
-            Iterator<Vertex> currentList = current.vList().iterator();
+            Iterator<Edge> currentList = current.eList().iterator();
             while (currentList.hasNext()) {
-                Vertex next = currentList.next();
+                Edge t = currentList.next();
+                Vertex next = getConn(current, t);
                 if (next.wasVisited == false) {
                     next.wasVisited = true;
                     q.add(next);
@@ -338,13 +346,13 @@ public class Algorithms {
                                     if (conn.isEmpty()) { // keep sorted always
                                         GG.printlnConsole("adding " + next.getId());
                                         conn.add(next.getId());
-                                    }else{
+                                    } else {
                                         conn.add(next.getId());
-                                        for(int i = 1; i < conn.size(); i++){
-                                            for(int j = i; j > 0; j--){
-                                                if(vertex.get(conn.get(j)).getRating() < vertex.get(conn.get(j-1)).getRating()){
-                                                    conn.add(j, conn.get(j-1));
-                                                    conn.add(j-1, conn.get(j));
+                                        for (int i = 1; i < conn.size(); i++) {
+                                            for (int j = i; j > 0; j--) {
+                                                if (vertex.get(conn.get(j)).getRating() < vertex.get(conn.get(j - 1)).getRating()) {
+                                                    conn.add(j, conn.get(j - 1));
+                                                    conn.add(j - 1, conn.get(j));
                                                 }
                                             }
                                         }
@@ -405,29 +413,6 @@ public class Algorithms {
             }
         }
         return true;
-    }
-
-    boolean isEulerian() {
-        int noOfOdds = 0;
-        if (isConnected()) {
-            Iterator<Vertex> allNode = vertex.values().iterator();
-            while (allNode.hasNext()) {
-                Vertex key = allNode.next();
-                int keyEdgeSize = key.vList().size();
-                if (keyEdgeSize % 2 != 0 && keyEdgeSize != 0) {
-                    noOfOdds++;
-                }
-            }
-        } else {
-            return false;
-        }
-        if (noOfOdds == 0) {
-            return true;
-        }
-        if (noOfOdds == 2) {
-            GG.printlnConsole("There is an euler path");
-        }
-        return false;
     }
 
     public int hasPath(int v) {

@@ -11,6 +11,7 @@ package graphify;
  * @author Ayomitunde
  */
 
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +21,8 @@ public class Vertex {
 	public String label;
 	public boolean wasVisited;
 	public Vertex parent;
-	private HashSet <Vertex> vList;
+	private Point location;
+        private HashSet<Edge> eList;
 	private int id;
 	private int rating;
         private String type;
@@ -28,14 +30,15 @@ public class Vertex {
         public Vertex(GraphifyGUI GG){
             
         }
-	public Vertex(int id, String vertexLabel,String type, int rating) {
+	public Vertex(int id, Point loc, String vertexLabel,String type, int rating) {
 		this.label = vertexLabel;
 		this.wasVisited = false;
                 this.type = type;
 		this.parent = this; // change this to vertex
 		this.id = id;
 		this.rating = rating;
-		this.vList = new HashSet<>();
+		this.location = loc; 
+                this.eList = new HashSet<>();
 	}
 
 	public String getLabel() {
@@ -70,9 +73,18 @@ public class Vertex {
             return this;
         }
         
-        public HashSet<Vertex> vList(){
-		return this.vList;
-	}
+        public Point getLocation(){
+            return this.location;
+        }
+        
+    /**
+     *
+     * @return
+     * returns edges connected to this vertex
+     */
+    public HashSet<Edge> eList(){
+            return this.eList;
+        }
 	
 	public Vertex getParent(){
 		return this.parent;
@@ -144,7 +156,7 @@ class Edge{
 	}
 	
 	public String getConnections(){
-		return source.label+" <==> "+dest.label;
+		return source.getId()+","+dest.getId();
 	}
 	
 	@Override
@@ -172,11 +184,6 @@ class Graph {
 		return edges;
 	}
 
-	public void printList(Vertex v){
-		for(Vertex x : v.vList()){
-			x.getLabel();
-		}
-	}
 	
 	// get all people with age between 18 to 20 and show their parents
 	
