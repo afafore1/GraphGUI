@@ -214,7 +214,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnClearConsole.setText("Clear Console");
         btnClearConsole.addActionListener(this::btnClearConsoleActionPerformed);
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Dijkstra", "Double Graph", "Vertex Cover", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness"}));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BFS", "DFS", "Dijkstra", "Connectedness"}));
         jcbAlgo.addActionListener(this::jcbAlgoActionPerformed);
 
         btnStart.setText("Start");
@@ -542,12 +542,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             alg.execute(vertices.get(_source));
             alg.shortestPath(_source, _dest);
-        } else if (x == "Cut") {
-            _source = -1;
-            _dest = -1;
-            alg.AP();
-            cutV = alg.getCutV();
-            graph();
         } else if (x == "Connectedness") {
             txtConsole.setText("");
             if (_source == -1) {
