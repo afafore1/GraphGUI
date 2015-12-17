@@ -79,9 +79,10 @@ public class Commands {
                 cutV.clear();
                 result = "";
                 if (n.equals("friends") || n.equals("places") || n.equals("cities")) {
-                    Iterator<Vertex> mine = s.vList().iterator();
+                    Iterator<Edge> mine = s.eList().iterator();
                     while (mine.hasNext()) {
-                        Vertex next = mine.next();
+                        Edge t = mine.next();
+                        Vertex next = Algorithms.getConn(s, t);
                         if (next.getType().equals(Types.Person.toString()) && n.equals("friends")) {
                             cutV.add(next.getId());
                         } else if (next.getType().equals(Types.City.toString()) && n.equals("cities")) {
@@ -126,9 +127,10 @@ public class Commands {
         String[] tokens = query.split(" ");
         String sec = tokens[1];
         if (sec.equals("i")) {
-            Iterator<Vertex> p = source.vList().iterator();
+            Iterator<Edge> p = source.eList().iterator();
             while (p.hasNext()) {
-                Vertex pla = p.next();
+                Edge t = p.next();
+                Vertex pla = Algorithms.getConn(source, t);
                 if (pla.getType().equals("Place")) {
                     places += pla.getName() + " ";
                 }
@@ -142,9 +144,10 @@ public class Commands {
         String sec = tokens[1];
         String friendList = "";
         if (sec.equals("friends")) {
-            Iterator<Vertex> friends = source.vList().iterator();
+            Iterator<Edge> friends = source.eList().iterator();
             while (friends.hasNext()) {
-                Vertex f = friends.next();
+                Edge t = friends.next();
+                Vertex f = Algorithms.getConn(source, t);
                 if (f.getType().equals("Person")) {
                     friendList += f.getName() + " ";
                 }

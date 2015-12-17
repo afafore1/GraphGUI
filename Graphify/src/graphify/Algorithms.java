@@ -318,7 +318,7 @@ public class Algorithms {
                     next.wasVisited = true;
                     q.add(next);
                     next.parent = current;
-                    if (!source.vList().contains(next)) {
+                    if (!source.eList().contains(t)) {
                         switch (num) {
                             case 0:
                                 if (next.getType().equals(Types.Person.toString())) {
