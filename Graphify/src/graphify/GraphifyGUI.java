@@ -607,7 +607,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         saveAs();
     }
 
-    void LoadVertices(File f) throws FileNotFoundException {
+    void LoadFile(File f) throws FileNotFoundException {
         Scanner sc = new Scanner(f);
         int mode = 0;
         while (sc.hasNext()) {
@@ -627,12 +627,16 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 Vertex v = new Vertex(newId, newPoint, tokens[1], tokens[2], 0);
                 vertices.put(newId, v);
                 id = newId;
+                if("failed".equals(tokens[5])){
+                    failed.add(v);
+                }
             } else if (mode == 1) {
                 int newId = Integer.parseInt(tokens[0]);
                 int sourceKey = Integer.parseInt(tokens[1]);
                 int destKey = Integer.parseInt(tokens[2]);
                 int weight = Integer.parseInt(tokens[3]);
-                Edge e = new Edge(newId, vertices.get(sourceKey), vertices.get(destKey), 0, weight, false);
+                boolean fail = Boolean.parseBoolean(tokens[4]);
+                Edge e = new Edge(newId, vertices.get(sourceKey), vertices.get(destKey), 0, weight, fail);
                 edges.add(e);
                 vertices.get(sourceKey).eList().add(e);
                 vertices.get(destKey).eList().add(e);
@@ -651,7 +655,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     reset();
                     currentProject = theChooser.getSelectedFile().getPath();
                     File theFile = new File(currentProject);
-                    LoadVertices(theFile);
+                    LoadFile(theFile);
                     graph();
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -666,15 +670,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
             return "None";
         }
         return "" + nodeId;
-    }
-
-    private int getWeight(Vertex s, Vertex d) {
-        for (Edge e : edges) {
-            if (e.getSource().equals(s) && e.getDest().equals(d)) {
-                return e.getWeight();
-            }
-        }
-        return -1; // edge does not exist then
     }
 
     public void graph() {
@@ -794,82 +789,18 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private String getSaveString() {
         String result = "Vertices:\n";
         for (Vertex v : vertices.values()) {
-            result += v.getId() + "," + v.getName() + "," + v.getType() + "," + v.getLocation().x + "," + v.getLocation().y;
+            if(failed.contains(v)){
+                result += v.getId() + "," + v.getName() + "," + v.getType() + "," + v.getLocation().x + "," + v.getLocation().y +","+"failed";
+            }else{
+                result += v.getId() + "," + v.getName() + "," + v.getType() + "," + v.getLocation().x + "," + v.getLocation().y +","+"notfailed";
+            }
             result += "\n";
         }
         result += "Edges:\n";
-        for (Edge e : edges) {
-            result += e.getId() + "," + e.getConnections() + "," + e.getWeight() + "\n";
-        }
+        result = edges.stream().map((e) -> e.getId() + "," + e.getConnections() + "," + e.getWeight() +","+ e.isFailed()+ "\n").reduce(result, String::concat);
         return result;
     }
-
-//    private void randomize(int max) { // I don't really like this... Seem quite messy
-//        String result = "";
-//        int Ncon = 12;
-//        // create connections for each nodes
-//        for (int i = 0; i < max; i++) {
-//            HashSet<Integer> st = new HashSet<>();
-//            while (st.size() < (int) (Math.random() * Ncon)) {
-//                int con = (int) (Math.random() * max);
-//                if (con != i) {
-//                    st.add(con);
-//                }
-//            }
-//            nodes.put(i, st);
-//        }
-//
-//        // add connections for nodes equally. Undirected graph i.e. if node a consist node b, the same must happen the other way
-//        for (int i = 0; i < nodes.size(); i++) {
-//            Iterator<Integer> t = alg.getEdge(i).iterator();
-//            while (t.hasNext()) {
-//                int nextNum = t.next();
-//                if (nodes.get(nextNum) != null) {
-//                    if (!(nodes.get(nextNum).contains(i))) {
-//                        HashSet<Integer> tList = nodes.get(nextNum);
-//                        tList.add(i);
-//                        nodes.put(nextNum, tList);
-//                    }
-//                }
-//
-//            }
-//        }
-//        HashMap<Integer, Integer> nums = new HashMap<>();
-//        for (int i = 0; i < nodes.size(); i++) {
-//            int t = (int) (Math.random() * 925 + 20);
-//            int s = (int) (Math.random() * 325 + 20);
-//            int x = 0;
-//            int y = 0;
-//            if(nums.containsKey(t) || nums.containsValue(s)){
-//                i--;
-//            }else{
-//                nums.put(t, s);
-//            x = (int) (2 * t);
-//            y = (int) (2 * s);
-//            result += i + "," + x + "," + y + "," + nodes.get(i).toString().replace("[", "").replace("]", "").replaceAll(" ", "") + "\n";
-//            }            
-//            
-//        }
-//
-//        Scanner scanner = new Scanner(result);
-//        while (scanner.hasNext()) {
-//            String currentLine = scanner.nextLine();
-//            String[] tokens = currentLine.split(",");
-//            Integer key = Integer.parseInt(tokens[0]);
-//            Integer x = Integer.parseInt(tokens[1]);
-//            Integer y = Integer.parseInt(tokens[2]);
-//            HashSet<Integer> connections = new HashSet();
-//            for (int i = 3; i < tokens.length; i++) {
-//                connections.add(Integer.parseInt(tokens[i]));
-//            }
-//            nodes.put(key, connections);
-//            locations.put(key, new Point(x, y));
-//            id = key;
-//        }
-//        id++;
-//        graph();
-//        //return result;
-//    }
+    
     private void save(String path) {
         try {
             File fileToSave = new File(path);
