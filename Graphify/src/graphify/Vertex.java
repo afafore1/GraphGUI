@@ -16,8 +16,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
+import java.io.Serializable;
 
-public class Vertex {
+public class Vertex  implements Serializable{
 	public String label;
 	public boolean wasVisited;
 	public Vertex parent;
@@ -30,7 +31,7 @@ public class Vertex {
         public Vertex(GraphifyGUI GG){
             
         }
-	public Vertex(int id, Point loc, String vertexLabel,String type, int rating) {
+	public Vertex(int id, Point loc, String vertexLabel,String type, int rating){
 		this.label = vertexLabel;
 		this.wasVisited = false;
                 this.type = type;
@@ -120,7 +121,7 @@ public class Vertex {
 	
 }
 
-class Edge{
+class Edge implements Serializable{
 	private final int id;
 	private final Vertex source;
 	private final Vertex dest;

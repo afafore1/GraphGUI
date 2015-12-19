@@ -7,6 +7,7 @@ package graphify;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -16,10 +17,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,7 +39,9 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -321,9 +331,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
         } else if (SwingUtilities.isLeftMouseButton(evt)) {
             if (evt.isControlDown() && evt.isShiftDown()) { // control shift to fail all edges leading out of a vertex
                 Vertex fail = vertices.get(_selectedNode);
-                if(failed.contains(fail)){
+                if (failed.contains(fail)) {
                     failed.remove(fail);
-                }else{
+                } else {
                     failed.add(fail);
                 }
                 Iterator<Edge> e = fail.eList().iterator();
@@ -332,15 +342,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     next.setFailed(!next.isFailed()); //set it to opposite of what it is
                 }
                 alg.getVisited().clear();
-                alg.getGlowMap().clear(); 
+                alg.getGlowMap().clear();
                 alg.getSet().clear();
-                if(sim == "DFS"){
+                if (sim == "DFS") {
                     alg.Dfs(vertices.get(_source));
                     alg.shortestPath(_source, _dest);
-                }else if(sim == "BFS"){
+                } else if (sim == "BFS") {
                     Algorithms.Bfs(vertices.get(_source));
                     alg.shortestPath(_source, _dest);
-                }else if(sim == "Dijkstra"){
+                } else if (sim == "Dijkstra") {
                     alg.execute(vertices.get(_source));
                     alg.shortestPath(_source, _dest);
                 }
@@ -490,6 +500,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 // Implement path finding here.
                 set.clear();
             }
+            
             graph();
         }
     }
@@ -607,57 +618,37 @@ public class GraphifyGUI extends javax.swing.JFrame {
         saveAs();
     }
 
-    void LoadFile(File f) throws FileNotFoundException {
-        Scanner sc = new Scanner(f);
-        int mode = 0;
-        while (sc.hasNext()) {
-            String line = sc.nextLine();
-            if (line.startsWith("Vertices:")) {
-                mode = 0;
-                continue;
-            }
-            if (line.startsWith("Edges:")) {
-                mode = 1;
-                continue;
-            }
-            String[] tokens = line.split(",");
-            if (mode == 0) {
-                int newId = Integer.parseInt(tokens[0]);
-                Point newPoint = new Point(Integer.parseInt(tokens[3]), Integer.parseInt(tokens[4]));
-                Vertex v = new Vertex(newId, newPoint, tokens[1], tokens[2], 0);
-                vertices.put(newId, v);
-                id = newId;
-                if("failed".equals(tokens[5])){
-                    failed.add(v);
-                }
-            } else if (mode == 1) {
-                int newId = Integer.parseInt(tokens[0]);
-                int sourceKey = Integer.parseInt(tokens[1]);
-                int destKey = Integer.parseInt(tokens[2]);
-                int weight = Integer.parseInt(tokens[3]);
-                boolean fail = Boolean.parseBoolean(tokens[4]);
-                Edge e = new Edge(newId, vertices.get(sourceKey), vertices.get(destKey), 0, weight, fail);
-                edges.add(e);
-                vertices.get(sourceKey).eList().add(e);
-                vertices.get(destKey).eList().add(e);
-            }
+    void Open(File file) throws FileNotFoundException, IOException {
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            vertices = (HashMap) ois.readObject();
+            edges = (ArrayList) ois.readObject();
+            id = (int) ois.readObject();
+            failed = (ArrayList) ois.readObject();
+            ois.close();
+            fis.close();
+        } catch (IOException ioe) {
+        } catch (ClassNotFoundException c) {
+            printlnConsole("Class not found");
         }
-        id++;
     }
 
     private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) { // needs to be changed to get correct info
         if (checkForChange()) {
             JFileChooser theChooser = new JFileChooser();
-            theChooser.setFileFilter(new FileNameExtensionFilter("GraphifyGUI files", "sgf"));
+            theChooser.setFileFilter(new FileNameExtensionFilter("GraphifyGUI files", "ser"));
             if (theChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 try {
                     changesMade = false;
                     reset();
                     currentProject = theChooser.getSelectedFile().getPath();
                     File theFile = new File(currentProject);
-                    LoadFile(theFile);
+                    Open(theFile);
                     graph();
                 } catch (FileNotFoundException ex) {
+                    Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
                     Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
@@ -684,8 +675,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         for (Edge e : edges) {
             Point source = e.getSource().getLocation();
             Point dest = e.getDest().getLocation();
-            xmid = (source.x + dest.x) / 2 + 10;
-            ymid = (source.y + dest.y) / 2 + 10;
+            xmid = (source.x + dest.x) / 2 + 5;
+            ymid = (source.y + dest.y) / 2 + 5;
             bufferGraphic.drawLine(source.x, source.y, dest.x, dest.y);
             int edgeWeight = e.getWeight();
             if (!(edgeWeight == -1)) {
@@ -717,8 +708,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
             } else {
                 bufferGraphic.setColor(Color.red);
             }
-            if(!failed.isEmpty()){
-                if(failed.contains(v)){
+            if (!failed.isEmpty()) {
+                if (failed.contains(v)) {
                     bufferGraphic.setColor(Color.gray);
                 }
             }
@@ -731,7 +722,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
             bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
         }
-
         // Node labels.
         bufferGraphic.setColor(Color.blue);
         for (Vertex v : vertices.values()) {
@@ -786,30 +776,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
     }
 
-    private String getSaveString() {
-        String result = "Vertices:\n";
-        for (Vertex v : vertices.values()) {
-            if(failed.contains(v)){
-                result += v.getId() + "," + v.getName() + "," + v.getType() + "," + v.getLocation().x + "," + v.getLocation().y +","+"failed";
-            }else{
-                result += v.getId() + "," + v.getName() + "," + v.getType() + "," + v.getLocation().x + "," + v.getLocation().y +","+"notfailed";
-            }
-            result += "\n";
-        }
-        result += "Edges:\n";
-        result = edges.stream().map((e) -> e.getId() + "," + e.getConnections() + "," + e.getWeight() +","+ e.isFailed()+ "\n").reduce(result, String::concat);
-        return result;
-    }
-    
     private void save(String path) {
         try {
-            File fileToSave = new File(path);
-            FileWriter writer;
-            writer = new FileWriter(fileToSave);
-            String stringToWrite = getSaveString();
-            writer.write(stringToWrite);
-            changesMade = false;
-            writer.close();
+            try (FileOutputStream fileOut = new FileOutputStream(path); ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+                out.writeObject(vertices);
+                out.writeObject(edges);
+                out.writeObject(id);
+                out.writeObject(failed);
+            }
+
         } catch (IOException ex) {
             Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -817,11 +792,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void saveAs() {
         JFileChooser theChooser = new JFileChooser();
-        theChooser.setFileFilter(new FileNameExtensionFilter("GraphifyGUI files", "sgf"));
+        theChooser.setFileFilter(new FileNameExtensionFilter("GraphifyGUI files", "ser"));
         if (theChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             String nominatedPath = theChooser.getSelectedFile().getPath();
-            if (!nominatedPath.endsWith(".sgf")) {
-                nominatedPath += ".sgf";
+            if (!nominatedPath.endsWith(".ser")) {
+                nominatedPath += ".ser";
             }
             currentProject = nominatedPath;
             save(currentProject);
@@ -840,13 +815,16 @@ public class GraphifyGUI extends javax.swing.JFrame {
         if (changesMade) {
             int option = JOptionPane.showConfirmDialog(this,
                     "Changes have been made. Do you want to save before continuing?", "", JOptionPane.YES_NO_CANCEL_OPTION);
-            if (option == JOptionPane.YES_OPTION) {
-                justSave();
-                return true;
-            } else if (option == JOptionPane.CANCEL_OPTION) {
-                return false;
-            } else if (option == JOptionPane.NO_OPTION) {
-                return true;
+            switch (option) {
+                case JOptionPane.YES_OPTION:
+                    justSave();
+                    return true;
+                case JOptionPane.CANCEL_OPTION:
+                    return false;
+                case JOptionPane.NO_OPTION:
+                    return true;
+                default:
+                    break;
             }
         }
         return true;
@@ -874,15 +852,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GraphifyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GraphifyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GraphifyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(GraphifyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        
         //</editor-fold>
 
         /* Create and display the form */
@@ -919,6 +893,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         public ActionListenerImpl() {
         }
 
+        @Override
         public void actionPerformed(java.awt.event.ActionEvent evt) {
             btnPrintListActionPerformed(evt);
         }
