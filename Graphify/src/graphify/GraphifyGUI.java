@@ -53,7 +53,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     HashMap<Integer, Integer> glowMap;
-    Runnable decreseWeights;
+    ActionListener decreseWeights;
     Queue<Integer> queue;
     Stack<Integer> stack;
     String sim = null;
@@ -125,15 +125,18 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
             }
         });
-        this.decreseWeights = () -> {
+        this.decreseWeights = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
             if ("Dijkstra".equals(sim)) {
                 reduceIncreasepAmount();
                 //graph();
             }
+            }
         };
         int time = 500;
-        ScheduledExecutorService exe = Executors.newScheduledThreadPool(1);
-        exe.scheduleAtFixedRate(decreseWeights, 0, time, TimeUnit.MILLISECONDS);
+        Timer exe = new Timer(time, decreseWeights);
+        exe.start();
     }
 
     public static HashMap getNode() {
@@ -779,19 +782,22 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     void drawArrow(Graphics g1, int x1, int y1, int x2, int y2) {
         Graphics2D g = (Graphics2D) g1.create();
+        drawArrowOnGraphics(g, x1, y1, x2, y2);
+    }
+
+    private void drawArrowOnGraphics(Graphics2D g1, int x1, int y1, int x2, int y2) {
         double dx = x2 - x1, dy = y2 - y1;
         double angle = Math.atan2(dy, dx);
         int len = (int) Math.sqrt(dx * dx + dy * dy);
         AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
         at.concatenate(AffineTransform.getRotateInstance(angle));
-        g.transform(at);
+        g1.transform(at);
 
         // Draw horizontal arrow starting in (0, 0)
-        g.drawLine(0, 0, len, 0);
-        g.fillPolygon(new int[]{len, len - ARR_SIZE, len - ARR_SIZE, len},
+        g1.drawLine(0, 0, len, 0);
+        g1.fillPolygon(new int[]{len, len - ARR_SIZE, len - ARR_SIZE, len},
                 new int[]{0, -ARR_SIZE, ARR_SIZE, 0}, 4);
     }
-
     private void drawDottedLine(Graphics2D g, Point p1, Point p2, double offset) {
         long total = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
         total = (long) Math.sqrt(total);
