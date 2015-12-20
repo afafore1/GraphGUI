@@ -134,7 +134,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             }
         };
-        int time = 500;
+        int time = 1;
         Timer exe = new Timer(time, decreseWeights);
         exe.start();
     }

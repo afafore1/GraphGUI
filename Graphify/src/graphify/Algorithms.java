@@ -399,7 +399,7 @@ public class Algorithms {
 //            
 //            execute(vertex.get(v));
 //        }
-        GG.printlnConsole(set.toString().replaceAll("=", "-->"));
+        //GG.printlnConsole(set.toString().replaceAll("=", "-->"));
         GG.printlnConsole("Capacity transfered is "+capacity);
         glowMap.clear();
         set.keySet().stream().forEach((i) -> {
