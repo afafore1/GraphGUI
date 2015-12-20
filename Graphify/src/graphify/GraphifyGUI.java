@@ -52,7 +52,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class GraphifyGUI extends javax.swing.JFrame {
 
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
-    HashMap<Integer, Integer> glowMap;
     ActionListener decreseWeights;
     Queue<Integer> queue;
     Stack<Integer> stack;
@@ -65,6 +64,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     HashMap<Integer, Integer> greedyresult;
     HashSet<Integer> _colors2;
     HashSet<Integer> randomKeys;
+    ArrayList<Edge> glowMap;
     ArrayList<Integer> cutV;
     ArrayList<Vertex> failed;
     Color[] vertexColors;
@@ -732,11 +732,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
         bufferGraphic.setColor(new Color(10, 230, 40));
         bufferGraphic.setStroke(new BasicStroke(6));
         if (!btnReset.isSelected()) {
-            for (Iterator<Integer> it = glowMap.keySet().iterator(); it.hasNext();) {
-                int sourceKey = it.next();
-                int destKey = glowMap.get(sourceKey);
-                Point sourcePoint = vertices.get(sourceKey).getLocation();
-                Point destPoint = vertices.get(destKey).getLocation();
+            for (Edge edge : glowMap) {
+                Point sourcePoint = edge.getSource().getLocation();
+                Point destPoint = edge.getDest().getLocation();
                 drawDottedLine(bufferGraphic, sourcePoint, destPoint, dotOffset);
             }
         }

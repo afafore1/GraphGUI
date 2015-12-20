@@ -26,12 +26,12 @@ public class Algorithms {
     private static ArrayList<Edge> edges;
     private static Queue<Vertex> q;
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
-    private final HashMap<Integer, Integer> glowMap = new HashMap<>();
+    private final ArrayList<Edge> glowMap = new ArrayList<>();
     HashMap<Integer, HashSet<Integer>> nodes;
     private Queue<Integer> queue;
     private Stack<Vertex> stack;
     private HashMap<Integer, Integer> distTo;
-    private HashMap<Integer, Integer> set = new HashMap<>();
+    private HashMap<Integer, Integer> setShortestPath = new HashMap<>();
     private HashMap<Integer, Integer> visited;
     private static ArrayList<Integer> conn;
     private HashSet<Vertex> bconn;
@@ -57,7 +57,7 @@ public class Algorithms {
         this.stack = new Stack<>();
         this.cutV = new ArrayList<>();
         this.visited = new HashMap<>();
-        this.set = new HashMap<>();
+        this.setShortestPath = new HashMap<>();
         this.visited = new HashMap<>();
     }
 
@@ -187,7 +187,7 @@ public class Algorithms {
         q = new LinkedList<>(); // FIFO
         source.wasVisited = true; // marked as visited
         q.add(source); // put into queue
-        source.parent = source; // set parent
+        source.parent = source; // setShortestPath parent
         conn = new ArrayList<>();
         while (!q.isEmpty()) { // source
             Vertex current = q.poll(); // remove first 
@@ -221,11 +221,11 @@ public class Algorithms {
         // get vertices and edges from GUI
         vertex = GraphifyGUI.getNode();
         edges = GraphifyGUI.getEdges();
-        sNodes = new HashSet<>(); // settled nodes will be placed in this set
-        uSNodes = new HashSet<>(); // unsettled nodes will be placed in this set
+        sNodes = new HashSet<>(); // settled nodes will be placed in this setShortestPath
+        uSNodes = new HashSet<>(); // unsettled nodes will be placed in this setShortestPath
         dist = new HashMap<>(); // weight to get to node
         reset();
-        dist.put(source, 0); // first set source to 0
+        dist.put(source, 0); // first setShortestPath source to 0
         uSNodes.add(source); // add source to unsettled nodes
         while (uSNodes.size() > 0) { // do this until no more unsettled nodes
             Vertex v = getMin(uSNodes); // we use min node from unsettled nodes each time to process
@@ -316,7 +316,7 @@ public class Algorithms {
         q = new LinkedList<>(); // FIFO
         source.wasVisited = true; // marked as visited
         q.add(source); // put into queue
-        source.parent = source; // set parent
+        source.parent = source; // setShortestPath parent
         conn = new ArrayList<>();
         while (!q.isEmpty()) { // source
             Vertex current = q.poll(); // remove first 
@@ -391,7 +391,7 @@ public class Algorithms {
                 break;
             }
             if (vertex.get(i).getParent().getId() != -1) {
-                set.put(vertex.get(i).getParent().getId(), i);
+                setShortestPath.put(vertex.get(i).getParent().getId(), i);
                 capacity += getpAmount(vertex.get(i).parent, vertex.get(i));
             }
         }
@@ -399,11 +399,18 @@ public class Algorithms {
 //            
 //            execute(vertex.get(v));
 //        }
-        GG.printlnConsole(set.toString().replaceAll("=", "-->"));
+        GG.printlnConsole(setShortestPath.toString().replaceAll("=", "-->"));
         GG.printlnConsole("Capacity transfered is "+capacity);
         glowMap.clear();
-        set.keySet().stream().forEach((i) -> {
-            glowMap.put(i, set.get(i));
+        setShortestPath.keySet().stream().forEach((i) -> {
+            for (Edge edge : edges) {
+                if (edge.getSource() == vertex.get(i) 
+                        && edge.getDest()== vertex.get(setShortestPath.get(i))
+                        || edge.getDest() == vertex.get(i) 
+                        && edge.getSource() == vertex.get(setShortestPath.get(i))) {
+                    glowMap.add(edge);
+                }
+            }
         });
         GG.graph();
     }
@@ -413,7 +420,7 @@ public class Algorithms {
         vertex.values().stream().forEach((v) -> {
             v.wasVisited = false;
         });
-        set.clear();
+        setShortestPath.clear();
     }
 
     boolean isConnected() {
@@ -446,7 +453,7 @@ public class Algorithms {
         return this.stack;
     }
 
-    public HashMap getGlowMap() {
+    public ArrayList<Edge> getGlowMap() {
         return this.glowMap;
     }
 
@@ -455,7 +462,7 @@ public class Algorithms {
     }
 
     public HashMap getSet() {
-        return this.set;
+        return this.setShortestPath;
     }
 
     public HashMap getVisited() {
