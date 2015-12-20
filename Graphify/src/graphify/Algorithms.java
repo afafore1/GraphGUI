@@ -249,6 +249,15 @@ public class Algorithms {
         }
         return -1; // edge does not exist then
     }
+    
+    private int getpAmount (Vertex s, Vertex d){
+        for(Edge e : edges){
+            if (e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s) {
+                return e.getpheromoneAmount();
+            }
+        }
+        return -1;
+    }
 
     //getNeighbors
     private List<Vertex> getNeighbors(Vertex v) {
@@ -376,18 +385,21 @@ public class Algorithms {
             GG.printlnConsole(v + "-->" + v);
             return;
         }
+        int capacity = 0;
         for (int i = e; i >= 0; i = vertex.get(i).getParent().getId()) {
             if (i == v) {
                 break;
             }
             if (vertex.get(i).getParent().getId() != -1) {
                 set.put(vertex.get(i).getParent().getId(), i);
+                capacity += getpAmount(vertex.get(i).parent, vertex.get(i));
             }
         }
-        int max = 0;
-        max = set.keySet().stream().map((i) -> dist.get(vertex.get(i))).reduce(max, Integer::sum);
+        if(capacity > vertex.get(e).getCapacity()){
+            execute(vertex.get(v));
+        }
         GG.printlnConsole(set.toString().replaceAll("=", "-->"));
-        GG.printlnConsole("this max "+max);
+        GG.printlnConsole("Capacity transfered is "+capacity);
         glowMap.clear();
         set.keySet().stream().forEach((i) -> {
             glowMap.put(i, set.get(i));
