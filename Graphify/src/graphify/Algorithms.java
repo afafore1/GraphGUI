@@ -180,7 +180,7 @@ public class Algorithms {
         GG.printlnConsole("order is " + bconn);
     }
 
-    public static void Bfs(Vertex source) {
+    public void Bfs(Vertex source) {
         vertex = GraphifyGUI.getNode();
         edges = GraphifyGUI.getEdges();
         reset();
@@ -244,7 +244,7 @@ public class Algorithms {
     private int getWeight(Vertex s, Vertex d) {
         for (Edge e : edges) {
             if (e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s) {
-                return e.getWeight();
+                return e.getWeight()/e.getpheromoneAmount();
             }
         }
         return -1; // edge does not exist then
@@ -310,7 +310,7 @@ public class Algorithms {
         }
     }
 
-    public static ArrayList BfsSuggest(Vertex source, int num) {
+    public ArrayList BfsSuggest(Vertex source, int num) {
         vertex = GraphifyGUI.getNode();
         reset();
         q = new LinkedList<>(); // FIFO
@@ -395,9 +395,10 @@ public class Algorithms {
                 capacity += getpAmount(vertex.get(i).parent, vertex.get(i));
             }
         }
-        if(capacity > vertex.get(e).getCapacity()){
-            execute(vertex.get(v));
-        }
+//        if(capacity < vertex.get(e).getCapacity()){
+//            
+//            execute(vertex.get(v));
+//        }
         GG.printlnConsole(set.toString().replaceAll("=", "-->"));
         GG.printlnConsole("Capacity transfered is "+capacity);
         glowMap.clear();
@@ -407,12 +408,12 @@ public class Algorithms {
         GG.graph();
     }
 
-    static void reset() {
+    void reset() {
         vertex = GraphifyGUI.getNode();
         vertex.values().stream().forEach((v) -> {
             v.wasVisited = false;
         });
-        dist.clear();
+        set.clear();
     }
 
     boolean isConnected() {
