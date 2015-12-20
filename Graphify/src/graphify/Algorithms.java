@@ -395,22 +395,16 @@ public class Algorithms {
                 capacity += getpAmount(vertex.get(i).parent, vertex.get(i));
             }
         }
-//        if(capacity < vertex.get(e).getCapacity()){
-//            
-//            execute(vertex.get(v));
-//        }
-        //GG.printlnConsole(set.toString().replaceAll("=", "-->"));
+
         GG.printlnConsole("Capacity transfered is "+capacity);
         glowMap.clear();
         setShortestPath.keySet().stream().forEach((i) -> {
-            for (Edge edge : edges) {
-                if (edge.getSource() == vertex.get(i) 
-                        && edge.getDest()== vertex.get(setShortestPath.get(i))
-                        || edge.getDest() == vertex.get(i) 
-                        && edge.getSource() == vertex.get(setShortestPath.get(i))) {
-                    glowMap.add(edge);
-                }
-            }
+            edges.stream().filter((edge) -> (edge.getSource() == vertex.get(i) 
+                    && edge.getDest()== vertex.get(setShortestPath.get(i))
+                    || edge.getDest() == vertex.get(i)
+                            && edge.getSource() == vertex.get(setShortestPath.get(i)))).forEach((edge) -> {
+                                glowMap.add(edge);
+            });
         });
         GG.graph();
     }
