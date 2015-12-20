@@ -11,11 +11,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,15 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -69,13 +63,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
     ArrayList<Vertex> failed;
     Color[] vertexColors;
     int _selectedNode = -1;
-    final int ARR_SIZE = 4;
+    final int ARR_SIZE = 8;
     int _SIZE_OF_NODE = 20;
     int id = 0;
     int Edgeid = 0;
     int weight = 0;
     List<Integer> edgeWeights; // store weights here
-    int time = 0;
     Integer maxColors = 0;
     int _source = -1;
     int _dest = -1;
@@ -87,6 +80,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     double dotOffset = 0.0;
     Algorithms alg;
     Vertex ver;
+    int pChangeTime = 300;
 
     private static HashMap<Integer, Vertex> vertices;
     private static ArrayList<Edge> edges;
@@ -134,8 +128,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             }
         };
-        int time = 1;
-        Timer exe = new Timer(time, decreseWeights);
+        Timer exe = new Timer(pChangeTime, decreseWeights);
         exe.start();
     }
 
@@ -711,11 +704,19 @@ public class GraphifyGUI extends javax.swing.JFrame {
         bufferGraphic.setStroke(new BasicStroke(2));
         for (Iterator<Edge> edge = edges.iterator(); edge.hasNext();) {
             Edge e = edge.next();
-            Point source = e.getSource().getLocation();
-            Point dest = e.getDest().getLocation();
+            Point source = (Point) e.getSource().getLocation().clone();
+            Point dest = (Point) e.getDest().getLocation().clone();
+            double dx = dest.x - source.x;
+            double dy = source.y - dest.y;
+            double angle = Math.atan2(dy, dx);
+            source.x += (int) (Math.cos(angle) * _SIZE_OF_NODE / 2);
+            source.y -= (int) (Math.sin(angle) * _SIZE_OF_NODE / 2);
+            dest.x -= (int) (Math.cos(angle) * _SIZE_OF_NODE / 2);
+            dest.y += (int) (Math.sin(angle) * _SIZE_OF_NODE / 2);
             xmid = (source.x + dest.x) / 2 + 5;
             ymid = (source.y + dest.y) / 2 + 5;
-            bufferGraphic.drawLine(source.x, source.y, dest.x, dest.y);
+            drawArrowOnGraphics(bufferGraphic, source.x, source.y, dest.x, dest.y);
+//            bufferGraphic.drawLine(source.x, source.y, dest.x, dest.y);
             int edgeWeight = e.getWeight();
             if (!(edgeWeight == -1)) {
                 bufferGraphic.setColor(
@@ -784,17 +785,21 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     private void drawArrowOnGraphics(Graphics2D g1, int x1, int y1, int x2, int y2) {
-        double dx = x2 - x1, dy = y2 - y1;
+        double dx = x2 - x1, dy = y1 - y2;
         double angle = Math.atan2(dy, dx);
         int len = (int) Math.sqrt(dx * dx + dy * dy);
-        AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
-        at.concatenate(AffineTransform.getRotateInstance(angle));
-        g1.transform(at);
 
+        int p1X = (int) (x2 + Math.cos(angle + Math.PI * 3/4) * ARR_SIZE);
+        int p1Y = (int) (y2 - Math.sin(angle + Math.PI * 3/4) * ARR_SIZE);
+        int p2X = (int) (x2 + Math.cos(angle - Math.PI * 3/4) * ARR_SIZE);
+        int p2Y = (int) (y2 - Math.sin(angle - Math.PI * 3/4) * ARR_SIZE);
         // Draw horizontal arrow starting in (0, 0)
-        g1.drawLine(0, 0, len, 0);
-        g1.fillPolygon(new int[]{len, len - ARR_SIZE, len - ARR_SIZE, len},
-                new int[]{0, -ARR_SIZE, ARR_SIZE, 0}, 4);
+        g1.drawLine(x1, y1, x2, y2);
+        Polygon polygon = new Polygon();
+        polygon.addPoint(x2, y2);
+        polygon.addPoint(p1X, p1Y);
+        polygon.addPoint(p2X, p2Y);
+        g1.fillPolygon(polygon);
     }
     private void drawDottedLine(Graphics2D g, Point p1, Point p2, double offset) {
         long total = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
