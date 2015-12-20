@@ -104,10 +104,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         stack = alg.getStack();
         cutV = alg.getCutV();
         failed = new ArrayList<>();
-        color = alg.getColor();
-        _colors2 = alg.getColors2();
         visited = alg.getVisited();
-        greedyresult = alg.getGreedyResult();
         glowMap = alg.getGlowMap();
         set = alg.getSet();
         distTo = alg.distTo();
@@ -128,10 +125,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
             }
         });
-
         this.decreseWeights = () -> {
-            reduceIncreasepAmount();
-            //graph();
+            if ("Dijkstra".equals(sim)) {
+                reduceIncreasepAmount();
+                //graph();
+            }
         };
         int time = 500;
         ScheduledExecutorService exe = Executors.newScheduledThreadPool(1);
@@ -145,7 +143,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     public static ArrayList getEdges() {
         return GraphifyGUI.edges;
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -229,7 +227,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         });
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Bipartite", "Cut", "GColoring", "isEulerian", "Connectedness" }));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Dijkstra", "Connectedness" }));
         jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbAlgoActionPerformed(evt);
@@ -320,12 +318,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addComponent(btnReset)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClearConsole)
-                        .addGap(44, 44, 44)
-                        .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnStart)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtQuery, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
+                        .addComponent(txtQuery, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnPrintList))
                     .addGroup(layout.createSequentialGroup()
@@ -385,8 +383,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
             } else if (_source != _selectedNode) {
                 glowMap.clear();
                 _dest = _selectedNode;
-                // Implement path finding here.
                 set.clear();
+                Vertex dest = vertices.get(_dest);
+                dest.setCapacity(150);
             }
 
             graph();
@@ -418,13 +417,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 alg.getVisited().clear();
                 alg.getGlowMap().clear();
                 alg.getSet().clear();
-                if (sim == "DFS") {
+                if ("DFS".equals(sim)) {
                     alg.Dfs(vertices.get(_source));
                     alg.shortestPath(_source, _dest);
-                } else if (sim == "BFS") {
+                } else if ("BFS".equals(sim)) {
                     Algorithms.Bfs(vertices.get(_source));
                     alg.shortestPath(_source, _dest);
-                } else if (sim == "Dijkstra") {
+                } else if ("Dijkstra".equals(sim)) {
                     alg.execute(vertices.get(_source));
                     alg.shortestPath(_source, _dest);
                 }
@@ -433,7 +432,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         } else if (SwingUtilities.isRightMouseButton(evt)) {
             changesMade = true;
             glowMap.clear();
-            greedyresult.clear();
             cutV.clear();
             _colors2.clear();
             _source = -1;
@@ -505,8 +503,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         alg.getVisited().clear();
         set.clear();
         alg.getSet().clear();
-        greedyresult.clear();
-        alg.getGreedyResult().clear();
         cutV.clear();
         alg.getCutV().clear();
         switch (x) {
@@ -652,6 +648,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
             int rand = (int) (Math.random() * edgeSize);
             Edge e = edges.get(rand);
             int pAmount = e.getpheromoneAmount() + (int) (Math.sqrt(e.getpheromoneAmount())) * (Math.random() > .5 ? -1 : 1);
+            if(pAmount == 0){
+                pAmount += 5;
+            }
             e.setpAmount(pAmount); // changes it
             glowMap.clear();
             alg.execute(vertices.get(_source));
@@ -660,17 +659,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
         //graph();
     }
-    
+
     void Open(File file) throws FileNotFoundException, IOException {
         try {
-            FileInputStream fis = new FileInputStream(file);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            vertices = (HashMap) ois.readObject();
-            edges = (ArrayList) ois.readObject();
-            id = (int) ois.readObject();
-            failed = (ArrayList) ois.readObject();
-            ois.close();
-            fis.close();
+            try (FileInputStream fis = new FileInputStream(file)) {
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                vertices = (HashMap) ois.readObject();
+                edges = (ArrayList) ois.readObject();
+                id = (int) ois.readObject();
+                failed = (ArrayList) ois.readObject();
+                ois.close();
+            }
         } catch (IOException ioe) {
         } catch (ClassNotFoundException c) {
             printlnConsole("Class not found");
@@ -684,11 +683,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         cutV = new ArrayList<>();
         alg.getCutV().clear();
         _colors2 = new HashSet<>();
-        alg.getColors2().clear();
         glowMap.clear();
         alg.getGlowMap().clear();
-        greedyresult.clear();
-        alg.getGreedyResult().clear();
         _source = -1;
         _dest = -1;
         graph();
@@ -726,7 +722,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         bufferGraphic.setColor(new Color(10, 230, 40));
         bufferGraphic.setStroke(new BasicStroke(6));
         if (!btnReset.isSelected()) {
-            for (int sourceKey : glowMap.keySet()) {
+            for (Iterator<Integer> it = glowMap.keySet().iterator(); it.hasNext();) {
+                int sourceKey = it.next();
                 int destKey = glowMap.get(sourceKey);
                 Point sourcePoint = vertices.get(sourceKey).getLocation();
                 Point destPoint = vertices.get(destKey).getLocation();

@@ -29,18 +29,13 @@ public class Algorithms {
     private final HashMap<Integer, Integer> glowMap = new HashMap<>();
     HashMap<Integer, HashSet<Integer>> nodes;
     private Queue<Integer> queue;
-
     private Stack<Vertex> stack;
     private HashMap<Integer, Integer> distTo;
     private HashMap<Integer, Integer> set = new HashMap<>();
     private HashMap<Integer, Integer> visited;
-    private HashMap<Integer, Vertex> color;
-    private HashMap<Integer, Integer> greedyresult;
-    private HashSet<Integer> _colors2;
     private static ArrayList<Integer> conn;
     private HashSet<Vertex> bconn;
     private ArrayList<Integer> cutV;
-    private Color[] vertexColors;
     int _selectedNode = -1;
     int _SIZE_OF_NODE = 20;
     int id = 0;
@@ -55,27 +50,22 @@ public class Algorithms {
     private HashMap<Vertex, Integer> dist; // distance
 
     public Algorithms(GraphifyGUI GG) {
-        this.GG = GG;
+        Algorithms.GG = GG;
         Algorithms.vertex = new HashMap<>();
         Algorithms.edges = new ArrayList<>();
         this.nodes = new HashMap<>();
         this.queue = new LinkedList<>();
         this.stack = new Stack<>();
         this.cutV = new ArrayList<>();
-        this._colors2 = new HashSet<>();
         this.visited = new HashMap<>();
         this.set = new HashMap<>();
         this.visited = new HashMap<>();
-        this.color = new HashMap<>();
-        this.greedyresult = new HashMap<>();
-        this.vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
     }
 
     public HashSet<Edge> getEdge(int source) {
         vertex = GraphifyGUI.getNode();
         return vertex.get(source).eList();
     }
-
 
     void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
         int children = 0;
@@ -229,7 +219,7 @@ public class Algorithms {
         reset();
         sNodes = new HashSet<>(); // settled nodes will be placed in this set
         uSNodes = new HashSet<>(); // unsettled nodes will be placed in this set
-        dist = new HashMap<>(); // distance to reach the node
+        dist = new HashMap<>(); // weight to get to node
         parents = new HashMap<>(); // parent/nodes we came from
         dist.put(source, 0); // first set source to 0
         uSNodes.add(source); // add source to unsettled nodes
@@ -245,9 +235,9 @@ public class Algorithms {
     private boolean isSettled(Vertex v) {
         return sNodes.contains(v);
     }
-    
+
     // get weight... Weight is a combination of the actual weight + pAmount on that edge
-        private int getWeight(Vertex s, Vertex d) {
+    private int getWeight(Vertex s, Vertex d) {
         for (Edge e : edges) {
             if (e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s) {
                 return e.getWeight();
@@ -275,18 +265,19 @@ public class Algorithms {
 
     // find min distance
     private void findMinDist(Vertex v) {
+        int combWeight = 0;
         List<Vertex> neighbors = getNeighbors(v);
         Iterator<Vertex> vert = neighbors.iterator();
         while (vert.hasNext()) {
             Vertex t = vert.next();
-            int combWeight = GSD(v) + getWeight(v, t);
-            GG.printlnConsole("" + combWeight +" of "+v.getName());
+            combWeight = GSD(v) + getWeight(v, t);
             if (GSD(t) > combWeight) {
                 dist.put(t, GSD(v) + getWeight(v, t));
                 t.parent = v;
                 uSNodes.add(t);
             }
         }
+        GG.printlnConsole(""+combWeight);
     }
 
     private Vertex getMin(HashSet<Vertex> v) {
@@ -360,7 +351,7 @@ public class Algorithms {
                                         conn.add(next.getId());
                                         for (int i = 1; i < conn.size(); i++) {
                                             for (int j = i; j > 0; j--) {
-                                                if (vertex.get(conn.get(j)).getRating() < vertex.get(conn.get(j - 1)).getRating()) {
+                                                if (vertex.get(conn.get(j)).getCapacity() < vertex.get(conn.get(j - 1)).getCapacity()) {
                                                     conn.add(j, conn.get(j - 1));
                                                     conn.add(j - 1, conn.get(j));
                                                 }
@@ -457,20 +448,8 @@ public class Algorithms {
         return this.visited;
     }
 
-    public HashMap getColor() {
-        return this.color;
-    }
-
-    public HashMap getGreedyResult() {
-        return this.greedyresult;
-    }
-
-    public HashSet getColors2() {
-        return this._colors2;
-    }
-
     public ArrayList getConn() {
-        return this.conn;
+        return Algorithms.conn;
     }
 
     public HashSet getBConn() {
@@ -479,10 +458,6 @@ public class Algorithms {
 
     public ArrayList getCutV() {
         return this.cutV;
-    }
-
-    public Color[] getVertexColors() {
-        return this.vertexColors;
     }
 
 }

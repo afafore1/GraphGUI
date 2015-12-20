@@ -24,20 +24,20 @@ public class Vertex implements Serializable {
     private Point location;
     private HashSet<Edge> eList;
     private int id;
-    private int rating;
+    private int cap;
     private String type;
 
     public Vertex(GraphifyGUI GG) {
 
     }
 
-    public Vertex(int id, Point loc, String vertexLabel, String type, int rating) {
+    public Vertex(int id, Point loc, String vertexLabel, String type, int capacity) {
         this.label = vertexLabel;
         this.wasVisited = false;
         this.type = type;
         this.parent = this; // change this to vertex
         this.id = id;
-        this.rating = rating;
+        this.cap = capacity;
         this.location = loc;
         this.eList = new HashSet<>();
     }
@@ -62,12 +62,16 @@ public class Vertex implements Serializable {
         this.id = id;
     }
 
-    public int getRating() {
-        return this.rating;
+    public int getCapacity() {
+        return this.cap;
+    }
+    
+    public void setCapacity(int x){
+        this.cap = x;
     }
 
     void setAge(int age) {
-        this.rating = age;
+        this.cap = age;
     }
 
     public Vertex getVertex(int id) {

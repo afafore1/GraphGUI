@@ -107,12 +107,12 @@
                       <Component id="btnReset" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnClearConsole" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
-                      <Component id="jcbAlgo" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                      <Component id="jcbAlgo" min="-2" pref="85" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnStart" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtQuery" pref="303" max="32767" attributes="0"/>
+                      <Component id="txtQuery" pref="280" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnPrintList" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -223,8 +223,13 @@
     </Component>
     <Component class="javax.swing.JComboBox" name="jcbAlgo">
       <Properties>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(new String[] { &quot;BFS&quot;, &quot;DFS&quot;, &quot;Bipartite&quot;, &quot;Cut&quot;, &quot;GColoring&quot;, &quot;isEulerian&quot;, &quot;Connectedness&quot; })" type="code"/>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="4">
+            <StringItem index="0" value="BFS"/>
+            <StringItem index="1" value="DFS"/>
+            <StringItem index="2" value="Dijkstra"/>
+            <StringItem index="3" value="Connectedness"/>
+          </StringArray>
         </Property>
       </Properties>
       <Events>
