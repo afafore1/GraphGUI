@@ -23,6 +23,11 @@ enum Types {
 public class Commands {
 
     static ArrayList<Integer> cutV;
+    static Algorithms alg;
+    
+    public Commands(Algorithms a){
+        Commands.alg = a;
+    }
 
     static String action(String query, Vertex source, HashMap<Integer, Vertex> v) {
         String[] tokens = query.split(" ");
@@ -97,12 +102,18 @@ public class Commands {
         } else if (sec.equals("friends") || sec.equals("places") || sec.equals("cities")) {
             cutV.clear();
             result = "";
-            if (sec.equals("friends")) {
-                cutV = Algorithms.BfsSuggest(s, 0);
-            } else if (sec.equals("places")) {
-                cutV = Algorithms.BfsSuggest(s, 1);
-            } else if (sec.equals("cities")) {
-                cutV = Algorithms.BfsSuggest(s, 2);
+            switch (sec) {
+                case "friends":
+                    cutV = alg.BfsSuggest(s, 0);
+                    break;
+                case "places":
+                    cutV = alg.BfsSuggest(s, 1);
+                    break;
+                case "cities":
+                    cutV = alg.BfsSuggest(s, 2);
+                    break;
+                default:
+                    break;
             }
         }else if(sec.equals("best")){
             if(n != null){
@@ -110,7 +121,7 @@ public class Commands {
                 result = "";
                 if(n.equals("places") || n.equals("cities")){
                     if(n.equals("places")){
-                        cutV = Algorithms.BfsSuggest(s, 3);
+                        cutV = alg.BfsSuggest(s, 3);
                     }
                 }
             }
