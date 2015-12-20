@@ -47,7 +47,7 @@ public class Algorithms {
     private HashSet<Vertex> uSNodes; // unsettled
     private HashSet<Vertex> sNodes; // settled
     private HashMap<Vertex, Vertex> parents;
-    private HashMap<Vertex, Integer> dist; // distance
+    private static HashMap<Vertex, Integer> dist; // distance
 
     public Algorithms(GraphifyGUI GG) {
         Algorithms.GG = GG;
@@ -216,11 +216,11 @@ public class Algorithms {
         // get vertices and edges from GUI
         vertex = GraphifyGUI.getNode();
         edges = GraphifyGUI.getEdges();
-        reset();
         sNodes = new HashSet<>(); // settled nodes will be placed in this set
         uSNodes = new HashSet<>(); // unsettled nodes will be placed in this set
         dist = new HashMap<>(); // weight to get to node
         parents = new HashMap<>(); // parent/nodes we came from
+        reset();
         dist.put(source, 0); // first set source to 0
         uSNodes.add(source); // add source to unsettled nodes
         while (uSNodes.size() > 0) { // do this until no more unsettled nodes
@@ -265,19 +265,15 @@ public class Algorithms {
 
     // find min distance
     private void findMinDist(Vertex v) {
-        int combWeight = 0;
         List<Vertex> neighbors = getNeighbors(v);
-        Iterator<Vertex> vert = neighbors.iterator();
-        while (vert.hasNext()) {
-            Vertex t = vert.next();
-            combWeight = GSD(v) + getWeight(v, t);
+        for (Vertex t : neighbors) {
+            int combWeight = GSD(v) + getWeight(v, t);
             if (GSD(t) > combWeight) {
                 dist.put(t, GSD(v) + getWeight(v, t));
                 t.parent = v;
                 uSNodes.add(t);
             }
         }
-        GG.printlnConsole(""+combWeight);
     }
 
     private Vertex getMin(HashSet<Vertex> v) {
@@ -384,22 +380,20 @@ public class Algorithms {
                 set.put(vertex.get(i).getParent().getId(), i);
             }
         }
-        // removed rset
         GG.printlnConsole(set.toString().replaceAll("=", "-->"));
         glowMap.clear();
-        for (int i : set.keySet()) {
+        set.keySet().stream().forEach((i) -> {
             glowMap.put(i, set.get(i));
-        }
+        });
         GG.graph();
     }
 
     static void reset() {
         vertex = GraphifyGUI.getNode();
-        Iterator<Vertex> vert = vertex.values().iterator();
-        while (vert.hasNext()) {
-            Vertex v = vert.next();
+        vertex.values().stream().forEach((v) -> {
             v.wasVisited = false;
-        }
+        });
+        dist.clear();
     }
 
     boolean isConnected() {
