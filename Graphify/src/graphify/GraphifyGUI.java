@@ -655,6 +655,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             glowMap.clear();
             alg.execute(vertices.get(_source));
             alg.shortestPath(_source, _dest);
+            e.setGlowLevel(1);
         }
 
         //graph();
@@ -702,10 +703,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         bufferGraphic.fillRect(0, 0, pnlGraph.getWidth(), pnlGraph.getHeight());
         connectionCache.clear();
         // Regular connections
-        bufferGraphic.setColor(Color.black);
-        bufferGraphic.setStroke(new BasicStroke(2));
         int xmid = 0;
         int ymid = 0;
+        bufferGraphic.setColor(Color.black);
+        bufferGraphic.setStroke(new BasicStroke(2));
         for (Edge e : edges) {
             Point source = e.getSource().getLocation();
             Point dest = e.getDest().getLocation();
@@ -714,7 +715,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
             bufferGraphic.drawLine(source.x, source.y, dest.x, dest.y);
             int edgeWeight = e.getWeight();
             if (!(edgeWeight == -1)) {
+                bufferGraphic.setColor(
+                        new Color(180, 30, 255, (int) (e.getGlowLevel() * 255)));
+                bufferGraphic.fillRect(xmid - 6, ymid - 14, 50, 20);
+                bufferGraphic.setColor(Color.black);
+                bufferGraphic.setStroke(new BasicStroke(2));
                 bufferGraphic.drawString(edgeWeight + "/" + e.getpheromoneAmount(), xmid, ymid);
+                e.glowDie(.05);
             }
         }
 

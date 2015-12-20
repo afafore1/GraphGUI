@@ -128,6 +128,7 @@ class Edge implements Serializable {
     private final int weight;
     private int pheromoneAmount;
     private boolean fail;
+    private double glowLevel = 0;
 
     public Edge(int id, Vertex source, Vertex dest, int pAmount, int weight, boolean fail) {
         this.id = id;
@@ -164,6 +165,18 @@ class Edge implements Serializable {
 
     public String getConnections() {
         return source.getId() + "," + dest.getId();
+    }
+
+    public double getGlowLevel() {
+        return glowLevel;
+    }
+
+    public void glowDie(double decrement) {
+        glowLevel = Math.max(glowLevel - decrement, 0);
+    }
+
+    public void setGlowLevel(double newGlow) {
+        glowLevel = newGlow;
     }
 
     public boolean isFailed() {

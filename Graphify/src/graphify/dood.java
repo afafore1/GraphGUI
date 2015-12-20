@@ -49,7 +49,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author Ayomitunde
  */
-public class GraphifyGUI extends javax.swing.JFrame {
+public class dood extends javax.swing.JFrame {
 
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     HashMap<Integer, Integer> glowMap;
