@@ -816,6 +816,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     public void printlnConsole(String string) {
         txtConsole.append(string + "\n");
+        txtConsole.setCaretPosition(txtConsole.getText().length());
     }
 
     static Vertex getConn(Vertex s, Edge e) {

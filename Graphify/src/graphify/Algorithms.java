@@ -46,7 +46,6 @@ public class Algorithms {
     //for dijkstra
     private HashSet<Vertex> uSNodes; // unsettled
     private HashSet<Vertex> sNodes; // settled
-    private HashMap<Vertex, Vertex> parents;
     private static HashMap<Vertex, Integer> dist; // distance
 
     public Algorithms(GraphifyGUI GG) {
@@ -62,6 +61,12 @@ public class Algorithms {
         this.visited = new HashMap<>();
     }
 
+    /**
+     *
+     * @param source
+     * @return
+     * returns the edges connected to this source
+     */
     public HashSet<Edge> getEdge(int source) {
         vertex = GraphifyGUI.getNode();
         return vertex.get(source).eList();
@@ -219,7 +224,6 @@ public class Algorithms {
         sNodes = new HashSet<>(); // settled nodes will be placed in this set
         uSNodes = new HashSet<>(); // unsettled nodes will be placed in this set
         dist = new HashMap<>(); // weight to get to node
-        parents = new HashMap<>(); // parent/nodes we came from
         reset();
         dist.put(source, 0); // first set source to 0
         uSNodes.add(source); // add source to unsettled nodes
@@ -380,7 +384,10 @@ public class Algorithms {
                 set.put(vertex.get(i).getParent().getId(), i);
             }
         }
+        int max = 0;
+        max = set.keySet().stream().map((i) -> dist.get(vertex.get(i))).reduce(max, Integer::sum);
         GG.printlnConsole(set.toString().replaceAll("=", "-->"));
+        GG.printlnConsole("this max "+max);
         glowMap.clear();
         set.keySet().stream().forEach((i) -> {
             glowMap.put(i, set.get(i));
