@@ -634,7 +634,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), pAmount, weight, false);
         edges.add(newEdge);
         vertices.get(sourceid).eList().add(newEdge);
-        vertices.get(destid).eList().add(newEdge);
     }
 
     private void reduceIncreasepAmount() {

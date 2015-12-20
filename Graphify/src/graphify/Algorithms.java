@@ -209,11 +209,7 @@ public class Algorithms {
     }
 
     static Vertex getConn(Vertex s, Edge e) {
-        if (s == e.getSource()) {
-            return e.getDest();
-        } else {
-            return e.getSource();
-        }
+        return e.getDest();
     }
 
     //dijsktra
