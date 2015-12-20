@@ -87,7 +87,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     double dotOffset = 0.0;
     Algorithms alg;
     Vertex ver;
-    int pChangeTime = 1;
+    int pChangeTime = 300;
 
     private static HashMap<Integer, Vertex> vertices;
     private static ArrayList<Edge> edges;
