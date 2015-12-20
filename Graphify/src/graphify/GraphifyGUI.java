@@ -421,7 +421,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     alg.Dfs(vertices.get(_source));
                     alg.shortestPath(_source, _dest);
                 } else if ("BFS".equals(sim)) {
-                    Algorithms.Bfs(vertices.get(_source));
+                    alg.Bfs(vertices.get(_source));
                     alg.shortestPath(_source, _dest);
                 } else if ("Dijkstra".equals(sim)) {
                     alg.execute(vertices.get(_source));
@@ -433,7 +433,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
             changesMade = true;
             glowMap.clear();
             cutV.clear();
-            _colors2.clear();
             _source = -1;
             _dest = -1;
 
@@ -529,7 +528,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     }
                     return;
                 }
-                Algorithms.Bfs(vertices.get(_source));
+                alg.Bfs(vertices.get(_source));
                 alg.shortestPath(_source, _dest);
                 break;
             case "Dijkstra":
@@ -648,7 +647,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             int rand = (int) (Math.random() * edgeSize);
             Edge e = edges.get(rand);
             int pAmount = e.getpheromoneAmount() + (int) (Math.sqrt(e.getpheromoneAmount())) * (Math.random() > .5 ? -1 : 1);
-            if(pAmount == 0){
+            if(pAmount <= 0){
                 pAmount += 5;
             }
             e.setpAmount(pAmount); // changes it
@@ -707,7 +706,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         int ymid = 0;
         bufferGraphic.setColor(Color.black);
         bufferGraphic.setStroke(new BasicStroke(2));
-        for (Edge e : edges) {
+        for (Iterator<Edge> edge = edges.iterator(); edge.hasNext();) {
+            Edge e = edge.next();
             Point source = e.getSource().getLocation();
             Point dest = e.getDest().getLocation();
             xmid = (source.x + dest.x) / 2 + 5;
@@ -739,7 +739,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
 
         // Nodes - red circles.
-        for (Vertex v : vertices.values()) {
+        vertices.values().stream().forEach((v) -> {
             Point thePoint = v.getLocation();
             if (v.getId() == _source) {
                 bufferGraphic.setColor(Color.green);
@@ -763,15 +763,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
             bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
-        }
+        });
         // Node labels.
         bufferGraphic.setColor(Color.blue);
-        for (Vertex v : vertices.values()) {
+        vertices.values().stream().forEach((v) -> {
             Point thePoint = v.getLocation();
             bufferGraphic.drawString("" + v.getId(),
                     thePoint.x - _SIZE_OF_NODE / 2,
                     thePoint.y - _SIZE_OF_NODE / 2);
-        }
+        });
         pnlGraph.getGraphics().drawImage(bufferImage, 1, 1, this);
         lblInfo.setText("Source: " + getNodeInfo(_source)
                 + " - Destination: " + getNodeInfo(_dest));
