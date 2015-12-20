@@ -7,7 +7,6 @@ package graphify;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -17,17 +16,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,10 +30,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Scanner;
 import java.util.Stack;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -55,7 +53,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     HashMap<Integer, Integer> connectionCache = new HashMap<>();
     HashMap<Integer, Integer> glowMap;
-    //private static HashMap<Integer, HashSet<Integer>> nodes = new HashMap();
+    Runnable decreseWeights;
     Queue<Integer> queue;
     Stack<Integer> stack;
     String sim = null;
@@ -130,6 +128,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
             }
         });
+
+        this.decreseWeights = () -> {
+            reduceIncreasepAmount();
+            //graph();
+        };
+        int time = 500;
+        ScheduledExecutorService exe = Executors.newScheduledThreadPool(1);
+        exe.scheduleAtFixedRate(decreseWeights, 0, time, TimeUnit.MILLISECONDS);
     }
 
     public static HashMap getNode() {
@@ -147,7 +153,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnPrintList = new javax.swing.JButton();
         btnRandomize = new javax.swing.JButton();
         lblInfo = new java.awt.Label();
-        lblResult = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtConsole = new javax.swing.JTextArea();
         btnClearConsole = new javax.swing.JButton();
@@ -289,8 +294,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                                 .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(layout.createSequentialGroup()
                                         .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(lblResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                         .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -302,8 +306,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(lblResult))
+                                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(btnReset)
@@ -435,7 +438,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
             int destination = nodeSelected(evt.getX(), evt.getY());
             if (destination >= 0 && destination != _selectedNode) {
                 weight = (int) (Math.random() * 100);
-                addEdge(Edgeid, _selectedNode, destination, weight);
+                int pAmount = (int) (Math.random() * 40 + 1);
+                addEdge(Edgeid, _selectedNode, destination, pAmount, weight);
                 edgeWeights.add(weight);
                 _selectedNode = -1;
                 changesMade = true;
@@ -445,12 +449,26 @@ public class GraphifyGUI extends javax.swing.JFrame {
         graph();
     }
 
-    private void addEdge(int edgeId, int sourceid, int destid, final int weight) {
-        Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), 0, weight, false);
+    private void addEdge(int edgeId, int sourceid, int destid, int pAmount, final int weight) {
+        Edge newEdge = new Edge(edgeId, vertices.get(sourceid), vertices.get(destid), pAmount, weight, false);
         edges.add(newEdge);
-        //printlnConsole(newEdge.getId() + " " + newEdge.getSource().getName() + " " + newEdge.getDest().getName() + " " + newEdge.getWeight());
         vertices.get(sourceid).eList().add(newEdge);
         vertices.get(destid).eList().add(newEdge);
+    }
+
+    private void reduceIncreasepAmount() {
+        if (_source > -1 && _dest > -1) {
+            int edgeSize = edges.size();
+            int rand = (int) (Math.random() * edgeSize);
+            Edge e = edges.get(rand);
+            int pAmount = e.getpheromoneAmount() + (int) (Math.sqrt(e.getpheromoneAmount())) * (Math.random() > .5 ? -1 : 1);
+            e.setpAmount(pAmount); // changes it
+            glowMap.clear();
+            alg.execute(vertices.get(_source));
+            alg.shortestPath(_source, _dest);
+        }
+
+        //graph();
     }
 
     private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {
@@ -500,7 +518,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 // Implement path finding here.
                 set.clear();
             }
-            
+
             graph();
         }
     }
@@ -544,53 +562,60 @@ public class GraphifyGUI extends javax.swing.JFrame {
         alg.getGreedyResult().clear();
         cutV.clear();
         alg.getCutV().clear();
-        if (x.equals("DFS")) {
-            txtConsole.setText("");
-            if (_source == -1 || _dest == -1 || vertices.get(_source).eList().isEmpty() || vertices.get(_dest).eList().isEmpty()) {
-                if (_source == -1) {
-                    printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
-                } else {
-                    printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
+        switch (x) {
+            case "DFS":
+                txtConsole.setText("");
+                if (_source == -1 || _dest == -1 || vertices.get(_source).eList().isEmpty() || vertices.get(_dest).eList().isEmpty()) {
+                    if (_source == -1) {
+                        printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
+                    } else {
+                        printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
+                    }
+                    return;
                 }
-                return;
-            }
-            alg.Dfs(vertices.get(_source));
-            alg.shortestPath(_source, _dest);
-        } else if (x == "BFS") {
-            txtConsole.setText("");
-            if (_source == -1 || _dest == -1 || vertices.get(_source).eList().isEmpty() || vertices.get(_dest).eList().isEmpty()) {
-                if (_source == -1) {
-                    printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
-                } else {
-                    printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
+                alg.Dfs(vertices.get(_source));
+                alg.shortestPath(_source, _dest);
+                break;
+            case "BFS":
+                txtConsole.setText("");
+                if (_source == -1 || _dest == -1 || vertices.get(_source).eList().isEmpty() || vertices.get(_dest).eList().isEmpty()) {
+                    if (_source == -1) {
+                        printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
+                    } else {
+                        printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
+                    }
+                    return;
                 }
-                return;
-            }
-            Algorithms.Bfs(vertices.get(_source));
-            alg.shortestPath(_source, _dest);
-        } else if (x == "Dijkstra") {
-            txtConsole.setText("");
-            if (_source == -1 || _dest == -1 || vertices.get(_source).eList().isEmpty() || vertices.get(_dest).eList().isEmpty()) {
-                if (_source == -1) {
-                    printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
-                } else {
-                    printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
+                Algorithms.Bfs(vertices.get(_source));
+                alg.shortestPath(_source, _dest);
+                break;
+            case "Dijkstra":
+                txtConsole.setText("");
+                if (_source == -1 || _dest == -1 || vertices.get(_source).eList().isEmpty() || vertices.get(_dest).eList().isEmpty()) {
+                    if (_source == -1) {
+                        printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
+                    } else {
+                        printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
+                    }
+                    return;
                 }
-                return;
-            }
-            alg.execute(vertices.get(_source));
-            alg.shortestPath(_source, _dest);
-        } else if (x == "Connectedness") {
-            txtConsole.setText("");
-            if (_source == -1) {
-                printlnConsole("Please select a source to begin");
-                return;
-            }
-            if (alg.isConnected()) {
-                printlnConsole("Graph is Connected");
-            } else {
-                printlnConsole("Graph is a disconnected Graph");
-            }
+                alg.execute(vertices.get(_source));
+                alg.shortestPath(_source, _dest);
+                break;
+            case "Connectedness":
+                txtConsole.setText("");
+                if (_source == -1) {
+                    printlnConsole("Please select a source to begin");
+                    return;
+                }
+                if (alg.isConnected()) {
+                    printlnConsole("Graph is Connected");
+                } else {
+                    printlnConsole("Graph is a disconnected Graph");
+                }
+                break;
+            default:
+                break;
         }
 
     }
@@ -680,7 +705,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             bufferGraphic.drawLine(source.x, source.y, dest.x, dest.y);
             int edgeWeight = e.getWeight();
             if (!(edgeWeight == -1)) {
-                bufferGraphic.drawString(String.valueOf(edgeWeight), xmid, ymid);
+                bufferGraphic.drawString(edgeWeight + "/" + e.getpheromoneAmount(), xmid, ymid);
             }
         }
 
@@ -856,13 +881,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(GraphifyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
+
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             GraphifyGUI theGraph = new GraphifyGUI();
             theGraph.setLocationRelativeTo(null);
+            theGraph.setExtendedState(MAXIMIZED_BOTH);
             theGraph.show();
         });
     }

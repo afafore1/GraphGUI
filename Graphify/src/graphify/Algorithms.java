@@ -76,14 +76,6 @@ public class Algorithms {
         return vertex.get(source).eList();
     }
 
-    private int getWeight(Vertex s, Vertex d) {
-        for (Edge e : edges) {
-            if (e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s) {
-                return e.getWeight();
-            }
-        }
-        return -1; // edge does not exist then
-    }
 
     void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
         int children = 0;
@@ -253,6 +245,16 @@ public class Algorithms {
     private boolean isSettled(Vertex v) {
         return sNodes.contains(v);
     }
+    
+    // get weight... Weight is a combination of the actual weight + pAmount on that edge
+        private int getWeight(Vertex s, Vertex d) {
+        for (Edge e : edges) {
+            if (e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s) {
+                return e.getWeight();
+            }
+        }
+        return -1; // edge does not exist then
+    }
 
     //getNeighbors
     private List<Vertex> getNeighbors(Vertex v) {
@@ -278,7 +280,7 @@ public class Algorithms {
         while (vert.hasNext()) {
             Vertex t = vert.next();
             int combWeight = GSD(v) + getWeight(v, t);
-            GG.printlnConsole("" + combWeight + " get weight " + getWeight(v, t) + " v is " + v.getName() + " t is " + t.getName());
+            GG.printlnConsole("" + combWeight +" of "+v.getName());
             if (GSD(t) > combWeight) {
                 dist.put(t, GSD(v) + getWeight(v, t));
                 t.parent = v;

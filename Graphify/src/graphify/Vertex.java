@@ -126,7 +126,7 @@ class Edge implements Serializable{
 	private final Vertex source;
 	private final Vertex dest;
 	private final int weight;
-        private final int pheromoneAmount;
+        private int pheromoneAmount;
         private boolean fail;
 	
 	public Edge(int id, Vertex source, Vertex dest, int pAmount, int weight, boolean fail){
@@ -154,6 +154,9 @@ class Edge implements Serializable{
             return pheromoneAmount;
         }
 	
+        public void setpAmount(int x){
+            this.pheromoneAmount = x;
+        }
 	public int getWeight(){
 		return weight;
 	}
