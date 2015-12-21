@@ -685,8 +685,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
             for (Iterator<Vertex> it = failed.iterator(); it.hasNext();) {
                 Vertex v = it.next();
                 if (Math.random() > 0.5) {
+                    it.remove();
                     printlnConsole(v.getName() + " has been healed");
-                    failed.remove(v);
                     v.eList().stream().forEach((next) -> {
                         next.setFailed(!next.isFailed());
                     });
