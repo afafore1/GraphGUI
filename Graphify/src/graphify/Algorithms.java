@@ -263,14 +263,14 @@ public class Algorithms {
         source.parent = source; // setShortestPath parent
         Model.conn = new ArrayList<>();
         while (!Model.suggestQueue.isEmpty()) { // source
-            Vertex current = q.poll(); // remove first 
+            Vertex current = Model.suggestQueue.poll(); // remove first 
             Iterator<Edge> currentList = current.eList().iterator();
             while (currentList.hasNext()) {
                 Edge t = currentList.next();
                 Vertex next = getConn(current, t);
                 if (next.wasVisited == false) {
                     next.wasVisited = true;
-                    q.add(next);
+                    Model.suggestQueue.add(next);
                     next.parent = current;
                     if (!source.eList().contains(t)) {
                         switch (num) {
@@ -305,8 +305,8 @@ public class Algorithms {
                                         for (int i = 1; i < Model.conn.size(); i++) {
                                             for (int j = i; j > 0; j--) {
                                                 if (Model.vertices.get(Model.conn.get(j)).getCapacity() < Model.vertices.get(Model.conn.get(j - 1)).getCapacity()) {
-                                                    conn.add(j, conn.get(j - 1));
-                                                    conn.add(j - 1, conn.get(j));
+                                                    Model.conn.add(j, Model.conn.get(j - 1));
+                                                    Model.conn.add(j - 1, Model.conn.get(j));
                                                 }
                                             }
                                         }
@@ -321,7 +321,7 @@ public class Algorithms {
             }
         }
 
-        return conn;
+        return Model.conn;
     }
 
     public static  void shortestPath(int v, int e) {
@@ -330,40 +330,39 @@ public class Algorithms {
             return;
         }
         int capacity = 0;
-        for (int i = e; i >= 0; i = vertex.get(i).getParent().getId()) {
+        for (int i = e; i >= 0; i = Model.vertices.get(i).getParent().getId()) {
             if (i == v) {
                 break;
             }
-            if (vertex.get(i).getParent().getId() != -1) {
-                setShortestPath.put(vertex.get(i).getParent().getId(), i);
-                capacity += getpAmount(vertex.get(i).parent, vertex.get(i));
+            if (Model.vertices.get(i).getParent().getId() != -1) {
+                Model.setShortestPath.put(Model.vertices.get(i).getParent().getId(), i);
+                capacity += getpAmount(Model.vertices.get(i).parent, Model.vertices.get(i));
             }
         }
         Model.graph.printlnConsole("Capacity transfered is "+capacity);
-        glowMap.clear();
-        setShortestPath.keySet().stream().forEach((i) -> {
-            edges.stream().filter((edge) -> (edge.getSource() == vertex.get(i) 
-                    && edge.getDest()== vertex.get(setShortestPath.get(i))
-                    || edge.getDest() == vertex.get(i)
-                            && edge.getSource() == vertex.get(setShortestPath.get(i)))).forEach((edge) -> {
-                                glowMap.add(edge);
+        Model.glowMap.clear();
+        Model.setShortestPath.keySet().stream().forEach((i) -> {
+            Model.edges.stream().filter((edge) -> (edge.getSource() == Model.vertices.get(i) 
+                    && edge.getDest()== Model.vertices.get(Model.setShortestPath.get(i))
+                    || edge.getDest() == Model.vertices.get(i)
+                            && edge.getSource() == Model.vertices.get(Model.setShortestPath.get(i)))).forEach((edge) -> {
+                                Model.glowMap.add(edge);
             });
         });
         Model.graph.graph();
     }
 
     public static  void reset() {
-        vertex = GraphifyGUI.getNode();
-        vertex.values().stream().forEach((v) -> {
+        Model.vertices.values().stream().forEach((v) -> {
             v.wasVisited = false;
         });
-        setShortestPath.clear();
+        Model.setShortestPath.clear();
     }
 
     static boolean isConnected() {
-        Vertex s = (Vertex) GraphifyGUI.getNode().get(_source);
+        Vertex s = Model.vertices.get(Model._source);
         Bfs(s);
-        Iterator<Vertex> vert = vertex.values().iterator();
+        Iterator<Vertex> vert = Model.vertices.values().iterator();
         while (vert.hasNext()) {
             Vertex key = vert.next();
             if (!key.wasVisited) {
@@ -378,6 +377,6 @@ public class Algorithms {
     }
 
     public static int distTo(int v) {
-        return distTo.get(v);
+        return Model.distTo.get(v);
     }
 }
