@@ -119,13 +119,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
             }
         });
-        this.decreseWeights = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        this.decreseWeights = (ActionEvent e) -> {
             if ("Dijkstra".equals(sim)) {
                 reduceIncreasepAmount();
+                autoFailure();
+                autoHeal();
                 //graph();
-            }
             }
         };
         Timer exe = new Timer(pChangeTime, decreseWeights);
@@ -642,7 +641,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             int rand = (int) (Math.random() * edgeSize);
             Edge e = edges.get(rand);
             int pAmount = e.getpheromoneAmount() + (int) (Math.sqrt(e.getpheromoneAmount())) * (Math.random() > .5 ? -1 : 1);
-            if(pAmount <= 0){
+            if (pAmount <= 0) {
                 pAmount += 5;
             }
             e.setpAmount(pAmount); // changes it
@@ -653,6 +652,47 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
 
         //graph();
+    }
+
+    private void autoFailure() { // randomly fail nodes in the network
+        if (_source > -1 && _dest > -1) {
+            if (Math.random() > 0.5) { // make probability of a node failure low
+                int vertexSize = vertices.size();
+                int rand = (int) (Math.random() * vertexSize);
+                Vertex v = vertices.get(rand);
+                if (!(rand == _source || rand == _dest)) { // do not fail source or destination
+                    if (failed.contains(v)) {
+                        failed.remove(v);
+                    } else {
+                        failed.add(v);
+                        printlnConsole(v.getName() + " has failed");
+                    }
+                    Iterator<Edge> e = v.eList().iterator();
+                    while (e.hasNext()) {
+                        Edge next = e.next();
+                        next.setFailed(!next.isFailed()); //set it to opposite of what it is
+                    }
+                    glowMap.clear();
+                    alg.execute(vertices.get(_source));
+                    alg.shortestPath(_source, _dest);
+                }
+            }
+        }
+    }
+
+    private void autoHeal() {
+        if (!failed.isEmpty()) {
+            for (Iterator<Vertex> it = failed.iterator(); it.hasNext();) {
+                Vertex v = it.next();
+                if (Math.random() > 0.5) {
+                    printlnConsole(v.getName() + " has been healed");
+                    failed.remove(v);
+                    v.eList().stream().forEach((next) -> {
+                        next.setFailed(!next.isFailed());
+                    });
+                }
+            }
+        }
     }
 
     void Open(File file) throws FileNotFoundException, IOException {
@@ -788,10 +828,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         double angle = Math.atan2(dy, dx);
         int len = (int) Math.sqrt(dx * dx + dy * dy);
 
-        int p1X = (int) (x2 + Math.cos(angle + Math.PI * 3/4) * ARR_SIZE);
-        int p1Y = (int) (y2 - Math.sin(angle + Math.PI * 3/4) * ARR_SIZE);
-        int p2X = (int) (x2 + Math.cos(angle - Math.PI * 3/4) * ARR_SIZE);
-        int p2Y = (int) (y2 - Math.sin(angle - Math.PI * 3/4) * ARR_SIZE);
+        int p1X = (int) (x2 + Math.cos(angle + Math.PI * 3 / 4) * ARR_SIZE);
+        int p1Y = (int) (y2 - Math.sin(angle + Math.PI * 3 / 4) * ARR_SIZE);
+        int p2X = (int) (x2 + Math.cos(angle - Math.PI * 3 / 4) * ARR_SIZE);
+        int p2Y = (int) (y2 - Math.sin(angle - Math.PI * 3 / 4) * ARR_SIZE);
         // Draw horizontal arrow starting in (0, 0)
         g1.drawLine(x1, y1, x2, y2);
         Polygon polygon = new Polygon();
@@ -800,6 +840,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         polygon.addPoint(p2X, p2Y);
         g1.fillPolygon(polygon);
     }
+
     private void drawDottedLine(Graphics2D g, Point p1, Point p2, double offset) {
         long total = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
         total = (long) Math.sqrt(total);

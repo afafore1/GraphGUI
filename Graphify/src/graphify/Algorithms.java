@@ -391,7 +391,6 @@ public class Algorithms {
                 capacity += getpAmount(vertex.get(i).parent, vertex.get(i));
             }
         }
-
         GG.printlnConsole("Capacity transfered is "+capacity);
         glowMap.clear();
         setShortestPath.keySet().stream().forEach((i) -> {
