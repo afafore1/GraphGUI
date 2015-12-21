@@ -58,6 +58,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Model.failed = new ArrayList<>();
         Model.vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
         Model.randomKeys = new HashSet<>();
+        Model.glowMap = new ArrayList<>();
+        Model.cutV = new ArrayList<>();
+        Model.set = new HashMap<>();
+        Model.visited = new HashMap<>();
         Timer animationTimer = new Timer(30, (ActionEvent e) -> {
             if (Model.glowMap.size() > 0) {
                 Model.dotOffset = (Model.dotOffset + .07) % 1;
@@ -437,21 +441,18 @@ public class GraphifyGUI extends javax.swing.JFrame {
         String x = String.valueOf(jcbAlgo.getSelectedItem());
         Model.sim = x;
         Model.glowMap.clear();
-        Model.glowMap.clear();
         txtConsole.setText("");
         Model.visited.clear();
-        Model.visited.clear();
-        Model.set.clear();
         Model.set.clear();
         Model.cutV.clear();
         switch (x) {
             case "DFS":
                 txtConsole.setText("");
-                if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty() || Model.vertices.get(Model._dest).eList().isEmpty()) {
+                if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty()) {
                     if (Model._source == -1) {
                         printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
                     } else {
-                        printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
+                        printlnConsole("Please choose a destination by double clicking a node");
                     }
                     return;
                 }
@@ -460,11 +461,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 break;
             case "BFS":
                 txtConsole.setText("");
-                if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty() || Model.vertices.get(Model._dest).eList().isEmpty()) {
+                if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty()) {
                     if (Model._source == -1) {
                         printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
                     } else {
-                        printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
+                        printlnConsole("Please choose a destination by double clicking a node");
                     }
                     return;
                 }
