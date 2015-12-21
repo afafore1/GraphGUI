@@ -159,6 +159,13 @@ public class Algorithms {
         Model.graph.printlnConsole("Order is " + Model.conn);
     }
 
+    /**
+     *
+     * @param s
+     * @param e
+     * @return
+     * get destination of vertex passed in from edge
+     */
     public static Vertex getConn(Vertex s, Edge e) {
         return e.getDest();
     }

@@ -46,10 +46,20 @@ public class Vertex implements Serializable {
         return (this.label + " ");
     }
 
+    /**
+     *
+     * @return 
+     * returns name assigned to this vertex
+     */
     public String getName() {
         return this.label;
     }
 
+    /**
+     *
+     * @return 
+     * returns type of this vertex
+     */
     public String getType() {
         return this.type;
     }
@@ -62,34 +72,51 @@ public class Vertex implements Serializable {
         this.id = id;
     }
 
+    /**
+     *
+     * @return 
+     * returns the capacity of this vertex
+     */
     public int getCapacity() {
         return this.cap;
     }
     
+    /**
+     *
+     * @param x
+     * sets capacity of vertex to x
+     */
     public void setCapacity(int x){
         this.cap = x;
-    }
-
-    void setAge(int age) {
-        this.cap = age;
     }
 
     public Vertex getVertex(int id) {
         return this;
     }
 
+    /**
+     *
+     * @return 
+     * returns x,y coordinate of vertex
+     */
     public Point getLocation() {
         return this.location;
     }
 
     /**
      *
-     * @return returns edges connected to this vertex
+     * @return 
+     * returns edges connected to this vertex
      */
     public HashSet<Edge> eList() {
         return this.eList;
     }
 
+    /**
+     *
+     * @return 
+     * returns the parent of this vertex
+     */
     public Vertex getParent() {
         return this.parent;
     }
