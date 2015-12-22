@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -47,7 +48,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     Image bufferImage;
     Graphics2D bufferGraphic;
     private ActionListener decreseWeights;
-
+    private JToggleButton[] tools = new JToggleButton[3];
     public GraphifyGUI() {
         initComponents();
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
@@ -87,15 +88,31 @@ public class GraphifyGUI extends javax.swing.JFrame {
         };
         Timer exe = new Timer(Model.pChangeTime, decreseWeights);
         exe.start();
+        for (int i = 0; i < tools.length; i++) {
+            tools[i] = new JToggleButton();
+            tools[i].setFocusable(false);
+            tools[i].setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+            tools[i].setPreferredSize(new java.awt.Dimension(40, 40));
+            tools[i].setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+            tools[i].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    for (JToggleButton tool : tools) {
+                        if (tool != e.getSource()) tool.setSelected(false);
+                    }
+                }
+            });
+            jToolBar1.add(tools[i]);
+        }
+        tools[0].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/vertex.png"))); // NOI18N
+        tools[1].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/bidirectional.png"))); // NOI18N
+        tools[2].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/directional.png"))); // NOI18N
     }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnlGraph = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtConsole = new javax.swing.JTextArea();
         btnReset = new javax.swing.JButton();
         lblInfo = new java.awt.Label();
         btnClearConsole = new javax.swing.JButton();
@@ -103,6 +120,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnStart = new javax.swing.JButton();
         btnPrintList = new javax.swing.JButton();
         txtQuery = new javax.swing.JTextField();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtConsole = new javax.swing.JTextArea();
+        pnlGraph = new javax.swing.JPanel(){
+            @Override
+            public void paintComponent(Graphics g) {
+                graph();
+                super.paintComponent(g);
+            }
+        };
+        jToolBar1 = new javax.swing.JToolBar();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -112,49 +140,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         mnuQuit = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(709, 584));
-        setSize(new java.awt.Dimension(709, 584));
-
-        pnlGraph.setBackground(new java.awt.Color(255, 255, 255));
-        pnlGraph.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        pnlGraph.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                pnlGraphMouseDragged(evt);
-            }
-        });
-        pnlGraph.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                pnlGraphMouseClicked(evt);
-            }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                pnlGraphMousePressed(evt);
-            }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                pnlGraphMouseReleased(evt);
-            }
-        });
-        pnlGraph.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                pnlGraphComponentResized(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnlGraphLayout = new javax.swing.GroupLayout(pnlGraph);
-        pnlGraph.setLayout(pnlGraphLayout);
-        pnlGraphLayout.setHorizontalGroup(
-            pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        pnlGraphLayout.setVerticalGroup(
-            pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 329, Short.MAX_VALUE)
-        );
-
-        txtConsole.setEditable(false);
-        txtConsole.setColumns(20);
-        txtConsole.setFont(new java.awt.Font("Courier New", 0, 16)); // NOI18N
-        txtConsole.setRows(5);
-        jScrollPane1.setViewportView(txtConsole);
 
         btnReset.setText("Reset");
         btnReset.addActionListener(new java.awt.event.ActionListener() {
@@ -198,6 +183,62 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 txtQueryActionPerformed(evt);
             }
         });
+
+        jSplitPane1.setDividerSize(3);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setResizeWeight(0.7);
+
+        txtConsole.setEditable(false);
+        txtConsole.setColumns(20);
+        txtConsole.setFont(new java.awt.Font("Courier New", 0, 16)); // NOI18N
+        txtConsole.setRows(5);
+        txtConsole.setPreferredSize(new java.awt.Dimension(204, 60));
+        jScrollPane1.setViewportView(txtConsole);
+
+        jSplitPane1.setBottomComponent(jScrollPane1);
+
+        pnlGraph.setBackground(new java.awt.Color(255, 255, 255));
+        pnlGraph.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnlGraph.setPreferredSize(new java.awt.Dimension(400, 500));
+        pnlGraph.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                pnlGraphMouseDragged(evt);
+            }
+        });
+        pnlGraph.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlGraphMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                pnlGraphMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                pnlGraphMouseReleased(evt);
+            }
+        });
+        pnlGraph.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                pnlGraphComponentResized(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlGraphLayout = new javax.swing.GroupLayout(pnlGraph);
+        pnlGraph.setLayout(pnlGraphLayout);
+        pnlGraphLayout.setHorizontalGroup(
+            pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 594, Short.MAX_VALUE)
+        );
+        pnlGraphLayout.setVerticalGroup(
+            pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 287, Short.MAX_VALUE)
+        );
+
+        jSplitPane1.setLeftComponent(pnlGraph);
+
+        jToolBar1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jToolBar1.setFloatable(false);
+        jToolBar1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jToolBar1.setRollover(true);
 
         mnuFile.setText("File");
 
@@ -255,34 +296,37 @@ public class GraphifyGUI extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(0, 0, 0)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnlGraph, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnReset)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClearConsole)
-                        .addGap(10, 10, 10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnStart)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtQuery, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+                        .addComponent(txtQuery)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnPrintList))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlGraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jSplitPane1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -300,20 +344,29 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseDragged
-        if (Model._selectedNode >= 0) {
+        if ((Model.toolType == Model.TOOL_BIDIRECTIONAL
+                || Model.toolType == Model.TOOL_DIRECTIONAL)
+                && Model._selectedNode >= 0) {
             if (SwingUtilities.isLeftMouseButton(evt)) {
                 Image buff = createImage(pnlGraph.getWidth() - 1, pnlGraph.getHeight() - 1);
                 Graphics buffG = buff.getGraphics();
                 buffG.drawImage(bufferImage, 0, 0, this);
                 Point source = Model.vertices.get(Model._selectedNode).getLocation();
-                drawArrow(buffG, source.x, source.y, evt.getX(), evt.getY());
+                if (Model.toolType == Model.TOOL_DIRECTIONAL) {
+                    drawArrow(buffG, source.x, source.y, evt.getX(), evt.getY());
+                } else {
+                    buffG.drawLine(source.x, source.y, evt.getX(), evt.getY());
+                }
                 pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
-            } else if (SwingUtilities.isMiddleMouseButton(evt)) {
-                Model.vertices.get(Model._selectedNode).getLocation().x = evt.getX();
-                Model.vertices.get(Model._selectedNode).getLocation().y = evt.getY();
-                graph();
-                Model.changesMade = true;
             }
+        }
+        if ((Model.toolType == Model.TOOL_NONE 
+                || Model.toolType == Model.TOOL_VERTEX)
+                && Model._selectedNode >= 0) {
+            Model.vertices.get(Model._selectedNode).getLocation().x = evt.getX();
+            Model.vertices.get(Model._selectedNode).getLocation().y = evt.getY();
+            graph();
+            Model.changesMade = true;
         }
     }//GEN-LAST:event_pnlGraphMouseDragged
 
@@ -332,49 +385,52 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 Vertex dest = Model.vertices.get(Model._dest);
                 dest.setCapacity(150);
             }
-
             graph();
         }
     }//GEN-LAST:event_pnlGraphMouseClicked
 
     private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMousePressed
-        Model._selectedNode = nodeSelected(evt.getX(), evt.getY());
+        Model.toolType = getTool();
         String[] types = new String[]{"Person", "City", "Place"};
-        if (Model._selectedNode < 0 && SwingUtilities.isLeftMouseButton(evt)) {
-            Model.changesMade = true;
-            //nodes.put(Model.id, new HashSet());
-            Vertex v = new Vertex(Model.id, new Point(evt.getX(), evt.getY()), String.valueOf(Model.id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
-            Model.vertices.put(v.getId(), v);
-            Model.id++;
-        } else if (SwingUtilities.isLeftMouseButton(evt)) {
-            if (evt.isControlDown() && evt.isShiftDown()) { // control shift to fail all Model.edges leading out of a vertex
-                Vertex fail = Model.vertices.get(Model._selectedNode);
-                if (Model.failed.contains(fail)) {
-                    Model.failed.remove(fail);
-                } else {
-                    Model.failed.add(fail);
-                }
-                Iterator<Edge> e = fail.eList().iterator();
-                while (e.hasNext()) {
-                    Edge next = e.next();
-                    next.setFailed(!next.isFailed()); //set it to opposite of what it is
-                }
-                Model.visited.clear();
-                Model.glowMap.clear();
-                Model.set.clear();
-                if ("DFS".equals(Model.sim)) {
-                    Algorithms.Dfs(Model.vertices.get(Model._source));
-                    Algorithms.shortestPath(Model._source, Model._dest);
-                } else if ("BFS".equals(Model.sim)) {
-                    Algorithms.Bfs(Model.vertices.get(Model._source));
-                    Algorithms.shortestPath(Model._source, Model._dest);
-                } else if ("Dijkstra".equals(Model.sim)) {
-                    Algorithms.execute(Model.vertices.get(Model._source));
-                    Algorithms.shortestPath(Model._source, Model._dest);
-                }
+        Model._selectedNode = nodeSelected(evt.getX(), evt.getY());
+        if (Model.toolType == Model.TOOL_VERTEX) {
+            if (Model._selectedNode < 0) {
                 Model.changesMade = true;
+                //nodes.put(Model.id, new HashSet());
+                Vertex v = new Vertex(Model.id, new Point(evt.getX(), evt.getY()), String.valueOf(Model.id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
+                Model.vertices.put(v.getId(), v);
+                Model.id++;
+            } else if (SwingUtilities.isLeftMouseButton(evt)) {
+                if (evt.isControlDown() && evt.isShiftDown()) { // control shift to fail all Model.edges leading out of a vertex
+                    Vertex fail = Model.vertices.get(Model._selectedNode);
+                    if (Model.failed.contains(fail)) {
+                        Model.failed.remove(fail);
+                    } else {
+                        Model.failed.add(fail);
+                    }
+                    Iterator<Edge> e = fail.eList().iterator();
+                    while (e.hasNext()) {
+                        Edge next = e.next();
+                        next.setFailed(!next.isFailed()); //set it to opposite of what it is
+                    }
+                    Model.visited.clear();
+                    Model.glowMap.clear();
+                    Model.set.clear();
+                    if ("DFS".equals(Model.sim)) {
+                        Algorithms.Dfs(Model.vertices.get(Model._source));
+                        Algorithms.shortestPath(Model._source, Model._dest);
+                    } else if ("BFS".equals(Model.sim)) {
+                        Algorithms.Bfs(Model.vertices.get(Model._source));
+                        Algorithms.shortestPath(Model._source, Model._dest);
+                    } else if ("Dijkstra".equals(Model.sim)) {
+                        Algorithms.execute(Model.vertices.get(Model._source));
+                        Algorithms.shortestPath(Model._source, Model._dest);
+                    }
+                    Model.changesMade = true;
+                }
             }
-        } else if (SwingUtilities.isRightMouseButton(evt)) {
+        }
+        /*else if (SwingUtilities.isRightMouseButton(evt)) {
             Model.changesMade = true;
             Model.glowMap.clear();
             Model.cutV.clear();
@@ -403,7 +459,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 Model.glowMap.clear();
             }
             Model._selectedNode = -1;
-        }
+        }*/
         graph();
     }//GEN-LAST:event_pnlGraphMousePressed
 
@@ -881,6 +937,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
         return true;
     }
 
+    private int getTool() {
+        for (int i = 0; i < tools.length; i++) {
+            if (tools[i].isSelected()) return i;
+        }
+        return -1;
+    }
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -926,6 +988,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JButton btnStart;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JComboBox<String> jcbAlgo;
     private java.awt.Label lblInfo;
     private javax.swing.JMenu mnuFile;

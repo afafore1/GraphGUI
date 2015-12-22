@@ -46,7 +46,7 @@ public class Model {
     public static Algorithms alg;
     public static int pChangeTime = 300;
     public static int time = 0;
-
+    public static int toolType = -1;
     public static HashMap<Integer, Vertex> vertices;
     public static ArrayList<Edge> edges;
     public static GraphifyGUI GG;
@@ -62,4 +62,9 @@ public class Model {
     public static HashMap<Vertex, Integer> dist; // distance
 
     public static GraphifyGUI graph;
+
+    public static final int TOOL_NONE = -1;
+    public static final int TOOL_VERTEX = 0;
+    public static final int TOOL_BIDIRECTIONAL = 1;
+    public static final int TOOL_DIRECTIONAL = 2;
 }
