@@ -159,15 +159,18 @@ public class Algorithms {
 
     /**
      *
-     * @param s
-     * @param e
+     * @param s passed in vertex
+     * @param e edge associated with vertex s
      * @return
      * get destination of vertex passed in from edge
      */
     public static Vertex getConn(Vertex s, Edge e) {
         if (e.getBidirectional()) {
-            if (e.getSource() == s) return e.getDest();
-            return e.getSource();
+            if (e.getSource() == s){
+                return e.getDest();
+            }else{
+                return e.getSource();
+            }
         } else {
             return e.getDest();
         }

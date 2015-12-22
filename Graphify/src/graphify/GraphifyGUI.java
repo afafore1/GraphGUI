@@ -652,52 +652,58 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_txtQueryActionPerformed
     
     private void pnlGraphKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pnlGraphKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
-            Model.glowMap.clear();
-            Integer[] keys = new Integer[Model.vertices.size()];
-            Model.vertices.keySet().toArray(keys);
-            for (Integer key : keys) {
-                Vertex remove = Model.vertices.get(key);
-                if (remove.getSelected()) {
-                    Model.changesMade = true;
-                    Model.cutV.clear();
-                    Model._source = -1;
-                    Model._dest = -1;
-                    
-                    Iterator<Edge> e = Model.edges.iterator();
-                    while (e.hasNext()) {
-                        Edge next = e.next();
-                        if (next.getSource() == remove || next.getDest() == remove) {
-                            next.getSource().eList().remove(next);
-                            next.getDest().eList().remove(next);
-                            e.remove();
-                        }
-                    }
-                    Model.vertices.remove(key);
-                    
-                    if (Model._selectedNode == Model._dest) {
-                        Model._dest = -1;
-                        Model.glowMap.clear();
-                    }
-                    if (Model._selectedNode == Model._source) {
+        switch (evt.getKeyCode()) {
+            case KeyEvent.VK_DELETE:
+                Model.glowMap.clear();
+                Integer[] keys = new Integer[Model.vertices.size()];
+                Model.vertices.keySet().toArray(keys);
+                for (Integer key : keys) {
+                    Vertex remove = Model.vertices.get(key);
+                    if (remove.getSelected()) {
+                        Model.changesMade = true;
+                        Model.cutV.clear();
                         Model._source = -1;
                         Model._dest = -1;
-                        Model.glowMap.clear();
+                        
+                        for (Iterator<Edge> e = Model.edges.iterator();e.hasNext();) {
+                            Edge next = e.next();
+                            if (next.getSource() == remove || next.getDest() == remove) {
+                                next.getSource().eList().remove(next);
+                                next.getDest().eList().remove(next);
+                                e.remove();
+                            }
+                        }
+                        Model.vertices.remove(key);
+                        
+                        if (Model._selectedNode == Model._dest) {
+                            Model._dest = -1;
+                            Model.glowMap.clear();
+                        }
+                        if (Model._selectedNode == Model._source) {
+                            Model._source = -1;
+                            Model._dest = -1;
+                            Model.glowMap.clear();
+                        }
+                        Model._selectedNode = -1;
                     }
-                    Model._selectedNode = -1;
-                }
-            }
-        } else if (evt.getKeyCode() == KeyEvent.VK_V) {
-            clearTools();
-            tools[0].setSelected(true);
-        } else if (evt.getKeyCode() == KeyEvent.VK_B) {
-            clearTools();
-            tools[1].setSelected(true);
-        } else if (evt.getKeyCode() == KeyEvent.VK_D) {
-            clearTools();
-            tools[2].setSelected(true);
-        } else if (evt.getKeyCode() == KeyEvent.VK_N) {
-            clearTools();
+                }   break;
+            case KeyEvent.VK_V:
+                clearTools();
+                tools[0].setSelected(true);
+                break;
+            case KeyEvent.VK_B:
+                clearTools();
+                tools[1].setSelected(true);
+                break;
+            case KeyEvent.VK_D:
+                clearTools();
+                tools[2].setSelected(true);
+                break;
+            case KeyEvent.VK_N:
+                clearTools();
+                break;
+            default:
+                break;
         }
         graph();
     }//GEN-LAST:event_pnlGraphKeyPressed
@@ -706,6 +712,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Edge newEdge = new Edge(edgeId, Model.vertices.get(sourceid), Model.vertices.get(destid), pAmount, weight, false);
         if (Model.toolType == Model.TOOL_BIDIRECTIONAL) {
             newEdge.setBidirectional(true);
+            Model.vertices.get(destid).eList().add(newEdge);
         }
         Model.edges.add(newEdge);
         Model.vertices.get(sourceid).eList().add(newEdge);
@@ -734,8 +741,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
         if (Model._source > -1 && Model._dest > -1) {
             if (Math.random() > 0.5) { // make probability of a node failure low
                 int vertexSize = Model.vertices.size();
-                int rand = (int) (Math.random() * vertexSize);
-                Vertex v = Model.vertices.get(rand);
+                Vertex v = null;
+                int rand = 0;
+                while(v == null){
+                rand = (int) (Math.random() * vertexSize);
+                v = Model.vertices.get(rand);
+                }
                 if (!(rand == Model._source || rand == Model._dest)) { // do not fail source or destination
                     if (Model.failed.contains(v)) {
                         Model.failed.remove(v);
