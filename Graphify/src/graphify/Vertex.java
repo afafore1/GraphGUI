@@ -26,6 +26,7 @@ public class Vertex implements Serializable {
     private int id;
     private int cap;
     private String type;
+    private boolean selected = false;
 
     public Vertex(GraphifyGUI GG) {
 
@@ -121,6 +122,13 @@ public class Vertex implements Serializable {
         return this.parent;
     }
 
+    public boolean getSelected() {
+        return selected;
+    }
+    
+    public void setSelected(boolean sel) {
+        selected = sel;
+    }
 //	public int hashCode(){
 //		final int prime = 31;
 //		int result = 1;
@@ -156,6 +164,7 @@ class Edge implements Serializable {
     private int pheromoneAmount;
     private boolean fail;
     private double glowLevel = 0;
+    private boolean bidirectional;
 
     public Edge(int id, Vertex source, Vertex dest, int pAmount, int weight, boolean fail) {
         this.id = id;
@@ -164,6 +173,15 @@ class Edge implements Serializable {
         this.pheromoneAmount = pAmount;
         this.weight = weight;
         this.fail = fail;
+        bidirectional = false;
+    }
+
+    public boolean getBidirectional() {
+        return bidirectional;
+    }
+
+    public void setBidirectional(boolean bi) {
+        bidirectional = bi;
     }
 
     public int getId() {

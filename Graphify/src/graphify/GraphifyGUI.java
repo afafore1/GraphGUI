@@ -1,8 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 package graphify;
 
 import java.awt.BasicStroke;
@@ -14,6 +14,7 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -107,7 +108,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         tools[1].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/bidirectional.png"))); // NOI18N
         tools[2].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/directional.png"))); // NOI18N
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -211,16 +212,21 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 pnlGraphComponentResized(evt);
             }
         });
+        pnlGraph.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                pnlGraphKeyPressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlGraphLayout = new javax.swing.GroupLayout(pnlGraph);
         pnlGraph.setLayout(pnlGraphLayout);
         pnlGraphLayout.setHorizontalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 594, Short.MAX_VALUE)
+            .addGap(0, 572, Short.MAX_VALUE)
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 499, Short.MAX_VALUE)
+            .addGap(0, 301, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(pnlGraph);
@@ -299,7 +305,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnReset)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClearConsole)
+                        .addComponent(btnClearConsole, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -315,7 +321,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addGap(10, 10, 10)
                         .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)))
+                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -324,7 +330,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 606, Short.MAX_VALUE))
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -340,156 +346,175 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
     private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseDragged
-        if ((Model.toolType == Model.TOOL_BIDIRECTIONAL
-                || Model.toolType == Model.TOOL_DIRECTIONAL)
-                && Model._selectedNode >= 0) {
-            if (SwingUtilities.isLeftMouseButton(evt)) {
+        if (SwingUtilities.isLeftMouseButton(evt)) {
+            if ((Model.toolType == Model.TOOL_BIDIRECTIONAL
+                    || Model.toolType == Model.TOOL_DIRECTIONAL)
+                    && Model._selectedNode >= 0) {
                 Image buff = createImage(pnlGraph.getWidth() - 1, pnlGraph.getHeight() - 1);
                 Graphics buffG = buff.getGraphics();
                 buffG.drawImage(bufferImage, 0, 0, this);
                 Point source = Model.vertices.get(Model._selectedNode).getLocation();
-                if (Model.toolType == Model.TOOL_DIRECTIONAL) {
-                    drawArrow(buffG, source.x, source.y, evt.getX(), evt.getY());
-                } else {
-                    buffG.drawLine(source.x, source.y, evt.getX(), evt.getY());
+                drawArrow(buffG, source.x, source.y, evt.getX(), evt.getY());
+                if (Model.toolType == Model.TOOL_BIDIRECTIONAL) {
+                    drawArrow(buffG, evt.getX(), evt.getY(), source.x, source.y);
                 }
                 pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
             }
-        }
-        if ((Model.toolType == Model.TOOL_NONE 
-                || Model.toolType == Model.TOOL_VERTEX)
-                && Model._selectedNode >= 0) {
-            Model.vertices.get(Model._selectedNode).getLocation().x = evt.getX();
-            Model.vertices.get(Model._selectedNode).getLocation().y = evt.getY();
-            graph();
-            Model.changesMade = true;
+            if ((Model.toolType == Model.TOOL_NONE
+                    || Model.toolType == Model.TOOL_VERTEX)
+                    && Model._selectedNode >= 0) {
+                Vertex selectedVertex = Model.vertices.get(Model._selectedNode);
+                int dX = evt.getX() - selectedVertex.getLocation().x;
+                int dY = evt.getY() - selectedVertex.getLocation().y;
+                for (Iterator<Vertex> it
+                        = Model.vertices.values().iterator();
+                        it.hasNext();) {
+                    Vertex vertex = it.next();
+                    if (vertex.getSelected()) {
+                        Point newLocation = vertex.getLocation();
+                        newLocation.x += dX;
+                        newLocation.y += dY;
+                    }
+                }
+                graph();
+                Model.changesMade = true;
+            }
         }
     }//GEN-LAST:event_pnlGraphMouseDragged
-
+    
     private void pnlGraphMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseClicked
-        Model._selectedNode = nodeSelected(evt.getX(), evt.getY());
-        if (evt.getClickCount() == 2) {
-            if (Model._source == -1 && Model._dest == -1
-                    || Model._source != -1 && Model._dest != -1) {
-                Model.glowMap.clear();
-                Model._source = Model._selectedNode;
-                Model._dest = -1;
-            } else if (Model._source != Model._selectedNode) {
-                Model.glowMap.clear();
-                Model._dest = Model._selectedNode;
-                Model.set.clear();
-                Vertex dest = Model.vertices.get(Model._dest);
-                dest.setCapacity(150);
+        if (SwingUtilities.isLeftMouseButton(evt)) {
+            Model._selectedNode = nodeSelected(evt.getX(), evt.getY());
+            if (evt.getClickCount() == 2) {
+                if (Model._source == -1 && Model._dest == -1
+                        || Model._source != -1 && Model._dest != -1) {
+                    Model.glowMap.clear();
+                    Model._source = Model._selectedNode;
+                    Model._dest = -1;
+                } else if (Model._source != Model._selectedNode) {
+                    Model.glowMap.clear();
+                    Model._dest = Model._selectedNode;
+                    Model.set.clear();
+                    Vertex dest = Model.vertices.get(Model._dest);
+                    dest.setCapacity(150);
+                }
+                graph();
+            }
+        }
+    }//GEN-LAST:event_pnlGraphMouseClicked
+    
+    private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMousePressed
+        pnlGraph.requestFocus();
+        if (SwingUtilities.isLeftMouseButton(evt)) {
+            Model.toolType = getTool();
+            String[] types = new String[]{"Person", "City", "Place"};
+            Model._selectedNode = nodeSelected(evt.getX(), evt.getY());
+            if (Model.toolType == Model.TOOL_VERTEX
+                    || Model.toolType == Model.TOOL_NONE) {
+                if (!evt.isControlDown()) {
+                    if (Model._selectedNode >= 0) {
+                        Vertex selectedVertex
+                                = Model.vertices.get(Model._selectedNode);
+                        if (!selectedVertex.getSelected()) {
+                            clearSelected();
+                        }
+                        selectedVertex.setSelected(true);
+                        return;
+                    } else {
+                        clearSelected();
+                    }
+                } else
+                    if (Model._selectedNode >= 0) {
+                        Vertex selectedVertex
+                                = Model.vertices.get(Model._selectedNode);
+                        selectedVertex.setSelected(!selectedVertex.getSelected());
+                        if (!selectedVertex.getSelected()) {
+                            Model._selectedNode = -1;
+                            return;
+                        }
+                    }
+            }
+            if (Model.toolType == Model.TOOL_VERTEX) {
+                if (Model._selectedNode < 0) {
+                    Model.changesMade = true;
+                    //nodes.put(Model.id, new HashSet());
+                    Vertex v = new Vertex(Model.id, new Point(evt.getX(), evt.getY()), String.valueOf(Model.id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
+                    Model.vertices.put(v.getId(), v);
+                    Model.id++;
+                } else {
+                    if (evt.isControlDown() && evt.isShiftDown()) { // control shift to fail all Model.edges leading out of a vertex
+                        Vertex fail = Model.vertices.get(Model._selectedNode);
+                        if (Model.failed.contains(fail)) {
+                            Model.failed.remove(fail);
+                        } else {
+                            Model.failed.add(fail);
+                        }
+                        Iterator<Edge> e = fail.eList().iterator();
+                        while (e.hasNext()) {
+                            Edge next = e.next();
+                            next.setFailed(!next.isFailed()); //set it to opposite of what it is
+                        }
+                        Model.visited.clear();
+                        Model.glowMap.clear();
+                        Model.set.clear();
+                        if ("DFS".equals(Model.sim)) {
+                            Algorithms.Dfs(Model.vertices.get(Model._source));
+                            Algorithms.shortestPath(Model._source, Model._dest);
+                        } else if ("BFS".equals(Model.sim)) {
+                            Algorithms.Bfs(Model.vertices.get(Model._source));
+                            Algorithms.shortestPath(Model._source, Model._dest);
+                        } else if ("Dijkstra".equals(Model.sim)) {
+                            Algorithms.execute(Model.vertices.get(Model._source));
+                            Algorithms.shortestPath(Model._source, Model._dest);
+                        }
+                        Model.changesMade = true;
+                    }
+                }
+            } else if (Model.toolType != Model.TOOL_NONE) {
+                if (Model._selectedNode >= 0) {
+                    Vertex selectedVertex
+                            = Model.vertices.get(Model._selectedNode);
+                    clearSelected();
+                    selectedVertex.setSelected(true);
+                }
             }
             graph();
         }
-    }//GEN-LAST:event_pnlGraphMouseClicked
-
-    private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMousePressed
-        Model.toolType = getTool();
-        String[] types = new String[]{"Person", "City", "Place"};
-        Model._selectedNode = nodeSelected(evt.getX(), evt.getY());
-        if (Model.toolType == Model.TOOL_VERTEX) {
-            if (Model._selectedNode < 0) {
-                Model.changesMade = true;
-                //nodes.put(Model.id, new HashSet());
-                Vertex v = new Vertex(Model.id, new Point(evt.getX(), evt.getY()), String.valueOf(Model.id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
-                Model.vertices.put(v.getId(), v);
-                Model.id++;
-            } else if (SwingUtilities.isLeftMouseButton(evt)) {
-                if (evt.isControlDown() && evt.isShiftDown()) { // control shift to fail all Model.edges leading out of a vertex
-                    Vertex fail = Model.vertices.get(Model._selectedNode);
-                    if (Model.failed.contains(fail)) {
-                        Model.failed.remove(fail);
-                    } else {
-                        Model.failed.add(fail);
-                    }
-                    Iterator<Edge> e = fail.eList().iterator();
-                    while (e.hasNext()) {
-                        Edge next = e.next();
-                        next.setFailed(!next.isFailed()); //set it to opposite of what it is
-                    }
-                    Model.visited.clear();
-                    Model.glowMap.clear();
-                    Model.set.clear();
-                    if ("DFS".equals(Model.sim)) {
-                        Algorithms.Dfs(Model.vertices.get(Model._source));
-                        Algorithms.shortestPath(Model._source, Model._dest);
-                    } else if ("BFS".equals(Model.sim)) {
-                        Algorithms.Bfs(Model.vertices.get(Model._source));
-                        Algorithms.shortestPath(Model._source, Model._dest);
-                    } else if ("Dijkstra".equals(Model.sim)) {
-                        Algorithms.execute(Model.vertices.get(Model._source));
-                        Algorithms.shortestPath(Model._source, Model._dest);
-                    }
-                    Model.changesMade = true;
-                }
-            }
-        }
-        /*else if (SwingUtilities.isRightMouseButton(evt)) {
-            Model.changesMade = true;
-            Model.glowMap.clear();
-            Model.cutV.clear();
-            Model._source = -1;
-            Model._dest = -1;
-
-            Vertex remove = Model.vertices.get(Model._selectedNode);
-            Iterator<Edge> e = Model.edges.iterator();
-            while (e.hasNext()) {
-                Edge next = e.next();
-                if (next.getSource() == remove || next.getDest() == remove) {
-                    next.getSource().eList().remove(next);
-                    next.getDest().eList().remove(next);
-                    e.remove();
-                }
-            }
-            Model.vertices.remove(Model._selectedNode);
-
-            if (Model._selectedNode == Model._dest) {
-                Model._dest = -1;
-                Model.glowMap.clear();
-            }
-            if (Model._selectedNode == Model._source) {
-                Model._source = -1;
-                Model._dest = -1;
-                Model.glowMap.clear();
-            }
-            Model._selectedNode = -1;
-        }*/
-        graph();
     }//GEN-LAST:event_pnlGraphMousePressed
-
+    
     private void pnlGraphMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseReleased
-        Model.weight = 0;
-        if (Model._selectedNode >= 0) {
-            int destination = nodeSelected(evt.getX(), evt.getY());
-            if (destination >= 0 && destination != Model._selectedNode) {
-                Model.weight = (int) (Math.random() * 100);
-                int pAmount = (int) (Math.random() * 40 + 1);
-                addEdge(Model.Edgeid, Model._selectedNode, destination, pAmount, Model.weight);
-                Model._selectedNode = -1;
-                Model.changesMade = true;
-                Model.Edgeid++;
+        if (SwingUtilities.isLeftMouseButton(evt)) {
+            Model.weight = 0;
+            if (Model._selectedNode >= 0) {
+                int destination = nodeSelected(evt.getX(), evt.getY());
+                if (destination >= 0 && destination != Model._selectedNode) {
+                    Model.weight = (int) (Math.random() * 100);
+                    int pAmount = (int) (Math.random() * 40 + 1);
+                    addEdge(Model.Edgeid, Model._selectedNode, destination, pAmount, Model.weight);
+                    Model._selectedNode = -1;
+                    Model.changesMade = true;
+                    Model.Edgeid++;
+                }
             }
+            graph();
         }
-        graph();
     }//GEN-LAST:event_pnlGraphMouseReleased
-
+    
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
         Model.changesMade = true;
         reset();
     }//GEN-LAST:event_btnResetActionPerformed
-
+    
     private void btnClearConsoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearConsoleActionPerformed
         txtConsole.setText("");
     }//GEN-LAST:event_btnClearConsoleActionPerformed
-
+    
     private void jcbAlgoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbAlgoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jcbAlgoActionPerformed
-
+    
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
         String x = String.valueOf(jcbAlgo.getSelectedItem());
         Model.sim = x;
@@ -554,36 +579,36 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 break;
         }
     }//GEN-LAST:event_btnStartActionPerformed
-
+    
     private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintListActionPerformed
         Iterator<Vertex> verts = Model.vertices.values().iterator();
         while (verts.hasNext()) {
             Vertex next = verts.next();
             printlnConsole(next.getName() + "->" + next.eList());
         }
-
+        
         printlnConsole("Source is: " + Model._source);
     }//GEN-LAST:event_btnPrintListActionPerformed
-
+    
     private void pnlGraphComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_pnlGraphComponentResized
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
     }//GEN-LAST:event_pnlGraphComponentResized
-
+    
     private void mnuQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuQuitActionPerformed
         if (checkForChange()) {
             System.exit(0);
         }
     }//GEN-LAST:event_mnuQuitActionPerformed
-
+    
     private void mnuSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveAsActionPerformed
         saveAs();
     }//GEN-LAST:event_mnuSaveAsActionPerformed
-
+    
     private void mnuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveActionPerformed
         justSave();
     }//GEN-LAST:event_mnuSaveActionPerformed
-
+    
     private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuOpenActionPerformed
         if (checkForChange()) {
             JFileChooser theChooser = new JFileChooser();
@@ -601,11 +626,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 } catch (IOException ex) {
                     Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
+                
             }
         }
     }//GEN-LAST:event_mnuOpenActionPerformed
-
+    
     private void mnuNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNewActionPerformed
         if (checkForChange()) {
             reset();
@@ -613,7 +638,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             Model.changesMade = false;
         }
     }//GEN-LAST:event_mnuNewActionPerformed
-
+    
     private void txtQueryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtQueryActionPerformed
         //Model._source = -1;
         Model._dest = -1;
@@ -626,13 +651,67 @@ public class GraphifyGUI extends javax.swing.JFrame {
         //String nodeNum = JOptionPane.showInputDialog(null, "Enter number of nodes");
         // randomize(Integer.parseInt(nodeNum));        
     }//GEN-LAST:event_txtQueryActionPerformed
-
+    
+    private void pnlGraphKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pnlGraphKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
+            Model.glowMap.clear();
+            Integer[] keys = new Integer[Model.vertices.size()];
+            Model.vertices.keySet().toArray(keys);
+            for (Integer key : keys) {
+                Vertex remove = Model.vertices.get(key);
+                if (remove.getSelected()) {
+                    Model.changesMade = true;
+                    Model.cutV.clear();
+                    Model._source = -1;
+                    Model._dest = -1;
+                    
+                    Iterator<Edge> e = Model.edges.iterator();
+                    while (e.hasNext()) {
+                        Edge next = e.next();
+                        if (next.getSource() == remove || next.getDest() == remove) {
+                            next.getSource().eList().remove(next);
+                            next.getDest().eList().remove(next);
+                            e.remove();
+                        }
+                    }
+                    Model.vertices.remove(key);
+                    
+                    if (Model._selectedNode == Model._dest) {
+                        Model._dest = -1;
+                        Model.glowMap.clear();
+                    }
+                    if (Model._selectedNode == Model._source) {
+                        Model._source = -1;
+                        Model._dest = -1;
+                        Model.glowMap.clear();
+                    }
+                    Model._selectedNode = -1;
+                }
+            }
+        } else if (evt.getKeyCode() == KeyEvent.VK_V) {
+            clearTools();
+            tools[0].setSelected(true);
+        } else if (evt.getKeyCode() == KeyEvent.VK_B) {
+            clearTools();
+            tools[1].setSelected(true);
+        } else if (evt.getKeyCode() == KeyEvent.VK_D) {
+            clearTools();
+            tools[2].setSelected(true);
+        } else if (evt.getKeyCode() == KeyEvent.VK_N) {
+            clearTools();
+        }
+        graph();
+    }//GEN-LAST:event_pnlGraphKeyPressed
+    
     private void addEdge(Integer edgeId, Integer sourceid, Integer destid, Integer pAmount, final Integer weight) {
         Edge newEdge = new Edge(edgeId, Model.vertices.get(sourceid), Model.vertices.get(destid), pAmount, weight, false);
+        if (Model.toolType == Model.TOOL_BIDIRECTIONAL) {
+            newEdge.setBidirectional(true);
+        }
         Model.edges.add(newEdge);
         Model.vertices.get(sourceid).eList().add(newEdge);
     }
-
+    
     private void reduceIncreasepAmount() {
         if (Model._source > -1 && Model._dest > -1) {
             int edgeSize = Model.edges.size();
@@ -648,10 +727,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
             Algorithms.shortestPath(Model._source, Model._dest);
             e.setGlowLevel(1);
         }
-
+        
         //graph();
     }
-
+    
     private void autoFailure() { // randomly fail nodes in the network
         if (Model._source > -1 && Model._dest > -1) {
             if (Math.random() > 0.5) { // make probability of a node failure low
@@ -677,7 +756,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         }
     }
-
+    
     private void autoHeal() {
         if (!Model.failed.isEmpty()) {
             for (Iterator<Vertex> it = Model.failed.iterator(); it.hasNext();) {
@@ -692,7 +771,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         }
     }
-
+    
     void Open(File file) throws FileNotFoundException, IOException {
         try {
             try (FileInputStream fis = new FileInputStream(file)) {
@@ -708,7 +787,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             printlnConsole("Class not found");
         }
     }
-
+    
     private void reset() {
         Model.vertices = new HashMap();
         Model.edges = new ArrayList();
@@ -721,14 +800,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Model._dest = -1;
         graph();
     }
-
+    
     private String getNodeInfo(int nodeId) {
         if (nodeId == -1) {
             return "None";
         }
         return "" + nodeId;
     }
-
+    
     public void graph() {
         bufferGraphic.setColor(Color.white);
         bufferGraphic.fillRect(0, 0, pnlGraph.getWidth(), pnlGraph.getHeight());
@@ -752,7 +831,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
             xmid = (source.x + dest.x) / 2 + 5;
             ymid = (source.y + dest.y) / 2 + 5;
             drawArrowOnGraphics(bufferGraphic, source.x, source.y, dest.x, dest.y);
-//            bufferGraphic.drawLine(source.x, source.y, dest.x, dest.y);
+            if (e.getBidirectional()) {
+                drawArrowOnGraphics(bufferGraphic, dest.x, dest.y, source.x, source.y);
+            }
             int edgeWeight = e.getWeight();
             if (!(edgeWeight == -1)) {
                 bufferGraphic.setColor(
@@ -764,7 +845,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 e.glowDie(.05);
             }
         }
-
+        
         // Glowing connections
         bufferGraphic.setColor(new Color(10, 230, 40));
         bufferGraphic.setStroke(new BasicStroke(6));
@@ -775,7 +856,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 drawDottedLine(bufferGraphic, sourcePoint, destPoint, Model.dotOffset);
             }
         }
-
+        
         // Nodes - red circles.
         Model.vertices.values().stream().forEach((v) -> {
             Point thePoint = v.getLocation();
@@ -783,7 +864,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 bufferGraphic.setColor(Color.green);
             } else if (v.getId() == Model._dest) {
                 bufferGraphic.setColor(Color.blue);
-            } else if (v.getId() == Model._selectedNode) {
+            } else if (v.getId() == Model._selectedNode || v.getSelected()) {
                 bufferGraphic.setColor(Color.orange);
             } else {
                 bufferGraphic.setColor(Color.red);
@@ -798,7 +879,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     bufferGraphic.setColor(Color.green);
                 }
             }
-
+            
             bufferGraphic.fillOval(thePoint.x - Model._SIZE_OF_NODE / 2,
                     thePoint.y - Model._SIZE_OF_NODE / 2, Model._SIZE_OF_NODE, Model._SIZE_OF_NODE);
         });
@@ -814,17 +895,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
         lblInfo.setText("Source: " + getNodeInfo(Model._source)
                 + " - Destination: " + getNodeInfo(Model._dest));
     }
-
+    
     void drawArrow(Graphics g1, int x1, int y1, int x2, int y2) {
         Graphics2D g = (Graphics2D) g1.create();
         drawArrowOnGraphics(g, x1, y1, x2, y2);
     }
-
+    
     private void drawArrowOnGraphics(Graphics2D g1, int x1, int y1, int x2, int y2) {
         double dx = x2 - x1, dy = y1 - y2;
         double angle = Math.atan2(dy, dx);
         int len = (int) Math.sqrt(dx * dx + dy * dy);
-
+        
         int p1X = (int) (x2 + Math.cos(angle + Math.PI * 3 / 4) * Model.ARR_SIZE);
         int p1Y = (int) (y2 - Math.sin(angle + Math.PI * 3 / 4) * Model.ARR_SIZE);
         int p2X = (int) (x2 + Math.cos(angle - Math.PI * 3 / 4) * Model.ARR_SIZE);
@@ -837,7 +918,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         polygon.addPoint(p2X, p2Y);
         g1.fillPolygon(polygon);
     }
-
+    
     private void drawDottedLine(Graphics2D g, Point p1, Point p2, double offset) {
         long total = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
         total = (long) Math.sqrt(total);
@@ -849,7 +930,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             g.drawLine(x1, y1, x2, y2);
         }
     }
-
+    
     private int nodeSelected(int x, int y) {
         for (Vertex v : Model.vertices.values()) {
             Point thePoint = v.getLocation();
@@ -862,16 +943,16 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
         return -1;
     }
-
+    
     public void printConsole(String string) {
         txtConsole.append(string);
     }
-
+    
     public void printlnConsole(String string) {
         txtConsole.append(string + "\n");
         txtConsole.setCaretPosition(txtConsole.getText().length());
     }
-
+    
     static Vertex getConn(Vertex s, Edge e) {
         if (s == e.getSource()) {
             return e.getDest();
@@ -879,7 +960,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             return e.getSource();
         }
     }
-
+    
     private void save(String path) {
         try {
             try (FileOutputStream fileOut = new FileOutputStream(path); ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
@@ -888,12 +969,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 out.writeObject(Model.id);
                 out.writeObject(Model.failed);
             }
-
+            
         } catch (IOException ex) {
             Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     private void saveAs() {
         JFileChooser theChooser = new JFileChooser();
         theChooser.setFileFilter(new FileNameExtensionFilter("GraphifyGUI files", "ser"));
@@ -906,7 +987,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             save(Model.currentProject);
         }
     }
-
+    
     private void justSave() {
         if (Model.currentProject == null) {
             saveAs();
@@ -914,7 +995,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             save(Model.currentProject);
         }
     }
-
+    
     private boolean checkForChange() {
         if (Model.changesMade) {
             int option = JOptionPane.showConfirmDialog(this,
@@ -933,19 +1014,32 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
         return true;
     }
-
+    
     private int getTool() {
         for (int i = 0; i < tools.length; i++) {
             if (tools[i].isSelected()) return i;
         }
         return -1;
     }
+
+    private void clearTools() {
+        for (JToggleButton tool : tools) {
+            tool.setSelected(false);
+        }
+    }
+    
+    private void clearSelected() {
+        for (Vertex vertex : Model.vertices.values()) {
+            vertex.setSelected(false);
+        }
+    }
+    
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         graph();
     }
-
+    
     /**
      * @param args the command line arguments
      */
@@ -954,7 +1048,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
+        */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -966,9 +1060,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(GraphifyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             Model.graph = new GraphifyGUI();
@@ -977,7 +1071,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             Model.graph.show();
         });
     }
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClearConsole;
     private javax.swing.JButton btnPrintList;

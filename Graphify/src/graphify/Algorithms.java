@@ -57,7 +57,7 @@ public class Algorithms {
         }
     }
 
-    public static  void AP() {
+    public static void AP() {
         Model.visited = new HashMap<>();
         boolean cutExist = false;
         HashMap<Integer, Integer> disc = new HashMap<>();
@@ -96,7 +96,7 @@ public class Algorithms {
         }
     }
 
-    public static  void Dfs(Vertex source) {
+    public static void Dfs(Vertex source) {
         reset();
         Model.stack = new Stack<>();
         Model.bconn = new HashSet<>();
@@ -165,7 +165,12 @@ public class Algorithms {
      * get destination of vertex passed in from edge
      */
     public static Vertex getConn(Vertex s, Edge e) {
-        return e.getDest();
+        if (e.getBidirectional()) {
+            if (e.getSource() == s) return e.getDest();
+            return e.getSource();
+        } else {
+            return e.getDest();
+        }
     }
 
     //dijsktra
@@ -329,7 +334,7 @@ public class Algorithms {
         return Model.conn;
     }
 
-    public static  void shortestPath(int v, int e) {
+    public static void shortestPath(int v, int e) {
         if (e == v) {
             Model.graph.printlnConsole(v + "-->" + v);
             return;
@@ -357,7 +362,7 @@ public class Algorithms {
         Model.graph.graph();
     }
 
-    public static  void reset() {
+    public static void reset() {
         Model.vertices.values().stream().forEach((v) -> {
             v.wasVisited = false;
         });
