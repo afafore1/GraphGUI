@@ -121,8 +121,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnPrintList = new javax.swing.JButton();
         txtQuery = new javax.swing.JTextField();
         jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtConsole = new javax.swing.JTextArea();
         pnlGraph = new javax.swing.JPanel(){
             @Override
             public void paintComponent(Graphics g) {
@@ -130,6 +128,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 super.paintComponent(g);
             }
         };
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtConsole = new javax.swing.JTextArea();
         jToolBar1 = new javax.swing.JToolBar();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
@@ -188,15 +188,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane1.setResizeWeight(0.7);
 
-        txtConsole.setEditable(false);
-        txtConsole.setColumns(20);
-        txtConsole.setFont(new java.awt.Font("Courier New", 0, 16)); // NOI18N
-        txtConsole.setRows(5);
-        txtConsole.setPreferredSize(new java.awt.Dimension(204, 60));
-        jScrollPane1.setViewportView(txtConsole);
-
-        jSplitPane1.setBottomComponent(jScrollPane1);
-
         pnlGraph.setBackground(new java.awt.Color(255, 255, 255));
         pnlGraph.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         pnlGraph.setPreferredSize(new java.awt.Dimension(400, 500));
@@ -230,10 +221,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 287, Short.MAX_VALUE)
+            .addGap(0, 499, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(pnlGraph);
+
+        txtConsole.setEditable(false);
+        txtConsole.setColumns(20);
+        txtConsole.setRows(5);
+        jScrollPane2.setViewportView(txtConsole);
+
+        jSplitPane1.setRightComponent(jScrollPane2);
 
         jToolBar1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jToolBar1.setFloatable(false);
@@ -987,7 +985,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnStart;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JComboBox<String> jcbAlgo;
