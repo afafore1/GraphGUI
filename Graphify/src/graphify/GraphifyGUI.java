@@ -53,7 +53,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         initComponents();
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
-        Model.edgeWeights = new ArrayList<>();
         Model.vertices = new HashMap<>();
         Model.edges = new ArrayList<>();
         Model.failed = new ArrayList<>();
@@ -470,7 +469,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 Model.weight = (int) (Math.random() * 100);
                 int pAmount = (int) (Math.random() * 40 + 1);
                 addEdge(Model.Edgeid, Model._selectedNode, destination, pAmount, Model.weight);
-                Model.edgeWeights.add(Model.weight);
                 Model._selectedNode = -1;
                 Model.changesMade = true;
                 Model.Edgeid++;

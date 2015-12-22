@@ -35,7 +35,6 @@ public class Model {
     public static int id = 0;
     public static int Edgeid = 0;
     public static int weight = 0;
-    public static List<Integer> edgeWeights; // store weights here
     public static Integer maxColors = 0;
     public static int _source = -1;
     public static int _dest = -1;
