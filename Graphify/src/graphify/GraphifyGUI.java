@@ -27,10 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -93,12 +89,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
             tools[i].setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
             tools[i].setPreferredSize(new java.awt.Dimension(40, 40));
             tools[i].setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-            tools[i].addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    for (JToggleButton tool : tools) {
-                        if (tool != e.getSource()) tool.setSelected(false);
-                    }
+            tools[i].addActionListener((ActionEvent e) -> {
+                for (JToggleButton tool : tools) {
+                    if (tool != e.getSource()) tool.setSelected(false);
                 }
             });
             jToolBar1.add(tools[i]);
@@ -352,7 +345,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 Point source = Model.vertices.get(Model._selectedNode).getLocation();
                 if (Model.toolType == Model.TOOL_DIRECTIONAL) {
                     drawArrow(buffG, source.x, source.y, evt.getX(), evt.getY());
-                } else {
+                } else if (Model.toolType == Model.TOOL_BIDIRECTIONAL) {
                     buffG.drawLine(source.x, source.y, evt.getX(), evt.getY());
                 }
                 pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
@@ -414,15 +407,21 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     Model.visited.clear();
                     Model.glowMap.clear();
                     Model.set.clear();
-                    if ("DFS".equals(Model.sim)) {
-                        Algorithms.Dfs(Model.vertices.get(Model._source));
-                        Algorithms.shortestPath(Model._source, Model._dest);
-                    } else if ("BFS".equals(Model.sim)) {
-                        Algorithms.Bfs(Model.vertices.get(Model._source));
-                        Algorithms.shortestPath(Model._source, Model._dest);
-                    } else if ("Dijkstra".equals(Model.sim)) {
-                        Algorithms.execute(Model.vertices.get(Model._source));
-                        Algorithms.shortestPath(Model._source, Model._dest);
+                    if (null != Model.sim) switch (Model.sim) {
+                        case "DFS":
+                            Algorithms.Dfs(Model.vertices.get(Model._source));
+                            Algorithms.shortestPath(Model._source, Model._dest);
+                            break;
+                        case "BFS":
+                            Algorithms.Bfs(Model.vertices.get(Model._source));
+                            Algorithms.shortestPath(Model._source, Model._dest);
+                            break;
+                        case "Dijkstra":
+                            Algorithms.execute(Model.vertices.get(Model._source));
+                            Algorithms.shortestPath(Model._source, Model._dest);
+                            break;
+                        default:
+                            break;
                     }
                     Model.changesMade = true;
                 }
