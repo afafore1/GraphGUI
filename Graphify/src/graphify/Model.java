@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
@@ -49,7 +48,7 @@ public class Model {
     public static GraphifyGUI GG;
     public static Queue<Vertex> suggestQueue;
     public static HashMap<Integer, HashSet<Integer>> nodes;
-    public static HashMap<Integer, Integer> setShortestPath = new HashMap<>();
+    public static HashMap<Vertex, Vertex> setShortestPath = new HashMap<>();
     public static Map<Integer, Integer> set;
     public static ArrayList<Integer> conn;
     public static HashSet<Vertex> bconn;

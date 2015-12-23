@@ -348,20 +348,21 @@ public class Algorithms {
                 break;
             }
             if (Model.vertices.get(i).getParent().getId() != -1) {
-                Model.setShortestPath.put(Model.vertices.get(i).getParent().getId(), i);
+                Model.setShortestPath.put(Model.vertices.get(i).getParent(), Model.vertices.get(i));
                 capacity += getpAmount(Model.vertices.get(i).parent, Model.vertices.get(i));
             }
         }
         Model.graph.printlnConsole("Capacity transfered is "+capacity);
         Model.glowMap.clear();
-        Model.setShortestPath.keySet().stream().forEach((i) -> {
-            Model.edges.stream().filter((edge) -> (edge.getSource() == Model.vertices.get(i)
-                    && edge.getDest()== Model.vertices.get(Model.setShortestPath.get(i))
-                    || edge.getDest() == Model.vertices.get(i)
-                            && edge.getSource() == Model.vertices.get(Model.setShortestPath.get(i)))).forEach((edge) -> {
-//                                Model.glowMap.add(edge);
-                            });
-        });
+        Model.glowMap = (HashMap) Model.setShortestPath.clone();
+//        Model.setShortestPath.keySet().stream().forEach((i) -> {
+//            Model.edges.stream().filter((edge) -> (edge.getSource() == Model.vertices.get(i)
+//                    && edge.getDest()== Model.vertices.get(Model.setShortestPath.get(i))
+//                    || edge.getDest() == Model.vertices.get(i)
+//                            && edge.getSource() == Model.vertices.get(Model.setShortestPath.get(i)))).forEach((edge) -> {
+////                                Model.glowMap.add(edge);
+//                            });
+//        });
         Model.graph.graph();
     }
 
