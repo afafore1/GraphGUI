@@ -752,7 +752,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         Model.failed.remove(v);
                     } else {
                         Model.failed.add(v);
-                        printlnConsole(v.getName() + " has Model.failed");
+                        printlnConsole(v.getName() + " has failed");
                     }
                     Iterator<Edge> e = v.eList().iterator();
                     while (e.hasNext()) {
