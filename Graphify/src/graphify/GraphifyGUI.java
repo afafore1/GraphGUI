@@ -55,7 +55,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Model.failed = new ArrayList<>();
         Model.vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
         Model.randomKeys = new HashSet<>();
-        Model.glowMap = new ArrayList<>();
+        Model.glowMap = new HashMap<>();
         Model.cutV = new ArrayList<>();
         Model.set = new HashMap<>();
         Model.visited = new HashMap<>();
@@ -860,9 +860,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
         bufferGraphic.setColor(new Color(10, 230, 40));
         bufferGraphic.setStroke(new BasicStroke(6));
         if (!btnReset.isSelected()) {
-            for (Edge edge : Model.glowMap) {
-                Point sourcePoint = edge.getSource().getLocation();
-                Point destPoint = edge.getDest().getLocation();
+            for (Iterator<Vertex> it = Model.glowMap.keySet().iterator();
+                    it.hasNext();) {
+                Vertex sourceVertex = it.next();
+                Vertex destinationVertex = Model.glowMap.get(sourceVertex);
+                Point sourcePoint = sourceVertex.getLocation();
+                Point destPoint = destinationVertex.getLocation();
                 drawDottedLine(bufferGraphic, sourcePoint, destPoint, Model.dotOffset);
             }
         }
