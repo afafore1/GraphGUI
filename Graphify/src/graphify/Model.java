@@ -23,15 +23,13 @@ public class Model {
     public static HashMap<Integer, Integer> color;
     public static HashMap<Integer, Integer> fcolors;
     public static HashMap<Integer, Integer> greedyresult;
+    public static HashMap<Vertex, Vertex> glowMap;
     public static HashSet<Integer> _colors2;
     public static HashSet<Integer> randomKeys;
-    public static ArrayList<Edge> glowMap;
     public static ArrayList<Integer> cutV;
     public static ArrayList<Vertex> failed;
     public static Color[] vertexColors;
     public static int _selectedNode = -1;
-    public static final int ARR_SIZE = 8;
-    public static int _SIZE_OF_NODE = 20;
     public static int id = 0;
     public static int Edgeid = 0;
     public static int weight = 0;
@@ -66,4 +64,6 @@ public class Model {
     public static final int TOOL_VERTEX = 0;
     public static final int TOOL_BIDIRECTIONAL = 1;
     public static final int TOOL_DIRECTIONAL = 2;
+    public static final int ARR_SIZE = 8;
+    public static int _SIZE_OF_NODE = 20;
 }
