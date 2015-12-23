@@ -355,12 +355,12 @@ public class Algorithms {
         Model.graph.printlnConsole("Capacity transfered is "+capacity);
         Model.glowMap.clear();
         Model.setShortestPath.keySet().stream().forEach((i) -> {
-            Model.edges.stream().filter((edge) -> (edge.getSource() == Model.vertices.get(i) 
+            Model.edges.stream().filter((edge) -> (edge.getSource() == Model.vertices.get(i)
                     && edge.getDest()== Model.vertices.get(Model.setShortestPath.get(i))
                     || edge.getDest() == Model.vertices.get(i)
                             && edge.getSource() == Model.vertices.get(Model.setShortestPath.get(i)))).forEach((edge) -> {
-                                Model.glowMap.add(edge);
-            });
+//                                Model.glowMap.add(edge);
+                            });
         });
         Model.graph.graph();
     }

@@ -2,6 +2,16 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+<<<<<<< HEAD
         <group/>
+=======
+        <group>
+            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/Commands.java</file>
+            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/Ant.java</file>
+            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/Vertex.java</file>
+            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/Algorithms.java</file>
+            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/GraphifyGUI.java</file>
+        </group>
+>>>>>>> 17e475e131e976ebb108426bbc6144bfccd12e9d
     </open-files>
 </project-private>
