@@ -22,10 +22,8 @@ public class Algorithms {
     /**
      *
      * @param source
-     * @return
-     * returns the edges connected to this source
+     * @return returns the edges connected to this source
      */
-
     public static void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
         int children = 0;
         Model.visited.put(u, 0);
@@ -106,25 +104,28 @@ public class Algorithms {
         while (!Model.stack.isEmpty()) {
             Vertex current = Model.stack.peek();
             Model.graph.printlnConsole("Considering element " + current.getName());
-            Model.bconn.add(current);
-            Iterator<Edge> currentList = current.eList().iterator();
-            while (currentList.hasNext()) {
-                Edge t = currentList.next();
-                if (!t.isFailed()) {
-                    Vertex next = getConn(current, t);
-                    if (!next.wasVisited) { // Model.visited just one at a time
-                        Model.graph.printlnConsole("Pushing " + next.getName());
-                        Model.stack.push(next);
-                        next.parent = current;
-                        next.wasVisited = true;
-                        break;
+            Model.bconn.add(current.getName());
+            if (current.eList().isEmpty()) {
+                Model.graph.printlnConsole("Removing " + Model.stack.pop());
+            } else {
+                for (Iterator<Edge> currentList = current.eList().iterator(); currentList.hasNext();) {
+                    Edge t = currentList.next();
+                    if (!t.isFailed()) {
+                        Vertex next = getConn(current, t);
+                        if (!next.wasVisited) { // visited just one at a time
+                            Model.graph.printlnConsole("Pushing " + next.getName());
+                            Model.stack.push(next);
+                            next.parent = current;
+                            next.wasVisited = true;
+                            break;
+                        }
+                        if (!currentList.hasNext()) {
+                            Vertex backEdge = Model.stack.pop();
+                            Model.graph.printlnConsole("Back edge " + backEdge.getName());
+                        }
+                    } else {
+                        Model.stack.pop();
                     }
-                    if (!currentList.hasNext()) {
-                        Vertex backEdge = Model.stack.pop();
-                        Model.graph.printlnConsole("Back edge " + backEdge.getName());
-                    }
-                } else {
-                    Model.stack.pop();
                 }
             }
         }
@@ -141,8 +142,7 @@ public class Algorithms {
         while (!Model.suggestQueue.isEmpty()) { // source
             Vertex current = Model.suggestQueue.poll(); // remove first 
             Model.conn.add(current.getId());
-            Iterator<Edge> currentList = current.eList().iterator();
-            while (currentList.hasNext()) {
+            for (Iterator<Edge> currentList = current.eList().iterator(); currentList.hasNext();) {
                 Edge t = currentList.next();
                 if (!t.isFailed()) {
                     Vertex next = getConn(current, t);
@@ -161,14 +161,13 @@ public class Algorithms {
      *
      * @param s passed in vertex
      * @param e edge associated with vertex s
-     * @return
-     * get destination of vertex passed in from edge
+     * @return get destination of vertex passed in from edge
      */
     public static Vertex getConn(Vertex s, Edge e) {
         if (e.getBidirectional()) {
-            if (e.getSource() == s){
+            if (e.getSource() == s) {
                 return e.getDest();
-            }else{
+            } else {
                 return e.getSource();
             }
         } else {
@@ -177,7 +176,7 @@ public class Algorithms {
     }
 
     //dijsktra
-    public static  void execute(Vertex source) {
+    public static void execute(Vertex source) {
         // get vertices and edges from GUI
         Model.sNodes = new HashSet<>(); // settled Model.vertices will be placed in this setShortestPath
         Model.uSNodes = new HashSet<>(); // unsettled Model.vertices will be placed in this setShortestPath
@@ -202,14 +201,14 @@ public class Algorithms {
     public static int getWeight(Vertex s, Vertex d) {
         for (Edge e : Model.edges) {
             if (e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s) {
-                return e.getWeight()/e.getpheromoneAmount();
+                return e.getWeight() / e.getpheromoneAmount();
             }
         }
         return -1; // edge does not exist then
     }
-    
-    public static int getpAmount (Vertex s, Vertex d){
-        for(Edge e : Model.edges){
+
+    public static int getpAmount(Vertex s, Vertex d) {
+        for (Edge e : Model.edges) {
             if (e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s) {
                 return e.getpheromoneAmount();
             }
@@ -352,7 +351,7 @@ public class Algorithms {
                 capacity += getpAmount(Model.vertices.get(i).parent, Model.vertices.get(i));
             }
         }
-        Model.graph.printlnConsole("Capacity transfered is "+capacity);
+        Model.graph.printlnConsole("Capacity transfered is " + capacity);
         Model.glowMap.clear();
         Model.glowMap = (HashMap) Model.setShortestPath.clone();
 //        Model.setShortestPath.keySet().stream().forEach((i) -> {

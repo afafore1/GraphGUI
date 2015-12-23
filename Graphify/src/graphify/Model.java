@@ -51,7 +51,7 @@ public class Model {
     public static HashMap<Vertex, Vertex> setShortestPath = new HashMap<>();
     public static Map<Integer, Integer> set;
     public static ArrayList<Integer> conn;
-    public static HashSet<Vertex> bconn;
+    public static HashSet<String> bconn;
     //for dijkstra
     public static HashSet<Vertex> uSNodes; // unsettled
     public static HashSet<Vertex> sNodes; // settled
