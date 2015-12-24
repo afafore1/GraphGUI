@@ -61,6 +61,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Model.visited = new HashMap<>();
         Timer animationTimer = new Timer(30, (ActionEvent e) -> {
             if (Model.glowMap.size() > 0) {
+                System.out.println("weee");
                 Model.dotOffset = (Model.dotOffset + .07) % 1;
                 graph();
             }
@@ -76,13 +77,18 @@ public class GraphifyGUI extends javax.swing.JFrame {
         });
         decreseWeights = (ActionEvent e) -> {
             if ("Dijkstra".equals(Model.sim)) {
-                reduceIncreasepAmount();
-                autoFailure();
-                autoHeal();
-                //graph();
+                if (Model.decreaseWeightEllapse < (1000 - sldrWeightSpeed.getValue())) {
+                    Model.decreaseWeightEllapse++;
+                } else {
+                    Model.decreaseWeightEllapse = 0;
+                    reduceIncreasepAmount();
+                    autoFailure();
+                    autoHeal();
+                    //graph();
+                }
             }
         };
-        Timer exe = new Timer(Model.pChangeTime, decreseWeights);
+        Timer exe = new Timer(1, decreseWeights);
         exe.start();
         for (int i = 0; i < tools.length; i++) {
             tools[i] = new JToggleButton();
@@ -124,6 +130,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         txtConsole = new javax.swing.JTextArea();
         jToolBar1 = new javax.swing.JToolBar();
+        sldrWeightSpeed = new javax.swing.JSlider();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -215,11 +222,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
         pnlGraph.setLayout(pnlGraphLayout);
         pnlGraphLayout.setHorizontalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 572, Short.MAX_VALUE)
+            .addGap(0, 557, Short.MAX_VALUE)
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 301, Short.MAX_VALUE)
+            .addGap(0, 287, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(pnlGraph);
@@ -236,6 +243,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
         jToolBar1.setFloatable(false);
         jToolBar1.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jToolBar1.setRollover(true);
+
+        sldrWeightSpeed.setMaximum(950);
+        sldrWeightSpeed.setValue(500);
 
         mnuFile.setText("File");
 
@@ -309,12 +319,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addComponent(btnPrintList))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)))
+                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -323,9 +334,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE))
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReset)
@@ -1103,6 +1116,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem mnuSave;
     private javax.swing.JMenuItem mnuSaveAs;
     private javax.swing.JPanel pnlGraph;
+    private javax.swing.JSlider sldrWeightSpeed;
     private javax.swing.JTextArea txtConsole;
     private javax.swing.JTextField txtQuery;
     // End of variables declaration//GEN-END:variables

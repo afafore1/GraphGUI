@@ -41,7 +41,6 @@ public class Model {
     public static boolean algCalled = false;
     public static double dotOffset = 0.0;
     public static Algorithms alg;
-    public static int pChangeTime = 300;
     public static int time = 0;
     public static int toolType = -1;
     public static HashMap<Integer, Vertex> vertices;
@@ -57,7 +56,7 @@ public class Model {
     public static HashSet<Vertex> uSNodes; // unsettled
     public static HashSet<Vertex> sNodes; // settled
     public static HashMap<Vertex, Integer> dist; // distance
-
+    public static int decreaseWeightEllapse = 0;
     public static GraphifyGUI graph;
 
     public static final int TOOL_NONE = -1;
