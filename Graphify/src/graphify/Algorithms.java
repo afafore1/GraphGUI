@@ -354,7 +354,7 @@ public class Algorithms {
         Model.graph.printlnConsole("Capacity transfered is " + capacity);
         Model.glowMap.clear();
         Model.glowMap = (HashMap) Model.setShortestPath.clone();
-//        Model.setShortestPath.keySet().stream().forEach((i) -> {
+//        Model.setShortestPath.keySet().stream().forEachw((i) -> {
 //            Model.edges.stream().filter((edge) -> (edge.getSource() == Model.vertices.get(i)
 //                    && edge.getDest()== Model.vertices.get(Model.setShortestPath.get(i))
 //                    || edge.getDest() == Model.vertices.get(i)
