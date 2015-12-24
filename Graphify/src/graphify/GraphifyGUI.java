@@ -103,8 +103,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
             jToolBar1.add(tools[i]);
         }
         tools[0].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/vertex.png")));
+        tools[0].setToolTipText("Place Vertex");
         tools[1].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/bidirectional.png")));
+        tools[1].setToolTipText("Bidirectonal");
         tools[2].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/directional.png")));
+        tools[2].setToolTipText("Directional");
     }
     
     @SuppressWarnings("unchecked")
