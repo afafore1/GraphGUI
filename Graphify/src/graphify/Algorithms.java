@@ -147,7 +147,7 @@ public class Algorithms {
             for (Iterator<Edge> currentList = current.eList().iterator(); currentList.hasNext();) {
                 Edge t = currentList.next();
                 Vertex next = getConn(current, t);
-                if (!t.isFailed()) {                    
+                if (!t.isFailed()) {
                     if (next.wasVisited == false) {
                         next.wasVisited = true;
                         Model.queue.add(next);
@@ -353,23 +353,16 @@ public class Algorithms {
                 Model.Capacity += getpAmount(Model.vertices.get(i).parent, Model.vertices.get(i));
             }
         }
+
         Model.graph.setlblCapTransferred(String.valueOf(Model.Capacity));
-        if(Model.tempCap < Model.Capacity){
+        if (Model.tempCap < Model.Capacity) {
             Model.graph.setlblCapTransferredColor(Color.blue);
-        }else{
+        } else {
             Model.graph.setlblCapTransferredColor(Color.red);
         }
         Model.tempCap = Model.Capacity;
         Model.glowMap.clear();
         Model.glowMap = (HashMap) Model.setShortestPath.clone();
-//        Model.setShortestPath.keySet().stream().forEachw((i) -> {
-//            Model.edges.stream().filter((edge) -> (edge.getSource() == Model.vertices.get(i)
-//                    && edge.getDest()== Model.vertices.get(Model.setShortestPath.get(i))
-//                    || edge.getDest() == Model.vertices.get(i)
-//                            && edge.getSource() == Model.vertices.get(Model.setShortestPath.get(i)))).forEach((edge) -> {
-////                                Model.glowMap.add(edge);
-//                            });
-//        });
         Model.graph.graph();
     }
 
