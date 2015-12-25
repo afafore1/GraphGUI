@@ -134,6 +134,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         jToolBar1 = new javax.swing.JToolBar();
         sldrWeightSpeed = new javax.swing.JSlider();
         jLabel1 = new javax.swing.JLabel();
+        lblCapacity = new javax.swing.JLabel();
+        lblCapTransferred = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -250,7 +252,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
         sldrWeightSpeed.setMaximum(950);
         sldrWeightSpeed.setValue(500);
 
-        jLabel1.setText("Weight Changing Speed");
+        jLabel1.setText("Cost Change Speed");
+
+        lblCapacity.setText("Capacity Transferred");
 
         mnuFile.setText("File");
 
@@ -330,9 +334,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel1)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(lblCapacity))
                         .addGap(18, 18, 18)
-                        .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCapTransferred))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -345,9 +353,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addGap(38, 38, 38)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblCapacity)
+                            .addComponent(lblCapTransferred)))
+                    .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReset)
                     .addComponent(btnPrintList)
@@ -1068,6 +1081,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
     }
     
+    public void setlblCapTransferred(String txt){
+        lblCapTransferred.setText(txt);
+    }
+    
+    public void setlblCapTransferredColor(Color c){
+        lblCapTransferred.setForeground(c);
+    }
+    
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -1117,6 +1138,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JComboBox<String> jcbAlgo;
+    private javax.swing.JLabel lblCapTransferred;
+    private javax.swing.JLabel lblCapacity;
     private java.awt.Label lblInfo;
     private javax.swing.JMenu mnuFile;
     private javax.swing.JMenuItem mnuNew;

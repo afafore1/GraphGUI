@@ -5,6 +5,7 @@
  */
 package graphify;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -134,21 +135,22 @@ public class Algorithms {
 
     public static void Bfs(Vertex source) {
         reset();
-        Model.suggestQueue = new LinkedList<>(); // FIFO
+        Model.queue = new LinkedList<>(); // FIFO
         source.wasVisited = true; // marked as Model.visited
-        Model.suggestQueue.add(source); // put into queue
+        Model.queue.add(source); // put into queue
         source.parent = source; // setShortestPath parent
         Model.conn = new ArrayList<>();
-        while (!Model.suggestQueue.isEmpty()) { // source
-            Vertex current = Model.suggestQueue.poll(); // remove first 
+        System.err.println("new line");
+        while (!Model.queue.isEmpty()) { // source
+            Vertex current = Model.queue.poll(); // remove first 
             Model.conn.add(current.getId());
             for (Iterator<Edge> currentList = current.eList().iterator(); currentList.hasNext();) {
                 Edge t = currentList.next();
-                if (!t.isFailed()) {
-                    Vertex next = getConn(current, t);
+                Vertex next = getConn(current, t);
+                if (!t.isFailed()) {                    
                     if (next.wasVisited == false) {
                         next.wasVisited = true;
-                        Model.suggestQueue.add(next);
+                        Model.queue.add(next);
                         next.parent = current;
                     }
                 }
@@ -337,21 +339,27 @@ public class Algorithms {
     }
 
     public static void shortestPath(int v, int e) {
+        Model.Capacity = 0;
         if (e == v) {
             Model.graph.printlnConsole(v + "-->" + v);
             return;
         }
-        int capacity = 0;
         for (int i = e; i >= 0; i = Model.vertices.get(i).getParent().getId()) {
             if (i == v) {
                 break;
             }
             if (Model.vertices.get(i).getParent().getId() != -1) {
                 Model.setShortestPath.put(Model.vertices.get(i).getParent(), Model.vertices.get(i));
-                capacity += getpAmount(Model.vertices.get(i).parent, Model.vertices.get(i));
+                Model.Capacity += getpAmount(Model.vertices.get(i).parent, Model.vertices.get(i));
             }
         }
-        Model.graph.printlnConsole("Capacity transfered is " + capacity);
+        Model.graph.setlblCapTransferred(String.valueOf(Model.Capacity));
+        if(Model.tempCap < Model.Capacity){
+            Model.graph.setlblCapTransferredColor(Color.blue);
+        }else{
+            Model.graph.setlblCapTransferredColor(Color.red);
+        }
+        Model.tempCap = Model.Capacity;
         Model.glowMap.clear();
         Model.glowMap = (HashMap) Model.setShortestPath.clone();
 //        Model.setShortestPath.keySet().stream().forEachw((i) -> {
@@ -370,6 +378,7 @@ public class Algorithms {
             v.wasVisited = false;
         });
         Model.setShortestPath.clear();
+        Model.glowMap.clear();
     }
 
     static boolean isConnected() {
