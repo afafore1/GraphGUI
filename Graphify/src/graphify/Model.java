@@ -53,7 +53,6 @@ public class Model {
     public static HashSet<String> bconn;
     //for dijkstra
     public static int Capacity = 0;
-    public static int tempCap = 0;
     public static HashSet<Vertex> uSNodes; // unsettled
     public static HashSet<Vertex> sNodes; // settled
     public static HashMap<Vertex, Integer> dist; // distance

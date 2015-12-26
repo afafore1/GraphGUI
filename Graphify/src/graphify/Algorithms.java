@@ -22,8 +22,12 @@ public class Algorithms {
 
     /**
      *
-     * @param source
-     * @return returns the edges connected to this source
+     * @param u
+     * @param visited
+     * @param disc
+     * @param low
+     * @param parent
+     * @param ap
      */
     public static void APF(int u, HashMap<Integer, Integer> visited, HashMap<Integer, Integer> disc, HashMap<Integer, Integer> low, HashMap<Integer, Integer> parent, HashMap<Integer, Integer> ap) {
         int children = 0;
@@ -238,14 +242,14 @@ public class Algorithms {
     // find min distance
     public static void findMinDist(Vertex v) {
         List<Vertex> neighbors = getNeighbors(v);
-        for (Vertex t : neighbors) {
+        neighbors.stream().forEach((t) -> {
             int combWeight = GSD(v) + getWeight(v, t);
             if (GSD(t) > combWeight) {
                 Model.dist.put(t, GSD(v) + getWeight(v, t));
                 t.parent = v;
                 Model.uSNodes.add(t);
             }
-        }
+        });
     }
 
     public static Vertex getMin(HashSet<Vertex> v) {
@@ -355,12 +359,11 @@ public class Algorithms {
         }
 
         Model.graph.setlblCapTransferred(String.valueOf(Model.Capacity));
-        if (Model.tempCap < Model.Capacity) {
-            Model.graph.setlblCapTransferredColor(Color.blue);
-        } else {
+        if (Model.Capacity <= Model.vertices.get(e).getCapacity()) {
             Model.graph.setlblCapTransferredColor(Color.red);
+        } else {
+            Model.graph.setlblCapTransferredColor(Color.blue);
         }
-        Model.tempCap = Model.Capacity;
         Model.glowMap.clear();
         Model.glowMap = (HashMap) Model.setShortestPath.clone();
         Model.graph.graph();

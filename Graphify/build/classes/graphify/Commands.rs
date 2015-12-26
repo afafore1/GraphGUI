@@ -1,2 +1,0 @@
-graphify.Types
-graphify.Commands
