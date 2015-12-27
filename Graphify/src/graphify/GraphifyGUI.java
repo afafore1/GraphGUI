@@ -748,10 +748,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     if (Model.node1 != -1) {
                         Model.node2 = Model._selectedNode;
                         try {
-                            Double newWeight = Double.parseDouble(JOptionPane.showInputDialog(this, "Input Weight:"));
+                            String newWeight = JOptionPane.showInputDialog(this, "Input Weight:");
+                            if(newWeight == null){
+                                break;
+                            }
+                            Integer weight = Integer.parseInt(newWeight);
                             for (Edge e : Model.edges) {
                                 if (e.getSource() == Model.vertices.get(Model.node1) && e.getDest() == Model.vertices.get(Model.node2)) {
-                                    e.setWeight(newWeight.intValue());
+                                    e.setWeight(weight);
                                     break;
                                 }
                             }
