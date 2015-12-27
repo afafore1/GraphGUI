@@ -747,8 +747,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 if (Model._selectedNode != -1) {
                     if (Model.node1 != -1) {
                         Model.node2 = Model._selectedNode;
-                        System.out.println("node selected " + Model.node1);
-                        System.out.println("node selected " + Model.node2);
                         try {
                             Double newWeight = Double.parseDouble(JOptionPane.showInputDialog(this, "Input Weight:"));
                             for (Edge e : Model.edges) {
