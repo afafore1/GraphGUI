@@ -736,6 +736,16 @@ public class GraphifyGUI extends javax.swing.JFrame {
             case KeyEvent.VK_N:
                 clearTools();
                 break;
+            case KeyEvent.VK_I:
+                if(Model._selectedNode != -1){
+                    double newWeight = Double.parseDouble(JOptionPane.showInputDialog(this, "Input Weight:"));
+                    for(Edge e : Model.edges){
+                        if(e.getSource() == Model.vertices.get(Model._selectedNode)){
+                            e.setWeight((int)newWeight);
+                        }
+                    }
+                }
+                break;
             default:
                 break;
         }

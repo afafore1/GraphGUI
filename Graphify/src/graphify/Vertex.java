@@ -160,7 +160,7 @@ class Edge implements Serializable {
     private final int id;
     private final Vertex source;
     private final Vertex dest;
-    private final int weight;
+    private int weight;
     private int pheromoneAmount;
     private boolean fail;
     private double glowLevel = 0;
@@ -206,6 +206,10 @@ class Edge implements Serializable {
 
     public int getWeight() {
         return weight;
+    }
+    
+    public void setWeight(int w){
+        this.weight = w;
     }
 
     public String getConnections() {
