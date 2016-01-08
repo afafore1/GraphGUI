@@ -17,6 +17,7 @@ public class Model {
     public static Queue<Vertex> queue;
     public static Stack<Vertex> stack;
     public static String sim = null;
+    public static boolean startSA = false;
     public static HashMap<Integer, Integer> distTo;
     public static HashMap<Integer, Integer> visited;
     public static HashMap<Integer, Integer> color;
@@ -51,6 +52,9 @@ public class Model {
     public static Map<Integer, Integer> set;
     public static ArrayList<Integer> conn;
     public static HashSet<String> bconn;
+    public static int pathvalue = 0;
+    public static HashMap<Vertex, Vertex> tempShortPath;
+    public static HashMap<Integer, HashMap<Vertex, Vertex>> disjointPaths = new HashMap<>();
     //for dijkstra
     public static int Capacity = 0;
     public static int node1 = -1;
@@ -60,6 +64,9 @@ public class Model {
     public static HashMap<Vertex, Integer> dist; // distance
     public static int decreaseWeightEllapse = 0;
     public static GraphifyGUI graph;
+    
+    //for TSP
+    
 
     public static final int TOOL_NONE = -1;
     public static final int TOOL_VERTEX = 0;

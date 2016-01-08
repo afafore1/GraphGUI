@@ -19,7 +19,7 @@ import java.io.Serializable;
 public class Vertex implements Serializable {
 
     public String label;
-    public boolean wasVisited;
+    private boolean wasVisited;
     public Vertex parent;
     private Point location;
     private HashSet<Edge> eList;
@@ -43,6 +43,14 @@ public class Vertex implements Serializable {
         this.eList = new HashSet<>();
     }
 
+    
+    public int getX(){
+        return this.location.x;
+    }
+    
+    public int getY(){
+        return this.location.y;
+    }
     public String getLabel() {
         return (this.label + " ");
     }
@@ -55,7 +63,14 @@ public class Vertex implements Serializable {
     public String getName() {
         return this.label;
     }
-
+    
+    public boolean visited(){
+        return this.wasVisited;
+    }
+    
+    public void setVisited(boolean bool){
+        this.wasVisited = bool;
+    }
     /**
      *
      * @return 

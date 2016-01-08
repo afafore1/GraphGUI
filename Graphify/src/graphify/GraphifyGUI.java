@@ -140,6 +140,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         lblCapacity = new javax.swing.JLabel();
         lblCapTransferred = new javax.swing.JLabel();
+        rbtnSA = new javax.swing.JRadioButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -166,7 +167,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         });
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "DFS", "Dijkstra", "Connectedness" }));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "OtherBfs", "DFS", "Dijkstra", "Connectedness" }));
         jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbAlgoActionPerformed(evt);
@@ -235,7 +236,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 270, Short.MAX_VALUE)
+            .addGap(0, 276, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(pnlGraph);
@@ -259,6 +260,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
         jLabel1.setText("Cost Change Speed");
 
         lblCapacity.setText("Capacity Transferred");
+
+        rbtnSA.setText("SA");
+        rbtnSA.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbtnSAActionPerformed(evt);
+            }
+        });
 
         mnuFile.setText("File");
 
@@ -338,6 +346,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(rbtnSA)
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
                             .addComponent(lblCapacity))
@@ -353,12 +363,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE))
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(rbtnSA))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblCapacity)
@@ -472,11 +484,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
             if (Model.toolType == Model.TOOL_VERTEX) {
                 if (Model._selectedNode < 0) {
                     Model.changesMade = true;
-                    //nodes.put(Model.id, new HashSet());
                     Vertex v = new Vertex(Model.id, new Point(evt.getX(), evt.getY()), String.valueOf(Model.id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
                     Model.vertices.put(v.getId(), v);
                     Model.id++;
-                } else if (evt.isControlDown() && evt.isShiftDown()) { // control shift to fail all Model.edges leading out of a vertex
+                } else if (evt.isControlDown() && evt.isShiftDown()) { // control shift to fail all edges leading out of a vertex
                     Vertex fail = Model.vertices.get(Model._selectedNode);
                     if (Model.failed.contains(fail)) {
                         Model.failed.remove(fail);
@@ -529,7 +540,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
             if (Model._selectedNode >= 0) {
                 int destination = nodeSelected(evt.getX(), evt.getY());
                 if (destination >= 0 && destination != Model._selectedNode) {
-                    Model.weight = (int) (Math.random() * 100);
+                    int xDistance = Math.abs(Model.vertices.get(Model._selectedNode).getX() - Model.vertices.get(destination).getX());
+                    int yDistance = Math.abs(Model.vertices.get(Model._selectedNode).getY() - Model.vertices.get(destination).getY());
+                    Model.weight = (int) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
                     int pAmount = (int) (Math.random() * 40 + 1);
                     addEdge(Model.Edgeid, Model._selectedNode, destination, pAmount, Model.weight);
                     Model._selectedNode = -1;
@@ -562,6 +575,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Model.visited.clear();
         Model.set.clear();
         Model.cutV.clear();
+        if (rbtnSA.isSelected()) {
+            TSP_SA.start();
+        }else
         switch (x) {
             case "DFS":
                 txtConsole.setText("");
@@ -588,6 +604,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
                 Algorithms.Bfs(Model.vertices.get(Model._source));
                 Algorithms.shortestPath(Model._source, Model._dest);
+                break;
+            case "OtherBfs":
+                txtConsole.setText("");
+                Algorithms.disJointshortestPath(Model._source, Model._dest);
                 break;
             case "Dijkstra":
                 txtConsole.setText("");
@@ -687,8 +707,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Model.cutV.clear();
         printlnConsole(Commands.action(query, Model.vertices.get(Model._source), Model.vertices));
         graph();
-        //String nodeNum = JOptionPane.showInputDialog(null, "Enter number of nodes");
-        // randomize(Integer.parseInt(nodeNum));        
     }//GEN-LAST:event_txtQueryActionPerformed
 
     private void pnlGraphKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pnlGraphKeyPressed
@@ -749,7 +767,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         Model.node2 = Model._selectedNode;
                         try {
                             String newWeight = JOptionPane.showInputDialog(this, "Input Weight:");
-                            if(newWeight == null){
+                            if (newWeight == null) {
                                 break;
                             }
                             Integer weight = Integer.parseInt(newWeight);
@@ -773,7 +791,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
         graph();
     }//GEN-LAST:event_pnlGraphKeyPressed
 
-    private void addEdge(Integer edgeId, Integer sourceid, Integer destid, Integer pAmount, final Integer weight) {
+    private void rbtnSAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnSAActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_rbtnSAActionPerformed
+
+    private void addEdge(Integer edgeId, Integer sourceid, Integer destid, Integer pAmount, int weight) {
         Edge newEdge = new Edge(edgeId, Model.vertices.get(sourceid), Model.vertices.get(destid), pAmount, weight, false);
         if (Model.toolType == Model.TOOL_BIDIRECTIONAL) {
             newEdge.setBidirectional(true);
@@ -909,7 +931,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             if (e.getBidirectional()) {
                 drawArrowOnGraphics(bufferGraphic, dest.x, dest.y, source.x, source.y);
             }
-            int edgeWeight = e.getWeight();
+            double edgeWeight = e.getWeight();
             if (!(edgeWeight == -1)) {
                 bufferGraphic.setColor(
                         new Color(180, 30, 255, (int) (e.getGlowLevel() * 255)));
@@ -1180,6 +1202,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem mnuSave;
     private javax.swing.JMenuItem mnuSaveAs;
     private javax.swing.JPanel pnlGraph;
+    private javax.swing.JRadioButton rbtnSA;
     private javax.swing.JSlider sldrWeightSpeed;
     private javax.swing.JTextArea txtConsole;
     private javax.swing.JTextField txtQuery;
