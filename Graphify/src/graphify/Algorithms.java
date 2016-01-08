@@ -103,7 +103,7 @@ public class Algorithms {
         reset();
         Model.stack = new Stack<>();
         Model.bconn = new HashSet<>();
-        source.wasVisited = true;
+        source.setVisited(true);
         source.parent = source;
         Model.stack.push(source);
         while (!Model.stack.isEmpty()) {
@@ -117,11 +117,11 @@ public class Algorithms {
                     Edge t = currentList.next();
                     if (!t.isFailed()) {
                         Vertex next = getConn(current, t);
-                        if (!next.wasVisited) { // visited just one at a time
+                        if (next.visited() == false) { // visited just one at a time
                             Model.graph.printlnConsole("Pushing " + next.getName());
                             Model.stack.push(next);
                             next.parent = current;
-                            next.wasVisited = true;
+                            next.setVisited(true);
                             break;
                         }
                         if (!currentList.hasNext()) {
@@ -140,7 +140,7 @@ public class Algorithms {
     public static void Bfs(Vertex source) {
         reset();
         Model.queue = new LinkedList<>(); // FIFO
-        source.wasVisited = true; // marked as Model.visited
+        source.setVisited(true); // marked as Model.visited
         Model.queue.add(source); // put into queue
         source.parent = source; // setShortestPath parent
         Model.conn = new ArrayList<>();
@@ -152,8 +152,8 @@ public class Algorithms {
                 Edge t = currentList.next();
                 Vertex next = getConn(current, t);
                 if (!t.isFailed()) {
-                    if (next.wasVisited == false) {
-                        next.wasVisited = true;
+                    if (next.visited() == false) {
+                        next.setVisited(true);
                         Model.queue.add(next);
                         next.parent = current;
                     }
@@ -163,6 +163,98 @@ public class Algorithms {
         Model.graph.printlnConsole("Order is " + Model.conn);
     }
     
+
+    public static boolean pathExist(Vertex source, Vertex dest) {
+        Model.vertices.values().stream().forEach((v) -> {
+            v.setVisited(false);
+        });
+        Model.queue = new LinkedList<>(); // FIFO
+        source.setVisited(true); // marked as Model.visited
+        Model.queue.add(source); // put into queue
+        while (!Model.queue.isEmpty()) { // source
+            Vertex current = Model.queue.poll(); // remove first 
+            for (Iterator<Edge> currentList = current.eList().iterator(); currentList.hasNext();) {
+                Edge t = currentList.next();
+                if (!t.isFailed()) {
+                    Vertex next = getConn(current, t);
+                    if (next == dest) {
+                        return true; // a path exist
+                    } else {
+                        if (next.visited() == false) {
+                            next.setVisited(true);
+                            Model.queue.add(next);
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static void disjointPathBfs(Vertex source) {
+        Model.vertices.values().stream().forEach((v) -> {
+            v.setVisited(false);
+        });
+        Model.tempShortPath = new HashMap<>();
+        Model.queue = new LinkedList<>(); // FIFO
+        source.setVisited(true); // marked as Model.visited
+        Model.queue.add(source); // put into queue
+        source.parent = source; // setShortestPath parent
+        Model.conn = new ArrayList<>();
+        while (!Model.queue.isEmpty()) { // source
+            Vertex current = Model.queue.poll(); // remove first 
+            Model.conn.add(current.getId());
+            for (Iterator<Edge> currentList = current.eList().iterator(); currentList.hasNext();) {
+                Edge t = currentList.next();
+                Vertex next = getConn(current, t);
+                if (!t.isFailed()) {
+                    if (next.visited() == false) {
+                        next.setVisited(true);
+                        Model.queue.add(next);
+                        next.parent = current;
+                    }
+                }
+            }
+        }
+        Model.graph.printlnConsole("Order is " + Model.conn);
+    }
+
+    public static Edge getEdge(Vertex s, Vertex d) {
+        for (Edge edge : Model.edges) {
+            if (edge.getSource() == s && edge.getDest() == d) {
+                return edge;
+            }
+        }
+        return null;
+    }
+
+    public static void disJointshortestPath(int v, int e) {
+        while (pathExist(Model.vertices.get(v), Model.vertices.get(e)) == true) {
+            System.out.println("Running ..");
+            disjointPathBfs(Model.vertices.get(v));
+            System.out.println("done!\nStarting shortest path");
+            for (int i = e; i >= 0; i = Model.vertices.get(i).getParent().getId()) {
+                if (i == v) {
+                    break;
+                }
+                if (Model.vertices.get(i).getParent().getId() != -1) {
+                    Edge failedge = getEdge(Model.vertices.get(i).getParent(), Model.vertices.get(i));
+                    if (failedge != null) {
+                        failedge.setFailed(true);
+                    }
+                    Model.tempShortPath.put(Model.vertices.get(i).getParent(), Model.vertices.get(i));
+                }
+            }
+            Model.glowMap.clear();
+            Model.glowMap = (HashMap) Model.tempShortPath.clone();
+            Model.graph.graph();
+            Model.disjointPaths.put(Model.pathvalue, Model.tempShortPath);
+            Model.pathvalue++;
+        }
+        System.out.println("No path exist!");
+        System.out.println("paths are " + Model.disjointPaths);
+
+    }
 
     /**
      *
@@ -277,7 +369,7 @@ public class Algorithms {
     public static ArrayList BfsSuggeest(Vertex source, int num) {
         reset();
         Model.suggestQueue = new LinkedList<>(); // FIFO
-        source.wasVisited = true; // marked as Model.visited
+        source.setVisited(true); // marked as Model.visited
         Model.suggestQueue.add(source); // put into queue
         source.parent = source; // setShortestPath parent
         Model.conn = new ArrayList<>();
@@ -287,8 +379,8 @@ public class Algorithms {
             while (currentList.hasNext()) {
                 Edge t = currentList.next();
                 Vertex next = getConn(current, t);
-                if (next.wasVisited == false) {
-                    next.wasVisited = true;
+                if (next.visited() == false) {
+                    next.setVisited(true);
                     Model.suggestQueue.add(next);
                     next.parent = current;
                     if (!source.eList().contains(t)) {
@@ -371,9 +463,12 @@ public class Algorithms {
     }
 
     public static void reset() {
-        Model.vertices.values().stream().forEach((v) -> {
-            v.wasVisited = false;
-        });
+        for (Vertex v : Model.vertices.values()) {
+            v.setVisited(false);
+        }
+        for (Edge e : Model.edges){
+            e.setFailed(false);
+        }
         Model.setShortestPath.clear();
         Model.glowMap.clear();
     }
@@ -384,7 +479,7 @@ public class Algorithms {
         Iterator<Vertex> vert = Model.vertices.values().iterator();
         while (vert.hasNext()) {
             Vertex key = vert.next();
-            if (!key.wasVisited) {
+            if (!key.visited()) {
                 return false;
             }
         }
