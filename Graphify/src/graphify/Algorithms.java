@@ -162,6 +162,7 @@ public class Algorithms {
         }
         Model.graph.printlnConsole("Order is " + Model.conn);
     }
+    
 
     /**
      *
