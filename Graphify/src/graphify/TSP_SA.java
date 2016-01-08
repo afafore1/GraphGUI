@@ -5,8 +5,6 @@
  */
 package graphify;
 
-import java.util.Iterator;
-
 /**
  *
  * @author Ayomitunde
@@ -15,6 +13,8 @@ public class TSP_SA {
 
     static double temp = 10000;
     static double coolingRate = 0.003;
+    static int InitialDistanceValue = 0;
+    static int FinalDistanceValue = 0;
 
     public static double acceptanceProbablity(int energy, int newEnergy, double temperature) {
         if (newEnergy < energy) {
@@ -25,28 +25,24 @@ public class TSP_SA {
     
     public static void setPath(Tour best){
         Model.glowMap.clear();
-        for(Iterator<Vertex> vert = best.getTour().iterator(); vert.hasNext(); ){
-            Vertex next = vert.next();
-            if(!vert.hasNext()){
-                next.parent = best.getTour().get(0);
+        for(int i = 0; i < best.getTour().size(); i++){
+            Vertex next = best.getTour().get(i);
+            Vertex parent;
+            if(i+1 != best.getTour().size()){
+                parent = best.getTour().get(i+1);
+            }else{
+                parent = best.getTour().get(0);
             }
-            next.parent = vert.next();
-        }
-        int startIndex = best.getTour().get(0).getId();
-        int endIndex = best.getTour().get(best.getTour().size() -1).getId();
-        for(int i = startIndex ; i == endIndex ; i = Model.vertices.get(i).parent.getId()){
-            Model.glowMap.put(Model.vertices.get(i), Model.vertices.get(i).parent);
+            Model.glowMap.put(next, parent);
         }
         Model.graph.graph();
-        //System.out.println(startIndex+" "+endIndex);
-        //Algorithms.shortestPath(startIndex, endIndex);
     }
 
     public static void start() {
         Tour currentSolution = new Tour();
         currentSolution.generateIndividual();
         Model.graph.printlnConsole("Initial Solution distance: "+currentSolution.getTourDistance());
-        
+        InitialDistanceValue = currentSolution.getTourDistance();
         Tour best = new Tour(currentSolution.getTour());
         setPath(best);
         while(temp > 1){
@@ -70,17 +66,15 @@ public class TSP_SA {
             
             if(currentSolution.getTourDistance() < best.getTourDistance()){
                 best = new Tour(currentSolution.getTour());
-                //setPath(best);
+                setPath(best);
             }
             
             temp *= 1 - coolingRate;
         }
         Model.graph.printlnConsole("Final Solution: "+best.getTourDistance());
+        FinalDistanceValue = best.getTourDistance();
         Model.graph.printlnConsole("Tour: "+best);
         setPath(best);
-        for(Vertex v : best.getTour()){
-            Model.graph.printlnConsole(v.getName());
-        }
         
     }
 

@@ -52,6 +52,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         initComponents();
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
+        lblInitalDistance.setVisible(false);
+        lblFinalDistance.setVisible(false);
+        lblInitalDistValue.setVisible(false);
+        lblFinalDistValue.setVisible(false);
         Model.vertices = new HashMap<>();
         Model.edges = new ArrayList<>();
         Model.failed = new ArrayList<>();
@@ -141,6 +145,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         lblCapacity = new javax.swing.JLabel();
         lblCapTransferred = new javax.swing.JLabel();
         rbtnSA = new javax.swing.JRadioButton();
+        lblInitalDistance = new javax.swing.JLabel();
+        lblFinalDistance = new javax.swing.JLabel();
+        lblInitalDistValue = new javax.swing.JLabel();
+        lblFinalDistValue = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -232,11 +240,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
         pnlGraph.setLayout(pnlGraphLayout);
         pnlGraphLayout.setHorizontalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 601, Short.MAX_VALUE)
+            .addGap(0, 752, Short.MAX_VALUE)
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 276, Short.MAX_VALUE)
+            .addGap(0, 278, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(pnlGraph);
@@ -267,6 +275,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 rbtnSAActionPerformed(evt);
             }
         });
+
+        lblInitalDistance.setText("Initial Distance");
+
+        lblFinalDistance.setText("Final Distance");
+
+        lblInitalDistValue.setText("0");
+
+        lblFinalDistValue.setText("0");
 
         mnuFile.setText("File");
 
@@ -329,32 +345,45 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addGap(10, 10, 10)
                         .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnReset)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClearConsole, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnStart)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtQuery)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnPrintList))
+                        .addComponent(jSplitPane1))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(rbtnSA)
-                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnReset)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnClearConsole, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(rbtnSA)
+                                    .addComponent(lblFinalDistance)
+                                    .addComponent(lblInitalDistance))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(lblCapacity))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblCapTransferred))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnStart)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtQuery, javax.swing.GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnPrintList))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(160, 160, 160)
+                                .addComponent(lblCapTransferred)
+                                .addGap(200, 350, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(lblInitalDistValue, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
+                                    .addComponent(lblFinalDistValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1)
+                                    .addComponent(lblCapacity))
+                                .addGap(18, 18, 18)
+                                .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -363,20 +392,30 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE))
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblInitalDistValue)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblFinalDistValue))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(rbtnSA)
+                                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblInitalDistance)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblFinalDistance))
+                        .addGroup(layout.createSequentialGroup()
                             .addComponent(jLabel1)
-                            .addComponent(rbtnSA))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblCapacity)
-                            .addComponent(lblCapTransferred)))
-                    .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(25, 25, 25)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblCapacity))
+                        .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblCapTransferred)
+                .addGap(5, 5, 5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReset)
                     .addComponent(btnPrintList)
@@ -386,6 +425,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     .addComponent(txtQuery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lblFinalDistValue, lblInitalDistValue});
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -576,66 +617,71 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Model.set.clear();
         Model.cutV.clear();
         if (rbtnSA.isSelected()) {
+            lblInitalDistance.setVisible(true);
+            lblFinalDistance.setVisible(true);
             TSP_SA.start();
-        }else
-        switch (x) {
-            case "DFS":
-                txtConsole.setText("");
-                if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty()) {
-                    if (Model._source == -1) {
-                        printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
-                    } else {
-                        printlnConsole("Please choose a destination by double clicking a node");
+            lblInitalDistValue.setText(String.valueOf(TSP_SA.InitialDistanceValue));
+            lblFinalDistValue.setText(String.valueOf(TSP_SA.FinalDistanceValue));
+        } else {
+            switch (x) {
+                case "DFS":
+                    txtConsole.setText("");
+                    if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty()) {
+                        if (Model._source == -1) {
+                            printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
+                        } else {
+                            printlnConsole("Please choose a destination by double clicking a node");
+                        }
+                        return;
                     }
-                    return;
-                }
-                Algorithms.Dfs(Model.vertices.get(Model._source));
-                Algorithms.shortestPath(Model._source, Model._dest);
-                break;
-            case "BFS":
-                txtConsole.setText("");
-                if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty()) {
-                    if (Model._source == -1) {
-                        printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
-                    } else {
-                        printlnConsole("Please choose a destination by double clicking a node");
+                    Algorithms.Dfs(Model.vertices.get(Model._source));
+                    Algorithms.shortestPath(Model._source, Model._dest);
+                    break;
+                case "BFS":
+                    txtConsole.setText("");
+                    if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty()) {
+                        if (Model._source == -1) {
+                            printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
+                        } else {
+                            printlnConsole("Please choose a destination by double clicking a node");
+                        }
+                        return;
                     }
-                    return;
-                }
-                Algorithms.Bfs(Model.vertices.get(Model._source));
-                Algorithms.shortestPath(Model._source, Model._dest);
-                break;
-            case "OtherBfs":
-                txtConsole.setText("");
-                Algorithms.disJointshortestPath(Model._source, Model._dest);
-                break;
-            case "Dijkstra":
-                txtConsole.setText("");
-                if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty() || Model.vertices.get(Model._dest).eList().isEmpty()) {
-                    if (Model._source == -1) {
-                        printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
-                    } else {
-                        printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
+                    Algorithms.Bfs(Model.vertices.get(Model._source));
+                    Algorithms.shortestPath(Model._source, Model._dest);
+                    break;
+                case "OtherBfs":
+                    txtConsole.setText("");
+                    Algorithms.disJointshortestPath(Model._source, Model._dest);
+                    break;
+                case "Dijkstra":
+                    txtConsole.setText("");
+                    if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty() || Model.vertices.get(Model._dest).eList().isEmpty()) {
+                        if (Model._source == -1) {
+                            printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
+                        } else {
+                            printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
+                        }
+                        return;
                     }
-                    return;
-                }
-                Algorithms.execute(Model.vertices.get(Model._source));
-                Algorithms.shortestPath(Model._source, Model._dest);
-                break;
-            case "Connectedness":
-                txtConsole.setText("");
-                if (Model._source == -1) {
-                    printlnConsole("Please select a source to begin");
-                    return;
-                }
-                if (Algorithms.isConnected()) {
-                    printlnConsole("Graph is Connected");
-                } else {
-                    printlnConsole("Graph is a disconnected Graph");
-                }
-                break;
-            default:
-                break;
+                    Algorithms.execute(Model.vertices.get(Model._source));
+                    Algorithms.shortestPath(Model._source, Model._dest);
+                    break;
+                case "Connectedness":
+                    txtConsole.setText("");
+                    if (Model._source == -1) {
+                        printlnConsole("Please select a source to begin");
+                        return;
+                    }
+                    if (Algorithms.isConnected()) {
+                        printlnConsole("Graph is Connected");
+                    } else {
+                        printlnConsole("Graph is a disconnected Graph");
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }//GEN-LAST:event_btnStartActionPerformed
 
@@ -793,6 +839,18 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void rbtnSAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnSAActionPerformed
         // TODO add your handling code here:
+        if (rbtnSA.isSelected()) {
+            lblInitalDistance.setVisible(true);
+            lblFinalDistance.setVisible(true);
+            lblInitalDistValue.setVisible(true);
+            lblFinalDistValue.setVisible(true);
+        } else {
+            lblInitalDistance.setVisible(false);
+            lblFinalDistance.setVisible(false);
+            lblInitalDistValue.setVisible(false);
+            lblFinalDistValue.setVisible(false);
+        }
+
     }//GEN-LAST:event_rbtnSAActionPerformed
 
     private void addEdge(Integer edgeId, Integer sourceid, Integer destid, Integer pAmount, int weight) {
@@ -1194,7 +1252,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> jcbAlgo;
     private javax.swing.JLabel lblCapTransferred;
     private javax.swing.JLabel lblCapacity;
+    private javax.swing.JLabel lblFinalDistValue;
+    private javax.swing.JLabel lblFinalDistance;
     private java.awt.Label lblInfo;
+    private javax.swing.JLabel lblInitalDistValue;
+    private javax.swing.JLabel lblInitalDistance;
     private javax.swing.JMenu mnuFile;
     private javax.swing.JMenuItem mnuNew;
     private javax.swing.JMenuItem mnuOpen;
