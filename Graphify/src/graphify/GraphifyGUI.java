@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,6 +31,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
@@ -56,6 +58,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         lblFinalDistance.setVisible(false);
         lblInitalDistValue.setVisible(false);
         lblFinalDistValue.setVisible(false);
+        btnGenResult.setVisible(false);
         Model.vertices = new HashMap<>();
         Model.edges = new ArrayList<>();
         Model.failed = new ArrayList<>();
@@ -128,7 +131,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         jcbAlgo = new javax.swing.JComboBox<>();
         btnStart = new javax.swing.JButton();
         btnPrintList = new javax.swing.JButton();
-        txtQuery = new javax.swing.JTextField();
         jSplitPane1 = new javax.swing.JSplitPane();
         pnlGraph = new javax.swing.JPanel(){
             @Override
@@ -150,6 +152,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         lblInitalDistValue = new javax.swing.JLabel();
         lblFinalDistValue = new javax.swing.JLabel();
         rbtnTSP_GA = new javax.swing.JRadioButton();
+        btnGenResult = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -194,12 +197,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnPrintList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPrintListActionPerformed(evt);
-            }
-        });
-
-        txtQuery.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtQueryActionPerformed(evt);
             }
         });
 
@@ -294,6 +291,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         });
 
+        btnGenResult.setText("Generate Result");
+        btnGenResult.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGenResultActionPerformed(evt);
+            }
+        });
+
         mnuFile.setText("File");
 
         mnuNew.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
@@ -378,17 +382,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnStart)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtQuery, javax.swing.GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnPrintList))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnGenResult)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnPrintList, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(9, 9, 9))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(lblInitalDistValue, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
                                     .addComponent(lblFinalDistValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 264, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel1)
                                     .addComponent(lblCapacity))
@@ -437,11 +441,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 .addGap(11, 11, 11)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReset)
-                    .addComponent(btnPrintList)
+                    .addComponent(btnPrintList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnClearConsole)
                     .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnStart)
-                    .addComponent(txtQuery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnGenResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -704,6 +708,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     break;
             }
         }
+        btnGenResult.setVisible(true);
     }//GEN-LAST:event_btnStartActionPerformed
 
     private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintListActionPerformed
@@ -727,6 +732,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_mnuQuitActionPerformed
 
+    private void saveResult() throws IOException{
+        ImageIO.write((RenderedImage) bufferImage, "PNG", new File("Result.png"));
+    }
     private void mnuSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveAsActionPerformed
         saveAs();
     }//GEN-LAST:event_mnuSaveAsActionPerformed
@@ -764,17 +772,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
             Model.changesMade = false;
         }
     }//GEN-LAST:event_mnuNewActionPerformed
-
-    private void txtQueryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtQueryActionPerformed
-        //Model._source = -1;
-        Model._dest = -1;
-        Model.glowMap.clear();
-        String query = txtQuery.getText();
-        query = query.toLowerCase(); // perform all operations in lower case
-        Model.cutV.clear();
-        printlnConsole(Commands.action(query, Model.vertices.get(Model._source), Model.vertices));
-        graph();
-    }//GEN-LAST:event_txtQueryActionPerformed
 
     private void pnlGraphKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pnlGraphKeyPressed
         switch (evt.getKeyCode()) {
@@ -887,6 +884,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
             lblFinalDistValue.setVisible(false);
         }
     }//GEN-LAST:event_rbtnTSP_GAActionPerformed
+
+    private void btnGenResultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenResultActionPerformed
+        // TODO add your handling code here:
+        try {
+            saveResult();
+        } catch (IOException ex) {
+            Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnGenResultActionPerformed
 
     private void addEdge(Integer edgeId, Integer sourceid, Integer destid, Integer pAmount, int weight) {
         Edge newEdge = new Edge(edgeId, Model.vertices.get(sourceid), Model.vertices.get(destid), pAmount, weight, false);
@@ -1277,6 +1283,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClearConsole;
+    private javax.swing.JButton btnGenResult;
     private javax.swing.JButton btnPrintList;
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnStart;
@@ -1304,6 +1311,5 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JRadioButton rbtnTSP_GA;
     private javax.swing.JSlider sldrWeightSpeed;
     private javax.swing.JTextArea txtConsole;
-    private javax.swing.JTextField txtQuery;
     // End of variables declaration//GEN-END:variables
 }
