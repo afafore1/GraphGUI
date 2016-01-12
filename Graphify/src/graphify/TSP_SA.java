@@ -13,14 +13,12 @@ public class TSP_SA {
 
     static double temp = 10000;
     static double coolingRate = 0.003;
-    static int InitialDistanceValue = 0;
-    static int FinalDistanceValue = 0;
 
-    static void reset() {
+    private static void reset() {
         temp = 10000;
         coolingRate = 0.003;
-        InitialDistanceValue = 0;
-        FinalDistanceValue = 0;
+        Model.InitialDistanceValue = 0;
+        Model.FinalDistanceValue = 0;
     }
 
     public static double acceptanceProbablity(int energy, int newEnergy, double temperature) {
@@ -50,7 +48,7 @@ public class TSP_SA {
         Tour currentSolution = new Tour();
         currentSolution.generateIndividual();
         Model.graph.printlnConsole("Initial Solution distance: " + currentSolution.getTourDistance());
-        InitialDistanceValue = currentSolution.getTourDistance();
+        Model.InitialDistanceValue = currentSolution.getTourDistance();
         Tour best = new Tour(currentSolution.getTour());
         setPath(best);
         while (temp > 1) {
@@ -80,7 +78,7 @@ public class TSP_SA {
             temp *= 1 - coolingRate;
         }
         Model.graph.printlnConsole("Final Solution: " + best.getTourDistance());
-        FinalDistanceValue = best.getTourDistance();
+        Model.FinalDistanceValue = best.getTourDistance();
         Model.graph.printlnConsole("Tour: " + best);
         setPath(best);
 

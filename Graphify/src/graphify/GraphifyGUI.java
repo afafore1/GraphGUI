@@ -149,6 +149,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         lblFinalDistance = new javax.swing.JLabel();
         lblInitalDistValue = new javax.swing.JLabel();
         lblFinalDistValue = new javax.swing.JLabel();
+        rbtnTSP_GA = new javax.swing.JRadioButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -271,7 +272,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
         lblCapTransferred.setText("0");
 
-        rbtnSA.setText("SA");
+        rbtnSA.setText("TSP-SA");
         rbtnSA.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rbtnSAActionPerformed(evt);
@@ -285,6 +286,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
         lblInitalDistValue.setText("0");
 
         lblFinalDistValue.setText("0");
+
+        rbtnTSP_GA.setText("TSP-GA");
+        rbtnTSP_GA.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbtnTSP_GAActionPerformed(evt);
+            }
+        });
 
         mnuFile.setText("File");
 
@@ -361,15 +369,19 @@ public class GraphifyGUI extends javax.swing.JFrame {
                                 .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(rbtnSA)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(rbtnSA)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(rbtnTSP_GA))
                                     .addComponent(lblFinalDistance)
-                                    .addComponent(lblInitalDistance))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(lblInitalDistance))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnStart)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtQuery, javax.swing.GroupLayout.DEFAULT_SIZE, 546, Short.MAX_VALUE)
+                                .addComponent(txtQuery, javax.swing.GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnPrintList))
                             .addGroup(layout.createSequentialGroup()
@@ -401,7 +413,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(rbtnSA)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(rbtnSA)
+                                .addComponent(rbtnTSP_GA))
                             .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -622,11 +636,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Model.set.clear();
         Model.cutV.clear();
         if (rbtnSA.isSelected()) {
-            lblInitalDistance.setVisible(true);
-            lblFinalDistance.setVisible(true);
             TSP_SA.start();
-            lblInitalDistValue.setText(String.valueOf(TSP_SA.InitialDistanceValue));
-            lblFinalDistValue.setText(String.valueOf(TSP_SA.FinalDistanceValue));
+            lblInitalDistValue.setText(String.valueOf(Model.InitialDistanceValue));
+            lblFinalDistValue.setText(String.valueOf(Model.FinalDistanceValue));
+        } else if (rbtnTSP_GA.isSelected()) {
+            TSP_GA.start();
+            lblInitalDistValue.setText(String.valueOf(Model.InitialDistanceValue));
+            lblFinalDistValue.setText(String.valueOf(Model.FinalDistanceValue));
         } else {
             switch (x) {
                 case "DFS":
@@ -822,9 +838,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
                                 break;
                             }
                             Integer weight = Integer.parseInt(newWeight);
-                            for (Edge e : Model.edges) {
-                                if (e.getSource() == Model.vertices.get(Model.node1) && e.getDest() == Model.vertices.get(Model.node2)) {
-                                    e.setWeight(weight);
+                            for (Edge edge : Model.vertices.get(Model.node1).eList()) {
+                                if (edge.getDest() == Model.vertices.get(Model.node2)) {
+                                    edge.setWeight(weight);
                                     break;
                                 }
                             }
@@ -858,14 +874,29 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     }//GEN-LAST:event_rbtnSAActionPerformed
 
+    private void rbtnTSP_GAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnTSP_GAActionPerformed
+        if (rbtnTSP_GA.isSelected()) {
+            lblInitalDistance.setVisible(true);
+            lblFinalDistance.setVisible(true);
+            lblInitalDistValue.setVisible(true);
+            lblFinalDistValue.setVisible(true);
+        } else {
+            lblInitalDistance.setVisible(false);
+            lblFinalDistance.setVisible(false);
+            lblInitalDistValue.setVisible(false);
+            lblFinalDistValue.setVisible(false);
+        }
+    }//GEN-LAST:event_rbtnTSP_GAActionPerformed
+
     private void addEdge(Integer edgeId, Integer sourceid, Integer destid, Integer pAmount, int weight) {
         Edge newEdge = new Edge(edgeId, Model.vertices.get(sourceid), Model.vertices.get(destid), pAmount, weight, false);
+        Model.vertices.get(sourceid).eList().add(newEdge);
         if (Model.toolType == Model.TOOL_BIDIRECTIONAL) {
             newEdge.setBidirectional(true);
-            Model.vertices.get(destid).eList().add(newEdge);
+            Edge tempEdge = new Edge(edgeId, Model.vertices.get(destid), Model.vertices.get(sourceid), pAmount, weight, false);
+            Model.vertices.get(destid).eList().add(tempEdge);
         }
         Model.edges.add(newEdge);
-        Model.vertices.get(sourceid).eList().add(newEdge);
     }
 
     private void reduceIncreasepAmount() {
@@ -1270,6 +1301,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem mnuSaveAs;
     private javax.swing.JPanel pnlGraph;
     private javax.swing.JRadioButton rbtnSA;
+    private javax.swing.JRadioButton rbtnTSP_GA;
     private javax.swing.JSlider sldrWeightSpeed;
     private javax.swing.JTextArea txtConsole;
     private javax.swing.JTextField txtQuery;
