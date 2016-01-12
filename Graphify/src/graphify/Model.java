@@ -63,9 +63,13 @@ public class Model {
     public static HashSet<Vertex> sNodes; // settled
     public static HashMap<Vertex, Integer> dist; // distance
     public static int decreaseWeightEllapse = 0;
+    //classes
     public static GraphifyGUI graph;
-    
-    //for TSP
+    public static TSP_SA tsp_sa;
+    public static TSP_GA tsp_ga;
+    // distances
+    public static int InitialDistanceValue = 0;
+    public static int FinalDistanceValue = 0;
     
 
     public static final int TOOL_NONE = -1;
