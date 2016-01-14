@@ -1274,10 +1274,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         //</editor-fold>
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            Model.graph = new GraphifyGUI();
-            Model.graph.setLocationRelativeTo(null);
-            Model.graph.setExtendedState(MAXIMIZED_BOTH);
-            Model.graph.show();
+            Model.Gui = new GraphifyGUI();
+            Model.Gui.setLocationRelativeTo(null);
+            Model.Gui.setExtendedState(MAXIMIZED_BOTH);
+            Model.Gui.show();
         });
     }
 

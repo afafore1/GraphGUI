@@ -89,14 +89,14 @@ public class Algorithms {
         while (allNodes.hasNext()) {
             int key = allNodes.next();
             if (ap.get(key) == 1) {
-                Model.graph.printlnConsole(key + " is a cut vertex");
+                Model.Gui.printlnConsole(key + " is a cut vertex");
                 Model.cutV.add(key);
                 cutExist = true;
             }
         }
 
         if (cutExist == false) {
-            Model.graph.printlnConsole("No cut vertex in Graph");
+            Model.Gui.printlnConsole("No cut vertex in Graph");
         }
     }
 
@@ -109,17 +109,17 @@ public class Algorithms {
         Model.stack.push(source);
         while (!Model.stack.isEmpty()) {
             Vertex current = Model.stack.peek();
-            Model.graph.printlnConsole("Considering element " + current.getName());
+            Model.Gui.printlnConsole("Considering element " + current.getName());
             Model.bconn.add(current.getName());
             if (current.eList().isEmpty()) {
-                Model.graph.printlnConsole("Removing " + Model.stack.pop());
+                Model.Gui.printlnConsole("Removing " + Model.stack.pop());
             } else {
                 for (Iterator<Edge> currentList = current.eList().iterator(); currentList.hasNext();) {
                     Edge t = currentList.next();
                     if (!t.isFailed()) {
                         Vertex next = getConn(current, t);
                         if (next.visited() == false) { // visited just one at a time
-                            Model.graph.printlnConsole("Pushing " + next.getName());
+                            Model.Gui.printlnConsole("Pushing " + next.getName());
                             Model.stack.push(next);
                             next.parent = current;
                             next.setVisited(true);
@@ -127,7 +127,7 @@ public class Algorithms {
                         }
                         if (!currentList.hasNext()) {
                             Vertex backEdge = Model.stack.pop();
-                            Model.graph.printlnConsole("Back edge " + backEdge.getName());
+                            Model.Gui.printlnConsole("Back edge " + backEdge.getName());
                         }
                     } else {
                         Model.stack.pop();
@@ -135,7 +135,7 @@ public class Algorithms {
                 }
             }
         }
-        Model.graph.printlnConsole("order is " + Model.bconn);
+        Model.Gui.printlnConsole("order is " + Model.bconn);
     }
 
     public static void Bfs(Vertex source) {
@@ -161,7 +161,7 @@ public class Algorithms {
                 }
             }
         }
-        Model.graph.printlnConsole("Order is " + Model.conn);
+        Model.Gui.printlnConsole("Order is " + Model.conn);
     }
 
     public static boolean pathExist(Vertex source, Vertex dest) {
@@ -216,7 +216,7 @@ public class Algorithms {
                 }
             }
         }
-        Model.graph.printlnConsole("Order is " + Model.conn);
+        Model.Gui.printlnConsole("Order is " + Model.conn);
     }
 
     public static Edge getEdge(Vertex s, Vertex d) {
@@ -247,7 +247,7 @@ public class Algorithms {
             }
             Model.glowMap.clear();
             Model.glowMap = (HashMap) Model.tempShortPath.clone();
-            Model.graph.graph();
+            Model.Gui.graph();
             Model.disjointPaths.put(Model.pathvalue, Model.tempShortPath);
             Model.pathvalue++;
         }
@@ -411,7 +411,7 @@ public class Algorithms {
                             case 3:
                                 if (next.getType().equals(Types.Place.toString())) {
                                     if (Model.conn.isEmpty()) { // keep sorted always
-                                        Model.graph.printlnConsole("adding " + next.getId());
+                                        Model.Gui.printlnConsole("adding " + next.getId());
                                         Model.conn.add(next.getId());
                                     } else {
                                         Model.conn.add(next.getId());
@@ -440,7 +440,7 @@ public class Algorithms {
     public static void shortestPath(int v, int e) {
         Model.Capacity = 0;
         if (e == v) {
-            Model.graph.printlnConsole(v + "-->" + v);
+            Model.Gui.printlnConsole(v + "-->" + v);
             return;
         }
         for (int i = e; i >= 0; i = Model.vertices.get(i).getParent().getId()) {
@@ -453,15 +453,15 @@ public class Algorithms {
             }
         }
 
-        Model.graph.setlblCapTransferred(String.valueOf(Model.Capacity));
+        Model.Gui.setlblCapTransferred(String.valueOf(Model.Capacity));
         if (Model.Capacity <= Model.vertices.get(e).getCapacity()) {
-            Model.graph.setlblCapTransferredColor(Color.red);
+            Model.Gui.setlblCapTransferredColor(Color.red);
         } else {
-            Model.graph.setlblCapTransferredColor(Color.blue);
+            Model.Gui.setlblCapTransferredColor(Color.blue);
         }
         Model.glowMap.clear();
         Model.glowMap = (HashMap) Model.setShortestPath.clone();
-        Model.graph.graph();
+        Model.Gui.graph();
     }
 
     public static void reset() {

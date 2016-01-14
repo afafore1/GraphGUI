@@ -17,7 +17,7 @@ public class TSP_GA {
     public static void start(){
         reset();
         Population pop = new Population(Model.vertices.size(), true);
-        Model.graph.printlnConsole("Initial distance: "+pop.getFittest().getTourDistance());
+        Model.Gui.printlnConsole("Initial distance: "+pop.getFittest().getTourDistance());
         Model.InitialDistanceValue = pop.getFittest().getTourDistance();
         
         pop = GA.evolvePopulation(pop);
@@ -25,9 +25,9 @@ public class TSP_GA {
             pop = GA.evolvePopulation(pop);
         }
         
-        Model.graph.printlnConsole("Finished");
-        Model.graph.printlnConsole("Final distance: "+pop.getFittest().getTourDistance());
-        Model.graph.printlnConsole("Solution: \n"+pop.getFittest());
+        Model.Gui.printlnConsole("Finished");
+        Model.Gui.printlnConsole("Final distance: "+pop.getFittest().getTourDistance());
+        Model.Gui.printlnConsole("Solution: \n"+pop.getFittest());
         Model.FinalDistanceValue = pop.getFittest().getTourDistance();
     }
 }

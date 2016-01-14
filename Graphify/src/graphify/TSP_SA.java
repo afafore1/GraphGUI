@@ -40,14 +40,14 @@ public class TSP_SA {
             }
             Model.glowMap.put(next, parent);
         }
-        Model.graph.graph();
+        Model.Gui.graph();
     }
 
     public static void start() {
         reset();
         Tour currentSolution = new Tour();
         currentSolution.generateIndividual();
-        Model.graph.printlnConsole("Initial Solution distance: " + currentSolution.getTourDistance());
+        Model.Gui.printlnConsole("Initial Solution distance: " + currentSolution.getTourDistance());
         Model.InitialDistanceValue = currentSolution.getTourDistance();
         Tour best = new Tour(currentSolution.getTour());
         setPath(best);
@@ -77,9 +77,9 @@ public class TSP_SA {
 
             temp *= 1 - coolingRate;
         }
-        Model.graph.printlnConsole("Final Solution: " + best.getTourDistance());
+        Model.Gui.printlnConsole("Final Solution: " + best.getTourDistance());
         Model.FinalDistanceValue = best.getTourDistance();
-        Model.graph.printlnConsole("Tour: " + best);
+        Model.Gui.printlnConsole("Tour: " + best);
         setPath(best);
 
     }
