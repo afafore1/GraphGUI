@@ -926,7 +926,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void autoFailure() { // randomly fail nodes in the network
         if (Model._source > -1 && Model._dest > -1) {
-            if (Math.random() > 0.5) { // make probability of a node failure low
+            if (0.2 >= Math.random()) { // make probability of a node failure low
                 int vertexSize = Model.vertices.size();
                 Vertex v = null;
                 int rand = 0;
