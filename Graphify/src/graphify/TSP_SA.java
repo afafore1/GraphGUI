@@ -41,6 +41,7 @@ public class TSP_SA {
             Model.glowMap.put(next, parent);
         }
         Model.Gui.graph();
+<<<<<<< HEAD
     }
     
     public static void printTour(Tour best){
@@ -55,6 +56,8 @@ public class TSP_SA {
             Model.Gui.printConsole(next.getName()+"->"+parent.getName()+" |");
         }
         Model.Gui.printlnConsole("");
+=======
+>>>>>>> 97cee8a5085f65a639a8939d8e685973e4ea198e
     }
 
     public static void start() {
@@ -93,7 +96,10 @@ public class TSP_SA {
         }
         Model.Gui.printlnConsole("Final Solution: " + best.getTourDistance());
         Model.FinalDistanceValue = best.getTourDistance();
+<<<<<<< HEAD
         printTour(best);
+=======
+>>>>>>> 97cee8a5085f65a639a8939d8e685973e4ea198e
         Model.Gui.printlnConsole("Tour: " + best);
         setPath(best);
 
