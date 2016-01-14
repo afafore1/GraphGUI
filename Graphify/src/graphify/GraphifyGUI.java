@@ -90,8 +90,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 } else {
                     Model.decreaseWeightEllapse = 0;
                     reduceIncreasepAmount();
-                    autoFailure();
-                    autoHeal();
+                    //autoFailure();
+                    //autoHeal();
                     //graph();
                 }
             }
@@ -717,8 +717,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
             Vertex next = verts.next();
             printlnConsole(next.getName() + "->" + next.eList());
         }
-
-        printlnConsole("Source is: " + Model._source);
+        if(Model._source != -1){
+            printlnConsole("Source is: " + Model._source);
+        }        
     }//GEN-LAST:event_btnPrintListActionPerformed
 
     private void pnlGraphComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_pnlGraphComponentResized
@@ -1274,10 +1275,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         //</editor-fold>
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            Model.graph = new GraphifyGUI();
-            Model.graph.setLocationRelativeTo(null);
-            Model.graph.setExtendedState(MAXIMIZED_BOTH);
-            Model.graph.show();
+            Model.Gui = new GraphifyGUI();
+            Model.Gui.setLocationRelativeTo(null);
+            Model.Gui.setExtendedState(MAXIMIZED_BOTH);
+            Model.Gui.show();
         });
     }
 
