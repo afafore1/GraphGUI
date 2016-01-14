@@ -42,6 +42,19 @@ public class TSP_SA {
         }
         Model.Gui.graph();
     }
+    
+    public static void printTour(Tour best){
+        for(int i = 0; i < best.getTour().size(); i++){
+            Vertex next = best.getTour().get(i);
+            Vertex parent;
+            if (i + 1 != best.getTour().size()) {
+                parent = best.getTour().get(i + 1);
+            } else {
+                parent = best.getTour().get(0);
+            }
+            Model.Gui.printConsole(next.getName()+"->"+parent.getName()+" |");
+        }
+    }
 
     public static void start() {
         reset();
