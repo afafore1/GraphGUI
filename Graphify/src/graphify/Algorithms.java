@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import java.util.function.Consumer;
 
 /**
  *
@@ -299,7 +300,9 @@ public class Algorithms {
     public static int getWeight(Vertex s, Vertex d) {
         for (Edge e : Model.edges) {
             if (e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s) {
-                return e.getWeight() / e.getpheromoneAmount();
+                double logSum = Math.log(e.getWeight()/e.getpheromoneAmount());
+                int result = (int)(e.getWeight() + logSum);
+                return result;
             }
         }
         return -1; // edge does not exist then
@@ -334,9 +337,9 @@ public class Algorithms {
     // find min distance
     public static void findMinDist(Vertex v) {
         List<Vertex> neighbors = getNeighbors(v);
-        neighbors.stream().forEach((t) -> {
+        neighbors.stream().forEach((Vertex t) -> {
             int combWeight = GSD(v) + getWeight(v, t);
-            if (GSD(t) > combWeight) {
+            /*getWeight*/   if (GSD(t) > combWeight) {
                 Model.dist.put(t, GSD(v) + getWeight(v, t));
                 t.parent = v;
                 Model.uSNodes.add(t);
