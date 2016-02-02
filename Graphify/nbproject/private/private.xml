@@ -3,23 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
             <file>file:/C:/Users/afafore/Desktop/GraphGUI/Graphify/src/graphify/Algorithms.java</file>
             <file>file:/C:/Users/afafore/Desktop/GraphGUI/Graphify/src/graphify/Vertex.java</file>
+            <file>file:/C:/Users/afafore/Desktop/GraphGUI/Graphify/src/graphify/IGui.java</file>
             <file>file:/C:/Users/afafore/Desktop/GraphGUI/Graphify/src/graphify/Model.java</file>
             <file>file:/C:/Users/afafore/Desktop/GraphGUI/Graphify/src/graphify/Tour.java</file>
             <file>file:/C:/Users/afafore/Desktop/GraphGUI/Graphify/src/graphify/GraphifyGUI.java</file>
             <file>file:/C:/Users/afafore/Desktop/GraphGUI/Graphify/src/graphify/TSP_SA.java</file>
-=======
-            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/GA.java</file>
-            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/Model.java</file>
-            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/Vertex.java</file>
-            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/Tour.java</file>
-            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/TSP_SA.java</file>
-            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/TSP_GA.java</file>
-            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/Population.java</file>
-            <file>file:/C:/Users/Ayomitunde/Desktop/GraphifyGUI/Graphify/src/graphify/GraphifyGUI.java</file>
->>>>>>> a2e549e93e3413aa35fcc8e300b420c35bb2b5c1
         </group>
     </open-files>
 </project-private>
