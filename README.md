@@ -30,7 +30,7 @@ Several algorithms have been added to this application are visualized.
 
 
 **Test file**
-A test file exist in the [Test File](https://github.com/afafore1/GraphGUI/blob/Bugs/Graphify/SSandFiles/new.ser)
+[Test File](https://github.com/afafore1/GraphGUI/blob/Bugs/Graphify/SSandFiles/new.ser) to try out
 
 
 
