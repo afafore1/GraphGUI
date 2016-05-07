@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import java.util.function.Consumer;
 
 /**
  *
@@ -296,25 +295,14 @@ public class Algorithms {
         return Model.sNodes.contains(v);
     }
 
-    // get weight... Weight is a combination of the actual weight + pAmount on that edge
+    //returns weight
     public static int getWeight(Vertex s, Vertex d) {
         for (Edge e : Model.edges) {
             if (e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s) {
-                double logSum = Math.log(e.getWeight()/e.getpheromoneAmount());
-                int result = (int)(e.getWeight() + logSum);
-                return result;
+                return e.getWeight();
             }
         }
         return -1; // edge does not exist then
-    }
-
-    public static int getpAmount(Vertex s, Vertex d) {
-        for (Edge e : Model.edges) {
-            if (e.getSource() == s && e.getDest() == d || e.getSource() == d && e.getDest() == s) {
-                return e.getpheromoneAmount();
-            }
-        }
-        return -1;
     }
 
     //getNeighbors
@@ -449,7 +437,7 @@ public class Algorithms {
             }
             if (Model.vertices.get(i).getParent().getId() != -1) {
                 Model.setShortestPath.put(Model.vertices.get(i).getParent(), Model.vertices.get(i));
-                Model.Capacity += getpAmount(Model.vertices.get(i).parent, Model.vertices.get(i));
+                Model.Capacity += getWeight(Model.vertices.get(i).parent, Model.vertices.get(i));
             }
         }
 

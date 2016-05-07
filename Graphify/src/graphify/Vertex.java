@@ -23,6 +23,7 @@ public class Vertex implements Serializable {
     public Vertex parent;
     private Point location;
     private HashSet<Edge> eList;
+    private HashMap<Integer, Edge> path;
     private int id;
     private int cap;
     private String type;
@@ -53,6 +54,10 @@ public class Vertex implements Serializable {
     }
     public String getLabel() {
         return (this.label + " ");
+    }
+    
+    public HashMap getPath(){
+        return this.path;
     }
 
     /**
@@ -176,16 +181,14 @@ class Edge implements Serializable {
     private final Vertex source;
     private final Vertex dest;
     private int weight;
-    private int pheromoneAmount;
     private boolean fail;
     private double glowLevel = 0;
     private boolean bidirectional;
 
-    public Edge(int id, Vertex source, Vertex dest, int pAmount, int weight, boolean fail) {
+    public Edge(int id, Vertex source, Vertex dest, int weight, boolean fail) {
         this.id = id;
         this.source = source;
         this.dest = dest;
-        this.pheromoneAmount = pAmount;
         this.weight = weight;
         this.fail = fail;
         bidirectional = false;
@@ -209,14 +212,6 @@ class Edge implements Serializable {
 
     public Vertex getSource() {
         return source;
-    }
-
-    public int getpheromoneAmount() {
-        return pheromoneAmount;
-    }
-
-    public void setpAmount(int x) {
-        this.pheromoneAmount = x;
     }
 
     public int getWeight() {

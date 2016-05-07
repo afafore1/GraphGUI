@@ -45,9 +45,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class GraphifyGUI extends javax.swing.JFrame {
 
+    private static final long serialVersionUID = 1L;
     Image bufferImage;
     Graphics2D bufferGraphic;
-    private ActionListener decreseWeights;
+    private final ActionListener decreseWeights;
     private JToggleButton[] tools = new JToggleButton[3];
 
     public GraphifyGUI() {
@@ -89,7 +90,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     Model.decreaseWeightEllapse++;
                 } else {
                     Model.decreaseWeightEllapse = 0;
-                    reduceIncreasepAmount();
+                    reduceIncreaseWeight();
                     autoFailure();
                     autoHeal();
                     //graph();
@@ -125,10 +126,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         btnReset = new javax.swing.JButton();
         lblInfo = new java.awt.Label();
-        btnClearConsole = new javax.swing.JButton();
-        jcbAlgo = new javax.swing.JComboBox<>();
         btnStart = new javax.swing.JButton();
         btnPrintList = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
@@ -153,6 +153,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         lblFinalDistValue = new javax.swing.JLabel();
         rbtnTSP_GA = new javax.swing.JRadioButton();
         btnGenResult = new javax.swing.JButton();
+        jcbAlgo = new javax.swing.JComboBox<>();
+        btnClearConsole = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -160,6 +162,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         mnuSave = new javax.swing.JMenuItem();
         mnuSaveAs = new javax.swing.JMenuItem();
         mnuQuit = new javax.swing.JMenuItem();
+        mnuEdit = new javax.swing.JMenu();
+        mnuUpdateWeight = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -171,20 +175,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         });
 
         lblInfo.setText("Source: None - Destination: None");
-
-        btnClearConsole.setText("Clear Console");
-        btnClearConsole.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClearConsoleActionPerformed(evt);
-            }
-        });
-
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "OtherBfs", "DFS", "Dijkstra", "Connectedness" }));
-        jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jcbAlgoActionPerformed(evt);
-            }
-        });
 
         btnStart.setText("Start");
         btnStart.addActionListener(new java.awt.event.ActionListener() {
@@ -238,11 +228,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
         pnlGraph.setLayout(pnlGraphLayout);
         pnlGraphLayout.setHorizontalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 930, Short.MAX_VALUE)
+            .addGap(0, 1083, Short.MAX_VALUE)
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 278, Short.MAX_VALUE)
+            .addGap(0, 526, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(pnlGraph);
@@ -298,6 +288,20 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         });
 
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "OtherBfs", "DFS", "Dijkstra", "Connectedness" }));
+        jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jcbAlgoActionPerformed(evt);
+            }
+        });
+
+        btnClearConsole.setText("Clear Console");
+        btnClearConsole.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearConsoleActionPerformed(evt);
+            }
+        });
+
         mnuFile.setText("File");
 
         mnuNew.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
@@ -347,6 +351,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
         jMenuBar1.add(mnuFile);
 
+        mnuEdit.setText("Edit");
+
+        mnuUpdateWeight.setText("Update Weight");
+        mnuEdit.add(mnuUpdateWeight);
+
+        jMenuBar1.add(mnuEdit);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -354,98 +365,101 @@ public class GraphifyGUI extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnClearConsole, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(rbtnSA)
+                    .addComponent(rbtnTSP_GA))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSplitPane1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 644, Short.MAX_VALUE)
+                                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnReset)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnClearConsole, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(68, 68, 68)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(rbtnSA)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(rbtnTSP_GA))
                                     .addComponent(lblFinalDistance)
                                     .addComponent(lblInitalDistance))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnStart)
+                                .addGap(70, 70, 70)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(lblInitalDistValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblFinalDistValue, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1)
+                                    .addComponent(lblCapacity))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGap(38, 38, 38)
+                                    .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(lblCapTransferred, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(64, 64, 64)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(25, 25, 25)
                                 .addComponent(btnGenResult)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btnPrintList, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(9, 9, 9))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(lblInitalDistValue, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
-                                    .addComponent(lblFinalDistValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 264, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(lblCapacity))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(38, 38, 38)
-                                        .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(lblCapTransferred, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(64, 64, 64)))))))
-                .addContainerGap())
+                                .addGap(9, 9, 9)))
+                        .addGap(30, 30, 30))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jSplitPane1)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE))
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(rbtnSA)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(rbtnTSP_GA)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnReset)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnStart)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(rbtnSA)
-                                .addComponent(rbtnTSP_GA))
-                            .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblInitalDistance)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblFinalDistance))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblInitalDistValue)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblFinalDistValue))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblCapTransferred, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblCapacity)))
-                    .addComponent(jLabel1))
-                .addGap(11, 11, 11)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnReset)
-                    .addComponent(btnPrintList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnClearConsole)
-                    .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnStart)
-                    .addComponent(btnGenResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(lblCapacity)
+                            .addComponent(btnClearConsole, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblInitalDistance)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblFinalDistance))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblInitalDistValue)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblFinalDistValue)))
+                .addGap(16, 16, 16)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnPrintList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnGenResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -607,8 +621,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     int xDistance = Math.abs(Model.vertices.get(Model._selectedNode).getX() - Model.vertices.get(destination).getX());
                     int yDistance = Math.abs(Model.vertices.get(Model._selectedNode).getY() - Model.vertices.get(destination).getY());
                     Model.weight = (int) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
-                    int pAmount = (int) (Math.random() * 40 + 1);
-                    addEdge(Model.Edgeid, Model._selectedNode, destination, pAmount, Model.weight);
+                    addEdge(Model.Edgeid, Model._selectedNode, destination, Model.weight);
                     Model._selectedNode = -1;
                     Model.changesMade = true;
                     Model.Edgeid++;
@@ -894,27 +907,27 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnGenResultActionPerformed
 
-    private void addEdge(Integer edgeId, Integer sourceid, Integer destid, Integer pAmount, int weight) {
-        Edge newEdge = new Edge(edgeId, Model.vertices.get(sourceid), Model.vertices.get(destid), pAmount, weight, false);
+    private void addEdge(Integer edgeId, Integer sourceid, Integer destid, int weight) {
+        Edge newEdge = new Edge(edgeId, Model.vertices.get(sourceid), Model.vertices.get(destid), weight, false);
         Model.vertices.get(sourceid).eList().add(newEdge);
         if (Model.toolType == Model.TOOL_BIDIRECTIONAL) {
             newEdge.setBidirectional(true);
-            Edge tempEdge = new Edge(edgeId, Model.vertices.get(destid), Model.vertices.get(sourceid), pAmount, weight, false);
+            Edge tempEdge = new Edge(edgeId, Model.vertices.get(destid), Model.vertices.get(sourceid), weight, false);
             Model.vertices.get(destid).eList().add(tempEdge);
         }
         Model.edges.add(newEdge);
     }
 
-    private void reduceIncreasepAmount() {
+    private void reduceIncreaseWeight() {
         if (Model._source > -1 && Model._dest > -1) {
             int edgeSize = Model.edges.size();
             int rand = (int) (Math.random() * edgeSize);
             Edge e = Model.edges.get(rand);
-            int pAmount = e.getpheromoneAmount() + (int) (Math.sqrt(e.getpheromoneAmount())) * (Math.random() > .5 ? -1 : 1);
-            if (pAmount <= 0) {
-                pAmount += 5;
+            int cost = e.getWeight() + (int) (Math.sqrt(e.getWeight())) * (Math.random() > .5 ? -1 : 1);
+            if (cost <= 0) {
+                cost += 5;
             }
-            e.setpAmount(pAmount); // changes it
+            e.setWeight(cost); // changes it
             Model.glowMap.clear();
             Algorithms.execute(Model.vertices.get(Model._source));
             Algorithms.shortestPath(Model._source, Model._dest);
@@ -1031,14 +1044,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
             if (e.getBidirectional()) {
                 drawArrowOnGraphics(bufferGraphic, dest.x, dest.y, source.x, source.y);
             }
-            double edgeWeight = e.getWeight();
+            int edgeWeight = e.getWeight();
             if (!(edgeWeight == -1)) {
                 bufferGraphic.setColor(
                         new Color(180, 30, 255, (int) (e.getGlowLevel() * 255)));
                 bufferGraphic.fillRect(xmid - 6, ymid - 14, 50, 20);
                 bufferGraphic.setColor(Color.black);
                 bufferGraphic.setStroke(new BasicStroke(2));
-                bufferGraphic.drawString(edgeWeight + "/" + e.getpheromoneAmount(), xmid, ymid);
+                bufferGraphic.drawString(String.valueOf(edgeWeight), xmid, ymid);
                 e.glowDie(.05);
             }
         }
@@ -1287,6 +1300,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JButton btnPrintList;
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnStart;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -1300,12 +1314,14 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private java.awt.Label lblInfo;
     private javax.swing.JLabel lblInitalDistValue;
     private javax.swing.JLabel lblInitalDistance;
+    private javax.swing.JMenu mnuEdit;
     private javax.swing.JMenu mnuFile;
     private javax.swing.JMenuItem mnuNew;
     private javax.swing.JMenuItem mnuOpen;
     private javax.swing.JMenuItem mnuQuit;
     private javax.swing.JMenuItem mnuSave;
     private javax.swing.JMenuItem mnuSaveAs;
+    private javax.swing.JMenuItem mnuUpdateWeight;
     private javax.swing.JPanel pnlGraph;
     private javax.swing.JRadioButton rbtnSA;
     private javax.swing.JRadioButton rbtnTSP_GA;
