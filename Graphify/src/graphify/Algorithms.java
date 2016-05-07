@@ -139,20 +139,19 @@ public class Algorithms {
 
     public static void Bfs(Vertex source) {
         reset();
-        Model.queue = new LinkedList<>(); // FIFO
-        source.setVisited(true); // marked as Model.visited
+        Model.queue = new LinkedList<>(); // FIFO [1,2
+        source.setVisited(true); // marked as Model.visited [0,1,2
         Model.queue.add(source); // put into queue
         source.parent = source; // setShortestPath parent
         Model.conn = new ArrayList<>();
-        System.err.println("new line");
         while (!Model.queue.isEmpty()) { // source
-            Vertex current = Model.queue.poll(); // remove first 
+            Vertex current = Model.queue.poll(); // remove first 0
             Model.conn.add(current.getId());
             for (Iterator<Edge> currentList = current.eList().iterator(); currentList.hasNext();) {
                 Edge t = currentList.next();
                 Vertex next = getConn(current, t);
                 if (!t.isFailed()) {
-                    if (next.visited() == false) {
+                    if (!next.visited()) {
                         next.setVisited(true);
                         Model.queue.add(next);
                         next.parent = current;
@@ -162,6 +161,7 @@ public class Algorithms {
         }
         Model.Gui.printlnConsole("Order is " + Model.conn);
     }
+    
 
     public static boolean pathExist(Vertex source, Vertex dest) {
         Model.vertices.values().stream().forEach((v) -> {
@@ -312,7 +312,7 @@ public class Algorithms {
         Iterator<Edge> neighb = n.iterator();
         while (neighb.hasNext()) {
             Edge t = neighb.next();
-            if (!t.isFailed()) {
+            if (t.isFailed() != true) {
                 Vertex next = getConn(v, t);
                 if (!isSettled(next)) {
                     neighbors.add(next);

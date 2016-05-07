@@ -34,6 +34,15 @@ public class Tour {
         }
         Collections.shuffle(tour);
     }
+    
+    public boolean isSafe(Vertex s, Vertex d){
+        for(Edge e : s.eList()){
+            if(!tour.contains(d) && e.getDest() == d){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public Vertex getVertex(int vertexIndex) {
         return (Vertex)(tour.get(vertexIndex));

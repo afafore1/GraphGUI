@@ -730,8 +730,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
             Vertex next = verts.next();
             printlnConsole(next.getName() + "->" + next.eList());
         }
-
-        printlnConsole("Source is: " + Model._source);
+        if(Model._source != -1){
+            printlnConsole("Source is: " + Model._source);
+        }        
     }//GEN-LAST:event_btnPrintListActionPerformed
 
     private void pnlGraphComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_pnlGraphComponentResized

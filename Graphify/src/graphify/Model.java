@@ -12,7 +12,7 @@ import java.util.Stack;
  *
  * @author Jack
  */
-public class Model {
+public abstract class Model {
     public static HashMap<Integer, Integer> connectionCache = new HashMap<>();
     public static Queue<Vertex> queue;
     public static Stack<Vertex> stack;
@@ -45,7 +45,6 @@ public class Model {
     public static int toolType = -1;
     public static HashMap<Integer, Vertex> vertices;
     public static ArrayList<Edge> edges;
-    public static GraphifyGUI GG;
     public static Queue<Vertex> suggestQueue;
     public static HashMap<Integer, HashSet<Integer>> nodes;
     public static HashMap<Vertex, Vertex> setShortestPath = new HashMap<>();

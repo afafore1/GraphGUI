@@ -92,6 +92,7 @@ public class TSP_SA {
         }
         Model.Gui.printlnConsole("Final Solution: " + best.getTourDistance());
         Model.FinalDistanceValue = best.getTourDistance();
+
         printTour(best);
         Model.Gui.printlnConsole("Tour: " + best);
         setPath(best);
