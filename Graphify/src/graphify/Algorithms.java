@@ -312,7 +312,7 @@ public class Algorithms {
         Iterator<Edge> neighb = n.iterator();
         while (neighb.hasNext()) {
             Edge t = neighb.next();
-            if (t.isFailed() != true) {
+            if (!Model.failed.contains(t.getDest())) {
                 Vertex next = getConn(v, t);
                 if (!isSettled(next)) {
                     neighbors.add(next);

@@ -48,7 +48,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private static final long serialVersionUID = 1L;
     Image bufferImage;
     Graphics2D bufferGraphic;
-    private final ActionListener decreseWeights;
+    private ActionListener decreseWeights;
     private JToggleButton[] tools = new JToggleButton[3];
 
     public GraphifyGUI() {
@@ -84,21 +84,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
             }
         });
-        decreseWeights = (ActionEvent e) -> {
-            if ("Dijkstra".equals(Model.sim)) {
-                if (Model.decreaseWeightEllapse < (1000 - sldrWeightSpeed.getValue())) {
-                    Model.decreaseWeightEllapse++;
-                } else {
-                    Model.decreaseWeightEllapse = 0;
-                    reduceIncreaseWeight();
-                    autoFailure();
-                    autoHeal();
-                    //graph();
-                }
-            }
-        };
-        Timer exe = new Timer(1, decreseWeights);
-        exe.start();
+
         for (int i = 0; i < tools.length; i++) {
             tools[i] = new JToggleButton();
             tools[i].setFocusable(false);
@@ -155,6 +141,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnGenResult = new javax.swing.JButton();
         jcbAlgo = new javax.swing.JComboBox<>();
         btnClearConsole = new javax.swing.JButton();
+        rdnFailSim = new javax.swing.JRadioButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -302,6 +289,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         });
 
+        rdnFailSim.setText("Fail Sim");
+        rdnFailSim.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdnFailSimActionPerformed(evt);
+            }
+        });
+
         mnuFile.setText("File");
 
         mnuNew.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
@@ -375,14 +369,16 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(btnReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnClearConsole, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnClearConsole, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(rbtnSA)
-                            .addComponent(rbtnTSP_GA))
+                                .addComponent(rbtnSA)
+                                .addComponent(rbtnTSP_GA))
+                            .addComponent(rdnFailSim))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1110, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
@@ -417,24 +413,27 @@ public class GraphifyGUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 642, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 642, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(33, 33, 33)
+                        .addGap(18, 18, 18)
+                        .addComponent(rdnFailSim)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(rbtnSA)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(rbtnTSP_GA)
-                        .addGap(18, 18, 18)
+                        .addGap(75, 75, 75)
                         .addComponent(btnReset)
                         .addGap(18, 18, 18)
                         .addComponent(btnStart)
                         .addGap(18, 18, 18)
                         .addComponent(btnClearConsole, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(132, 132, 132)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -733,9 +732,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
             Vertex next = verts.next();
             printlnConsole(next.getName() + "->" + next.eList());
         }
-        if(Model._source != -1){
+        if (Model._source != -1) {
             printlnConsole("Source is: " + Model._source);
-        }        
+        }
     }//GEN-LAST:event_btnPrintListActionPerformed
 
     private void pnlGraphComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_pnlGraphComponentResized
@@ -749,7 +748,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_mnuQuitActionPerformed
 
-    private void saveResult() throws IOException{
+    private void saveResult() throws IOException {
         ImageIO.write((RenderedImage) bufferImage, "PNG", new File("Result.png"));
     }
     private void mnuSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaveAsActionPerformed
@@ -916,6 +915,28 @@ public class GraphifyGUI extends javax.swing.JFrame {
         NodeEdit.run();
     }//GEN-LAST:event_mnuUpdateWeightActionPerformed
 
+    private void rdnFailSimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdnFailSimActionPerformed
+        // TODO add your handling code here:
+        Timer exe = new Timer(1, null);
+        if (rdnFailSim.isSelected()) {
+            decreseWeights = (ActionEvent e) -> {
+                if ("Dijkstra".equals(Model.sim)) {
+                    if (Model.decreaseWeightEllapse < (1000 - sldrWeightSpeed.getValue())) {
+                        Model.decreaseWeightEllapse++;
+                    } else {
+                        Model.decreaseWeightEllapse = 0;
+                        reduceIncreaseWeight();
+                        autoFailure();
+                        autoHeal();
+                        graph();
+                    }
+                }
+            };
+            exe = new Timer(1, decreseWeights);
+            exe.start();
+        }
+    }//GEN-LAST:event_rdnFailSimActionPerformed
+
     private void addEdge(Integer edgeId, Integer sourceid, Integer destid, int weight) {
         Edge newEdge = new Edge(edgeId, Model.vertices.get(sourceid), Model.vertices.get(destid), weight, false);
         Model.vertices.get(sourceid).eList().add(newEdge);
@@ -963,11 +984,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         Model.failed.add(v);
                         printlnConsole(v.getName() + " has failed");
                     }
-                    Iterator<Edge> e = v.eList().iterator();
-                    while (e.hasNext()) {
-                        Edge next = e.next();
-                        next.setFailed(!next.isFailed()); //set it to opposite of what it is
-                    }
+//                    Iterator<Edge> e = v.eList().iterator();
+//                    while (e.hasNext()) {
+//                        Edge next = e.next();
+//                        next.setFailed(!next.isFailed()); //set it to opposite of what it is
+//                    }
                     Model.glowMap.clear();
                     Algorithms.execute(Model.vertices.get(Model._source));
                     Algorithms.shortestPath(Model._source, Model._dest);
@@ -1334,6 +1355,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JPanel pnlGraph;
     private javax.swing.JRadioButton rbtnSA;
     private javax.swing.JRadioButton rbtnTSP_GA;
+    private javax.swing.JRadioButton rdnFailSim;
     private javax.swing.JSlider sldrWeightSpeed;
     private javax.swing.JTextArea txtConsole;
     // End of variables declaration//GEN-END:variables

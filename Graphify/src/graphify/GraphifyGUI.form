@@ -117,15 +117,18 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="jToolBar1" alignment="0" min="-2" pref="47" max="-2" attributes="0"/>
-                              <Component id="btnReset" alignment="0" max="32767" attributes="0"/>
+                          <Component id="jToolBar1" min="-2" pref="47" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" alignment="1" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="btnReset" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="btnStart" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="btnClearConsole" alignment="1" min="-2" pref="107" max="-2" attributes="0"/>
+                              </Group>
                               <Component id="jcbAlgo" alignment="0" min="-2" pref="91" max="-2" attributes="0"/>
-                              <Component id="btnStart" alignment="0" max="32767" attributes="0"/>
-                              <Component id="btnClearConsole" alignment="1" min="-2" pref="107" max="-2" attributes="0"/>
+                              <Component id="rbtnSA" min="-2" max="-2" attributes="0"/>
+                              <Component id="rbtnTSP_GA" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="rbtnSA" min="-2" max="-2" attributes="0"/>
-                          <Component id="rbtnTSP_GA" min="-2" max="-2" attributes="0"/>
+                          <Component id="rdnFailSim" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="jSplitPane1" pref="1110" max="32767" attributes="0"/>
@@ -173,26 +176,30 @@
           <Group type="102" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSplitPane1" pref="642" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jSplitPane1" pref="642" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                       <Component id="jToolBar1" min="-2" pref="141" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="rdnFailSim" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="jcbAlgo" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="rbtnSA" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="rbtnTSP_GA" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="75" max="-2" attributes="0"/>
                       <Component id="btnReset" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="btnStart" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="btnClearConsole" min="-2" pref="23" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="132" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -450,6 +457,14 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnClearConsoleActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JRadioButton" name="rdnFailSim">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Fail Sim"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdnFailSimActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
