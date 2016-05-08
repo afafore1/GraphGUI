@@ -353,6 +353,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
         mnuEdit.setText("Edit");
 
+        mnuUpdateWeight.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
         mnuUpdateWeight.setText("Node Properties");
         mnuUpdateWeight.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

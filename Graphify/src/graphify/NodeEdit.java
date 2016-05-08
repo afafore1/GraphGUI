@@ -23,6 +23,10 @@ public class NodeEdit extends javax.swing.JFrame {
      */
     static String[] lstMod = {"Destination Node(s)", "Weight"};
     static DefaultTableModel _listerModel = new DefaultTableModel(0, 0);
+    Vertex _current = null;
+    Vertex _dest = null;
+    Integer _selectedRow = null;
+    Integer _selectedColumn = null;
 
     public NodeEdit() {
         initComponents();
@@ -33,8 +37,19 @@ public class NodeEdit extends javax.swing.JFrame {
         tblProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         _listerModel.setColumnIdentifiers(lstMod);
         tblProperties.setModel(_listerModel);
+        tblProperties.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mousePressed(MouseEvent e){
+                _selectedRow = tblProperties.getSelectedRow();
+                _selectedColumn = tblProperties.getSelectedColumn();
+                Object v = _listerModel.getValueAt(_selectedRow, 0);
+                int vert = Integer.parseInt(String.valueOf(v).trim());
+                _dest = Model.vertices.get(vert);
+            }
+        });
         lstAllNodes.addMouseListener(new MouseAdapter() {
             String selected = "";
+
             @Override
             public void mousePressed(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -42,20 +57,19 @@ public class NodeEdit extends javax.swing.JFrame {
                     selected = lstAllNodes.getSelectedItem();
                     if (selected != null) {
                         selected = selected.replace("Vertex ", "").trim();
-                        Vertex current = Model.vertices.get(Integer.parseInt(selected));
-                        for(Edge edge : Model.edges){
-                            if(edge.getSource().equals(current)){
-                                _listerModel.addRow(new Object[]{edge.getDest().getLabel(), edge.getWeight()});
-                            }
-                        }
+                        _current = Model.vertices.get(Integer.parseInt(selected));
+                        Model.edges.stream().filter((edge) -> (edge.getSource().equals(_current))).forEach((edge) -> {
+                            _dest = edge.getDest();
+                            _listerModel.addRow(new Object[]{edge.getDest().getLabel(), edge.getWeight()});
+                        });
                     }
                 }
             }
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
+//            @Override
+//            public void mouseReleased(MouseEvent e) {
+//
+//            }
         });
 
     }
@@ -74,6 +88,7 @@ public class NodeEdit extends javax.swing.JFrame {
         lstAllNodes = new java.awt.List();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblProperties = new javax.swing.JTable();
+        btnUpdate = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -83,6 +98,13 @@ public class NodeEdit extends javax.swing.JFrame {
         jLabel1.setText("Node Properties");
 
         jScrollPane1.setViewportView(tblProperties);
+
+        btnUpdate.setText("Update");
+        btnUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -96,17 +118,23 @@ public class NodeEdit extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(lstAllNodes, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 324, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 324, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnUpdate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(28, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lstAllNodes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnUpdate))
+                    .addComponent(lstAllNodes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -114,15 +142,34 @@ public class NodeEdit extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 436, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+        // TODO add your handling code here:
+        if (_selectedRow != null) {
+            Object w = _listerModel.getValueAt(_selectedRow, 1);
+            int weight = 0;
+            if (w != null) {
+                weight = Integer.parseInt(w.toString());
+                if (_current != null && _dest != null) {
+                    for (Edge e : Model.edges) {
+                        if (e.getSource().equals(_current) && e.getDest().equals(_dest)) {
+                            e.setWeight(weight);
+                        }
+                    }
+                    Model.Gui.graph();
+                }
+            }
+        }
+    }//GEN-LAST:event_btnUpdateActionPerformed
 
     /**
      * @param args the command line arguments
@@ -172,6 +219,7 @@ public class NodeEdit extends javax.swing.JFrame {
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnUpdate;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
