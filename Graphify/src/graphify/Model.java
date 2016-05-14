@@ -36,6 +36,7 @@ public abstract class Model {
     public static Integer maxColors = 0;
     public static int _source = -1;
     public static int _dest = -1;
+    public static int _findNode = -1;
     public static String currentProject = null;
     public static boolean changesMade = false;
     public static boolean algCalled = false;

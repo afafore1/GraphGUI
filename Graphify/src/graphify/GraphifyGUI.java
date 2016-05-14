@@ -50,6 +50,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     Graphics2D bufferGraphic;
     private ActionListener decreseWeights;
     private JToggleButton[] tools = new JToggleButton[3];
+    static boolean isWeighted = false;
 
     public GraphifyGUI() {
         initComponents();
@@ -141,6 +142,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnClearConsole = new javax.swing.JButton();
         rdnFailSim = new javax.swing.JRadioButton();
         jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        txtVertexLookUp = new javax.swing.JTextField();
+        btnFindVertex = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -150,6 +154,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
         mnuQuit = new javax.swing.JMenuItem();
         mnuEdit = new javax.swing.JMenu();
         mnuUpdateWeight = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -218,7 +225,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 500, Short.MAX_VALUE)
+            .addGap(0, 496, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(pnlGraph);
@@ -284,6 +291,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
         jLabel2.setText("Select Simulation");
 
+        jLabel3.setText("Vertex Lookup");
+
+        btnFindVertex.setText("Find");
+        btnFindVertex.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFindVertexActionPerformed(evt);
+            }
+        });
+
         mnuFile.setText("File");
 
         mnuNew.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
@@ -344,6 +360,28 @@ public class GraphifyGUI extends javax.swing.JFrame {
         });
         mnuEdit.add(mnuUpdateWeight);
 
+        jMenu1.setText("Graph Type");
+
+        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.SHIFT_MASK));
+        jMenuItem1.setText("Weighted");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_U, java.awt.event.InputEvent.SHIFT_MASK));
+        jMenuItem2.setText("UnWeighted");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem2);
+
+        mnuEdit.add(jMenu1);
+
         jMenuBar1.add(mnuEdit);
 
         setJMenuBar(jMenuBar1);
@@ -355,12 +393,19 @@ public class GraphifyGUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap(567, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblInfo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel1)
-                                .addComponent(lblCapacity)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtVertexLookUp, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnFindVertex))
+                                .addGap(185, 185, 185)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1)
+                                    .addComponent(lblCapacity))))
                         .addGap(30, 30, 30)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -401,7 +446,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 642, Short.MAX_VALUE)
+                        .addComponent(jSplitPane1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
@@ -414,11 +459,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addComponent(jcbAlgo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnReset)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnStart)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClearConsole, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnStart)
+                        .addGap(59, 59, 59)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblInitalDistance)
                             .addComponent(lblInitalDistValue))
@@ -439,10 +484,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(32, 32, 32)
-                                .addComponent(lblCapacity))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel3)
+                                    .addComponent(txtVertexLookUp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(11, 11, 11)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblCapacity)
+                                    .addComponent(btnFindVertex)))
                             .addComponent(jLabel1))
-                        .addGap(18, 18, 18)
+                        .addGap(10, 10, 10)
                         .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
@@ -899,6 +949,45 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_rdnFailSimActionPerformed
 
+    boolean isInteger(String s){
+        try{
+            Integer.parseInt(s);
+            return true;
+        }catch(NumberFormatException ex){
+        }
+        return false;
+    }
+    private void btnFindVertexActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindVertexActionPerformed
+        // TODO add your handling code here:
+        String vertexNum = txtVertexLookUp.getText();
+        if(isInteger(vertexNum)){
+            Model._findNode = Integer.parseInt(vertexNum);
+            for(Integer i : Model.vertices.keySet()){
+                if(i.equals(Model._findNode)){
+                    graph();
+                    break;
+                }
+            }
+        }else{
+            JOptionPane.showMessageDialog(this,
+    "Value should be an Integer",
+    "Value Error!",
+    JOptionPane.ERROR_MESSAGE);
+        }
+        
+        
+    }//GEN-LAST:event_btnFindVertexActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        isWeighted = true;
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        isWeighted = false;
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
     private void addEdge(Integer edgeId, Integer sourceid, Integer destid, int weight) {
         Edge newEdge = new Edge(edgeId, Model.vertices.get(sourceid), Model.vertices.get(destid), weight, false);
         Model.vertices.get(sourceid).eList().add(newEdge);
@@ -1043,7 +1132,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 bufferGraphic.fillRect(xmid - 6, ymid - 14, 50, 20);
                 bufferGraphic.setColor(Color.black);
                 bufferGraphic.setStroke(new BasicStroke(2));
-                bufferGraphic.drawString(String.valueOf(edgeWeight), xmid, ymid);
+                if(isWeighted == true){
+                    bufferGraphic.drawString(String.valueOf(edgeWeight), xmid, ymid);
+                }else{
+                    bufferGraphic.drawString("", xmid, ymid);
+                }
                 e.glowDie(.05);
             }
         }
@@ -1071,7 +1164,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 bufferGraphic.setColor(Color.blue);
             } else if (v.getId() == Model._selectedNode || v.getSelected()) {
                 bufferGraphic.setColor(Color.orange);
-            } else {
+            }else if(Model._findNode != -1 && v.getId() == Model._findNode){
+                bufferGraphic.setColor(Color.green);
+            }else {
                 bufferGraphic.setColor(Color.red);
             }
             if (!Model.failed.isEmpty()) {
@@ -1288,6 +1383,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClearConsole;
+    private javax.swing.JButton btnFindVertex;
     private javax.swing.JButton btnGenResult;
     private javax.swing.JButton btnPrintList;
     private javax.swing.JButton btnReset;
@@ -1295,7 +1391,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
@@ -1319,5 +1419,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JRadioButton rdnFailSim;
     private javax.swing.JSlider sldrWeightSpeed;
     private javax.swing.JTextArea txtConsole;
+    private javax.swing.JTextField txtVertexLookUp;
     // End of variables declaration//GEN-END:variables
 }
