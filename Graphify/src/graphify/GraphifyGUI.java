@@ -1165,7 +1165,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             } else if (v.getId() == Model._selectedNode || v.getSelected()) {
                 bufferGraphic.setColor(Color.orange);
             }else if(Model._findNode != -1 && v.getId() == Model._findNode){
-                bufferGraphic.setColor(Color.green);
+                bufferGraphic.setColor(Color.BLUE.brighter());
             }else {
                 bufferGraphic.setColor(Color.red);
             }
