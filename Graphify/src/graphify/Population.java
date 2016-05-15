@@ -14,7 +14,7 @@ public class Population {
     
     public Population(int populationSize, boolean initialize){
         tours = new Tour[populationSize];
-        if(initialize){
+        if(initialize == true){
             for(int i = 0; i < populationSize; i++){
                 Tour newTour = new Tour();
                 newTour.generateIndividual();
@@ -23,7 +23,7 @@ public class Population {
         }
     }
     
-    public void saveTour(int index, Tour tour){
+    public final void saveTour(int index, Tour tour){
         tours[index] = tour;
     }
     
@@ -35,7 +35,7 @@ public class Population {
         Tour fittest = tours[0];
         for(int i = 1; i < populationSize(); i++){
             Tour next = getTour(i);
-            System.err.println(next.getTour()+" "+next.getTourDistance());
+            //System.out.println(next.getTour()+" "+next.getTourDistance());
             if(fittest.getFitness() <= next.getFitness()){
                 fittest = next;
             }

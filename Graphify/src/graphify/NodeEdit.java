@@ -36,9 +36,9 @@ public class NodeEdit extends javax.swing.JFrame {
         tblProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         _listerModel.setColumnIdentifiers(lstMod);
         tblProperties.setModel(_listerModel);
-        tblProperties.addMouseListener(new MouseAdapter(){
+        tblProperties.addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e){
+            public void mousePressed(MouseEvent e) {
                 _selectedRow = tblProperties.getSelectedRow();
                 _selectedColumn = tblProperties.getSelectedColumn();
                 Object v = _listerModel.getValueAt(_selectedRow, 0);
@@ -182,21 +182,25 @@ public class NodeEdit extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnUpdateActionPerformed
 
-    void routeInfo(){
-        for(Integer i : Model.vertices.keySet()){
-            Vertex v = Model.vertices.get(i);
-            //_listerModel.addRow(new Object[]{edge.getDest().getLabel(), edge.getWeight()});
-            _listerModel.addRow(new Object[]{v.label, v.parent.label, null});
+    void routeInfo() {
+        lstAllNodes.setVisible(false);
+        btnUpdate.setVisible(false);
+        for (Vertex v : Model.setShortestPath.keySet()) {
+            //for (Edge e : v.eList()) {
+                _listerModel.addRow(new Object[]{v.label, Model.setShortestPath.get(v).label, "blah"});
+            //}
         }
     }
     private void btnRouteInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRouteInfoActionPerformed
         // TODO add your handling code here:
         String[] lstMod2 = {"Node", "Parent", "Weight"};
-        if(!"Node Properties".equals(btnRouteInfo.getText())){
+        if (!"Node Properties".equals(btnRouteInfo.getText())) {
             _listerModel.setColumnIdentifiers(lstMod2);
             routeInfo();
             btnRouteInfo.setText("Node Properties");
-        }else{
+        } else {
+            lstAllNodes.setVisible(true);
+            btnUpdate.setVisible(true);
             _listerModel.setColumnIdentifiers(lstMod);
             btnRouteInfo.setText("Routing Info");
         }

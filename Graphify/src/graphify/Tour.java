@@ -29,15 +29,16 @@ public class Tour {
     }
 
     public void generateIndividual() {
-        for (int vertexIndex = 0; vertexIndex < Model.vertices.size(); vertexIndex++) {
+        Model.vertices.keySet().stream().forEach((vertexIndex) -> {
             setVertex(vertexIndex, Model.vertices.get(vertexIndex));
-        }
+        });
         Collections.shuffle(tour);
+        System.out.println(tour.toString());
     }
-    
-    public boolean isSafe(Vertex s, Vertex d){
-        for(Edge e : s.eList()){
-            if(!tour.contains(d) && e.getDest() == d){
+
+    public boolean isSafe(Vertex s, Vertex d) {
+        for (Edge e : s.eList()) {
+            if (!tour.contains(d) && e.getDest() == d) {
                 return true;
             }
         }
@@ -45,7 +46,7 @@ public class Tour {
     }
 
     public Vertex getVertex(int vertexIndex) {
-        return (Vertex)(tour.get(vertexIndex));
+        return (Vertex) (tour.get(vertexIndex));
     }
 
     public void setVertex(int tourPosition, Vertex vertex) {
@@ -55,8 +56,9 @@ public class Tour {
     }
 
     public int getDistance(Vertex source, Vertex destination) {
-        for (Edge e : source.eList()) {
-            if(e.getDest() == destination){
+        for (Edge e : Model.edges) {
+            if ((e.getSource().equals(source) && e.getDest().equals(destination))
+                    || (e.getDest().equals(source) && e.getSource().equals(destination))) {
                 return e.getWeight();
             }
         }
@@ -105,7 +107,7 @@ public class Tour {
     public String toString() {
         String geneString = "| ";
         for (int i = 0; i < tourSize(); i++) {
-            geneString += getVertex(i) + " | ";
+            geneString += getVertex(i).label + " | ";
         }
         return geneString;
     }
