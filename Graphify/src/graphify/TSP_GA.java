@@ -33,19 +33,25 @@ public class TSP_GA {
     
     public static void start(){
         reset();
-        Population pop = new Population(Model.vertices.size(), true);
-        Model.Gui.printlnConsole("Initial distance: "+pop.getFittest().getTourDistance());
-        Model.InitialDistanceValue = pop.getFittest().getTourDistance();
+        Model.counter = 1;
+        String txtPopSize = GraphifyGUI.txtPopSize.getText();
+        String txtIterNum = GraphifyGUI.txtIterNum.getText();
+        int vertexSize = Model.vertices.size();
+        int popSize = !String.valueOf(vertexSize).equals(txtPopSize) ? Integer.parseInt(txtPopSize) : vertexSize;
+        int iterations = !txtIterNum.equals("100") ? Integer.parseInt(txtIterNum) : 100;
+        Model.startTime = System.currentTimeMillis();
+        Population pop = new Population(popSize, true);
+        Model.InitialDistanceValue = pop.getFittest(0).getTourDistance();
         
         pop = GA.evolvePopulation(pop);
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < iterations; i++){
             pop = GA.evolvePopulation(pop);
+            Model.Gui.setlblIterations(String.valueOf(Model.counter++));
         }
-        
-        Model.Gui.printlnConsole("Finished");
-        Model.Gui.printlnConsole("Final distance: "+pop.getFittest().getTourDistance());
-        Model.Gui.printlnConsole("Solution: \n"+pop.getFittest());
-        Model.FinalDistanceValue = pop.getFittest().getTourDistance();
-        setPath(pop.getFittest());
+        Model.endTime = System.currentTimeMillis();
+        GraphifyGUI.lblTimeTaken.setText(String.valueOf((Model.endTime - Model.startTime))+" ms");
+        Model.Gui.printlnConsole("Solution: \n"+pop.getFittest(0));
+        Model.FinalDistanceValue = pop.getFittest(0).getTourDistance();
+        setPath(pop.getFittest(0));
     }
 }

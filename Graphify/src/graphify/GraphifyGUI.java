@@ -51,16 +51,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private ActionListener decreseWeights;
     private JToggleButton[] tools = new JToggleButton[3];
     static boolean isWeighted = false;
+    static boolean isComplete = false;
 
     public GraphifyGUI() {
         initComponents();
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
-        lblInitalDistance.setVisible(false);
-        lblFinalDistance.setVisible(false);
-        lblInitalDistValue.setVisible(false);
-        lblFinalDistValue.setVisible(false);
-        btnGenResult.setVisible(false);
+        hider();
         Model.vertices = new HashMap<>();
         Model.edges = new ArrayList<>();
         Model.failed = new ArrayList<>();
@@ -142,9 +139,20 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnClearConsole = new javax.swing.JButton();
         rdnFailSim = new javax.swing.JRadioButton();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         txtVertexLookUp = new javax.swing.JTextField();
         btnFindVertex = new javax.swing.JButton();
+        lblNoIterations = new javax.swing.JLabel();
+        txtIterNum = new javax.swing.JTextField();
+        lblPopulationSize = new javax.swing.JLabel();
+        txtPopSize = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        lblTimeTaken = new javax.swing.JLabel();
+        lblTemperature = new javax.swing.JLabel();
+        txtTemperature = new javax.swing.JTextField();
+        lblCoolingRate = new javax.swing.JLabel();
+        txtCoolingRate = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        lblIterationNum = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -157,6 +165,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+        chkComplete = new javax.swing.JCheckBoxMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -221,7 +230,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         pnlGraph.setLayout(pnlGraphLayout);
         pnlGraphLayout.setHorizontalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1106, Short.MAX_VALUE)
+            .addGap(0, 1093, Short.MAX_VALUE)
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -291,14 +300,36 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
         jLabel2.setText("Select Simulation");
 
-        jLabel3.setText("Vertex Lookup");
-
-        btnFindVertex.setText("Find");
+        btnFindVertex.setText("Vertex LookUp");
         btnFindVertex.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnFindVertexActionPerformed(evt);
             }
         });
+
+        lblNoIterations.setText("Number of Iterations");
+
+        txtIterNum.setText("100");
+
+        lblPopulationSize.setText("Population Size");
+
+        txtPopSize.setText("0");
+
+        jLabel6.setText("Time Taken");
+
+        lblTimeTaken.setText("0");
+
+        lblTemperature.setText("Temperature");
+
+        txtTemperature.setText("10000");
+
+        lblCoolingRate.setText("Cooling Rate");
+
+        txtCoolingRate.setText("0.003");
+
+        jLabel3.setText("Iteration");
+
+        lblIterationNum.setText("0");
 
         mnuFile.setText("File");
 
@@ -380,6 +411,15 @@ public class GraphifyGUI extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItem2);
 
+        chkComplete.setSelected(false);
+        chkComplete.setText("Complete");
+        chkComplete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkCompleteActionPerformed(evt);
+            }
+        });
+        jMenu1.add(chkComplete);
+
         mnuEdit.add(jMenu1);
 
         jMenuBar1.add(mnuEdit);
@@ -391,18 +431,42 @@ public class GraphifyGUI extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rdnFailSim)
+                    .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnClearConsole, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
+                    .addComponent(btnReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jcbAlgo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel2)))
+                .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(567, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblInfo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 659, Short.MAX_VALUE)
+                                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel3)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblInitalDistance)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lblInitalDistValue, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblFinalDistance)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(lblFinalDistValue, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(43, 43, 43)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel3))
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtVertexLookUp, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btnFindVertex))
-                                .addGap(185, 185, 185)
+                                    .addComponent(lblTimeTaken, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblIterationNum, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel1)
                                     .addComponent(lblCapacity))))
@@ -417,27 +481,20 @@ public class GraphifyGUI extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btnPrintList, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(9, 9, 9))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(rdnFailSim)
-                            .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnClearConsole, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jcbAlgo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel2))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblInitalDistance)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblInitalDistValue, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblFinalDistance)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lblFinalDistValue, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(10, 10, 10)
-                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1112, Short.MAX_VALUE)))
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1099, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnFindVertex)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(txtCoolingRate, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(lblTemperature, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtTemperature, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(lblNoIterations, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtIterNum, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(lblPopulationSize, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtPopSize, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(txtVertexLookUp, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblCoolingRate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -445,9 +502,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jSplitPane1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -463,15 +517,32 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         .addComponent(btnClearConsole, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnStart)
-                        .addGap(59, 59, 59)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblInitalDistance)
-                            .addComponent(lblInitalDistValue))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblFinalDistance)
-                            .addComponent(lblFinalDistValue))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblNoIterations)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtIterNum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblPopulationSize)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtPopSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblTemperature)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtTemperature, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblCoolingRate)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtCoolingRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtVertexLookUp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnFindVertex)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jSplitPane1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(sldrWeightSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -484,15 +555,24 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
+                                .addGap(35, 35, 35)
+                                .addComponent(lblCapacity))
+                            .addComponent(jLabel1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblInitalDistance)
+                                        .addComponent(lblInitalDistValue))
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel6)
+                                        .addComponent(lblTimeTaken)))
+                                .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblFinalDistance)
+                                    .addComponent(lblFinalDistValue)
                                     .addComponent(jLabel3)
-                                    .addComponent(txtVertexLookUp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(11, 11, 11)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(lblCapacity)
-                                    .addComponent(btnFindVertex)))
-                            .addComponent(jLabel1))
-                        .addGap(10, 10, 10)
+                                    .addComponent(lblIterationNum))))
+                        .addGap(15, 15, 15)
                         .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
@@ -501,6 +581,57 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void hider() {
+        lblInitalDistance.setVisible(false);
+        lblFinalDistance.setVisible(false);
+        lblInitalDistValue.setVisible(false);
+        lblFinalDistValue.setVisible(false);
+        lblPopulationSize.setVisible(false);
+        txtPopSize.setVisible(false);
+        lblNoIterations.setVisible(false);
+        txtIterNum.setVisible(false);
+        lblTemperature.setVisible(false);
+        lblCoolingRate.setVisible(false);
+        txtTemperature.setVisible(false);
+        txtCoolingRate.setVisible(false);
+        btnGenResult.setVisible(false);
+    }
+
+    private void Autodraw(Point dest) {
+        Image buff = createImage(pnlGraph.getWidth() - 1, pnlGraph.getHeight() - 1);
+        Graphics buffG = buff.getGraphics();
+        buffG.drawImage(bufferImage, 0, 0, this);
+        Point source = Model.vertices.get(Model._selectedNode).getLocation();
+        drawArrow(buffG, source.x, source.y, dest.x, dest.y);
+        drawArrow(buffG, dest.x, dest.y, source.x, source.y);
+        pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
+    }
+
+    private void AutoAddEdge(Vertex v) {
+        Model.weight = 0;
+        if (Model._selectedNode >= 0) {
+            for (Integer d : Model.vertices.keySet()) {
+                Vertex dest = null;
+                if (!Model.vertices.get(d).equals(v)) {
+                    dest = Model.vertices.get(d);
+                } else {
+                    continue;
+                }
+                Point point = dest.getLocation();
+                int xDistance = Math.abs(v.getX() - dest.getX());
+                int yDistance = Math.abs(v.getY() - dest.getY());
+                Model.weight = (int) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
+                addEdge(Model.Edgeid, v.getId(), dest.getId(), Model.weight);
+                Autodraw(point);
+                //Model._selectedNode = -1;
+                Model.changesMade = true;
+                Model.Edgeid++;
+                //graph();
+            }
+        }
+        graph();
+    }
 
     private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseDragged
         if (SwingUtilities.isLeftMouseButton(evt)) {
@@ -596,9 +727,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
             if (Model.toolType == Model.TOOL_VERTEX) {
                 if (Model._selectedNode < 0) {
                     Model.changesMade = true;
-                    Vertex v = new Vertex(Model.id, new Point(evt.getX(), evt.getY()), String.valueOf(Model.id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
-                    Model.vertices.put(v.getId(), v);
-                    Model.id++;
+                    if (isComplete == true) {
+                        Vertex v = new Vertex(Model.id, new Point(evt.getX(), evt.getY()), String.valueOf(Model.id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
+                        Model.vertices.put(v.getId(), v);
+                        Model._selectedNode = Model.id;
+                        Model.id++;
+                        AutoAddEdge(v);
+                    } else {
+                        Vertex v = new Vertex(Model.id, new Point(evt.getX(), evt.getY()), String.valueOf(Model.id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
+                        Model.vertices.put(v.getId(), v);
+                        Model.id++;
+                    }
                 } else if (evt.isControlDown() && evt.isShiftDown()) { // control shift to fail all edges leading out of a vertex
                     Vertex fail = Model.vertices.get(Model._selectedNode);
                     if (Model.failed.contains(fail)) {
@@ -676,6 +815,30 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void jcbAlgoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbAlgoActionPerformed
         // TODO add your handling code here:
+        hider();
+        String selected = jcbAlgo.getSelectedItem().toString();
+        if (selected.equals("TSP-GA")) {
+            lblInitalDistance.setVisible(true);
+            lblFinalDistance.setVisible(true);
+            lblInitalDistValue.setVisible(true);
+            lblFinalDistValue.setVisible(true);
+            lblPopulationSize.setVisible(true);
+            txtPopSize.setVisible(true);
+            lblNoIterations.setVisible(true);
+            txtIterNum.setVisible(true);
+            if (Model.vertices.size() != -1) {
+                txtPopSize.setText(String.valueOf(Model.vertices.size()));
+            }
+        } else if (selected.equals("TSP-SA")) {
+            lblInitalDistance.setVisible(true);
+            lblFinalDistance.setVisible(true);
+            lblInitalDistValue.setVisible(true);
+            lblFinalDistValue.setVisible(true);
+            lblTemperature.setVisible(true);
+            lblCoolingRate.setVisible(true);
+            txtTemperature.setVisible(true);
+            txtCoolingRate.setVisible(true);
+        }
     }//GEN-LAST:event_jcbAlgoActionPerformed
 
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
@@ -744,20 +907,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 break;
             case "TSP-SA":
                 txtConsole.setText("");
-                lblInitalDistance.setVisible(true);
-                lblFinalDistance.setVisible(true);
-                lblInitalDistValue.setVisible(true);
-                lblFinalDistValue.setVisible(true);
                 TSP_SA.start();
                 lblInitalDistValue.setText(String.valueOf(Model.InitialDistanceValue));
                 lblFinalDistValue.setText(String.valueOf(Model.FinalDistanceValue));
                 break;
             case "TSP-GA":
                 txtConsole.setText("");
-                lblInitalDistance.setVisible(true);
-                lblFinalDistance.setVisible(true);
-                lblInitalDistValue.setVisible(true);
-                lblFinalDistValue.setVisible(true);
                 TSP_GA.start();
                 lblInitalDistValue.setText(String.valueOf(Model.InitialDistanceValue));
                 lblFinalDistValue.setText(String.valueOf(Model.FinalDistanceValue));
@@ -949,33 +1104,33 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_rdnFailSimActionPerformed
 
-    boolean isInteger(String s){
-        try{
+    boolean isInteger(String s) {
+        try {
             Integer.parseInt(s);
             return true;
-        }catch(NumberFormatException ex){
+        } catch (NumberFormatException ex) {
         }
         return false;
     }
     private void btnFindVertexActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindVertexActionPerformed
         // TODO add your handling code here:
         String vertexNum = txtVertexLookUp.getText();
-        if(isInteger(vertexNum)){
+        if (isInteger(vertexNum)) {
             Model._findNode = Integer.parseInt(vertexNum);
-            for(Integer i : Model.vertices.keySet()){
-                if(i.equals(Model._findNode)){
+            for (Integer i : Model.vertices.keySet()) {
+                if (i.equals(Model._findNode)) {
                     graph();
                     break;
                 }
             }
-        }else{
+        } else {
             JOptionPane.showMessageDialog(this,
-    "Value should be an Integer",
-    "Value Error!",
-    JOptionPane.ERROR_MESSAGE);
+                    "Value should be an Integer",
+                    "Value Error!",
+                    JOptionPane.ERROR_MESSAGE);
         }
-        
-        
+
+
     }//GEN-LAST:event_btnFindVertexActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -987,6 +1142,16 @@ public class GraphifyGUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         isWeighted = false;
     }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void chkCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCompleteActionPerformed
+        // TODO add your handling code here:
+        if (chkComplete.isSelected()) {
+            isComplete = true;
+        } else {
+            isComplete = false;
+        }
+
+    }//GEN-LAST:event_chkCompleteActionPerformed
 
     private void addEdge(Integer edgeId, Integer sourceid, Integer destid, int weight) {
         Edge newEdge = new Edge(edgeId, Model.vertices.get(sourceid), Model.vertices.get(destid), weight, false);
@@ -1107,7 +1272,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         int xmid = 0;
         int ymid = 0;
         bufferGraphic.setColor(Color.black);
-        bufferGraphic.setStroke(new BasicStroke(2));
+        bufferGraphic.setStroke(new BasicStroke(1));
         for (Iterator<Edge> edge = Model.edges.iterator(); edge.hasNext();) {
             Edge e = edge.next();
             Point source = (Point) e.getSource().getLocation().clone();
@@ -1131,10 +1296,16 @@ public class GraphifyGUI extends javax.swing.JFrame {
                         new Color(180, 30, 255, (int) (e.getGlowLevel() * 255)));
                 bufferGraphic.fillRect(xmid - 6, ymid - 14, 50, 20);
                 bufferGraphic.setColor(Color.black);
-                bufferGraphic.setStroke(new BasicStroke(2));
-                if(isWeighted == true){
+//                if(isComplete == true){
+//                    bufferGraphic.setStroke(new BasicStroke(1));
+//                }else{
+//                    bufferGraphic.setStroke(new BasicStroke(1));
+//                }
+                bufferGraphic.setStroke(new BasicStroke(1));
+
+                if (isWeighted == true) {
                     bufferGraphic.drawString(String.valueOf(edgeWeight), xmid, ymid);
-                }else{
+                } else {
                     bufferGraphic.drawString("", xmid, ymid);
                 }
                 e.glowDie(.05);
@@ -1143,7 +1314,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
         // Glowing connections
         bufferGraphic.setColor(new Color(10, 230, 40));
-        bufferGraphic.setStroke(new BasicStroke(6));
+        bufferGraphic.setStroke(new BasicStroke(4));
+
         if (!btnReset.isSelected()) {
             for (Iterator<Vertex> it = Model.glowMap.keySet().iterator();
                     it.hasNext();) {
@@ -1164,9 +1336,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 bufferGraphic.setColor(Color.blue);
             } else if (v.getId() == Model._selectedNode || v.getSelected()) {
                 bufferGraphic.setColor(Color.orange);
-            }else if(Model._findNode != -1 && v.getId() == Model._findNode){
+            } else if (Model._findNode != -1 && v.getId() == Model._findNode) {
                 bufferGraphic.setColor(Color.BLUE.brighter());
-            }else {
+            } else {
                 bufferGraphic.setColor(Color.red);
             }
             if (!Model.failed.isEmpty()) {
@@ -1344,6 +1516,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         lblCapTransferred.setForeground(c);
     }
 
+    public void setlblIterations(String txt) {
+        lblIterationNum.setText(txt);
+    }
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -1389,9 +1565,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnStart;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JCheckBoxMenuItem chkComplete;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
@@ -1402,11 +1580,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> jcbAlgo;
     private javax.swing.JLabel lblCapTransferred;
     private javax.swing.JLabel lblCapacity;
+    private javax.swing.JLabel lblCoolingRate;
     private javax.swing.JLabel lblFinalDistValue;
     private javax.swing.JLabel lblFinalDistance;
     private java.awt.Label lblInfo;
     private javax.swing.JLabel lblInitalDistValue;
     private javax.swing.JLabel lblInitalDistance;
+    public static javax.swing.JLabel lblIterationNum;
+    private javax.swing.JLabel lblNoIterations;
+    private javax.swing.JLabel lblPopulationSize;
+    private javax.swing.JLabel lblTemperature;
+    public static javax.swing.JLabel lblTimeTaken;
     private javax.swing.JMenu mnuEdit;
     private javax.swing.JMenu mnuFile;
     private javax.swing.JMenuItem mnuNew;
@@ -1419,6 +1603,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JRadioButton rdnFailSim;
     private javax.swing.JSlider sldrWeightSpeed;
     private javax.swing.JTextArea txtConsole;
+    public static javax.swing.JTextField txtCoolingRate;
+    public static javax.swing.JTextField txtIterNum;
+    public static javax.swing.JTextField txtPopSize;
+    public static javax.swing.JTextField txtTemperature;
     private javax.swing.JTextField txtVertexLookUp;
     // End of variables declaration//GEN-END:variables
 }

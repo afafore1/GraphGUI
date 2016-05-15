@@ -71,6 +71,12 @@ public abstract class Model {
     public static int InitialDistanceValue = 0;
     public static int FinalDistanceValue = 0;
     
+    //timer
+    public static long startTime = 0;
+    public static long endTime = 0;
+    
+    public static int counter = 0;
+    
 
     public static final int TOOL_NONE = -1;
     public static final int TOOL_VERTEX = 0;

@@ -15,8 +15,10 @@ public class TSP_SA {
     static double coolingRate = 0.003;
 
     private static void reset() {
-        temp = 10000;
-        coolingRate = 0.003;
+        String tempRate = GraphifyGUI.txtTemperature.getText();
+        String coolRate = GraphifyGUI.txtCoolingRate.getText();
+        temp = !tempRate.equals("10000") ? Double.parseDouble(tempRate) : 10000;
+        coolingRate = !coolRate.equals("0.003") ? Double.parseDouble(coolRate) : 0.003;
         Model.InitialDistanceValue = 0;
         Model.FinalDistanceValue = 0;
     }
@@ -58,6 +60,8 @@ public class TSP_SA {
 
     public static void start() {
         reset();
+        Model.counter = 0;
+        Model.startTime = System.currentTimeMillis();
         Tour currentSolution = new Tour();
         currentSolution.generateIndividual();
         Model.Gui.printlnConsole("Initial Solution distance: " + currentSolution.getTourDistance());
@@ -89,7 +93,10 @@ public class TSP_SA {
             }
 
             temp *= 1 - coolingRate;
+            Model.Gui.setlblIterations(String.valueOf(++Model.counter));
         }
+        Model.endTime = System.currentTimeMillis();
+        GraphifyGUI.lblTimeTaken.setText(String.valueOf((Model.endTime - Model.startTime))+" ms");
         Model.Gui.printlnConsole("Final Solution: " + best.getTourDistance());
         Model.FinalDistanceValue = best.getTourDistance();
 

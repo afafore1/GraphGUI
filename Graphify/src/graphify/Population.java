@@ -5,6 +5,9 @@
  */
 package graphify;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 /**
  *
  * @author Ayomitunde
@@ -31,15 +34,24 @@ public class Population {
         return tours[index];
     }
     
-    public Tour getFittest(){
-        Tour fittest = tours[0];
-        for(int i = 1; i < populationSize(); i++){
+    public void getParents(){
+        getFittest(0);
+        getFittest(1);       
+    }
+    
+    public Tour getFittest(int index){
+        Tour fittest = tours[index];
+        int fittestIndex = 0;
+        for(int i = index > 0 ? 2 : 1; i < populationSize(); i++){
             Tour next = getTour(i);
-            //System.out.println(next.getTour()+" "+next.getTourDistance());
             if(fittest.getFitness() <= next.getFitness()){
                 fittest = next;
+                fittestIndex = i;
             }
         }
+        //swap fittest with location index specified
+        tours[fittestIndex] = getTour(index);
+        tours[index] = fittest;
         return fittest;
     }
     

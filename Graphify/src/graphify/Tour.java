@@ -33,7 +33,6 @@ public class Tour {
             setVertex(vertexIndex, Model.vertices.get(vertexIndex));
         });
         Collections.shuffle(tour);
-        System.out.println(tour.toString());
     }
 
     public boolean isSafe(Vertex s, Vertex d) {
@@ -74,8 +73,6 @@ public class Tour {
 
     public int getTourDistance() {
         if (distance == 0) {
-            int tourDistance = 0;
-
             for (int vertexIndex = 0; vertexIndex < tourSize(); vertexIndex++) {
                 Vertex fromVertex = getVertex(vertexIndex);
                 Vertex destinationVertex;
@@ -86,11 +83,9 @@ public class Tour {
                 }
                 int dist = getDistance(fromVertex, destinationVertex);
                 if (dist != -1) { // means there is a connection
-                    tourDistance += dist;
+                    distance += dist;
                 }
-
             }
-            distance = tourDistance;
         }
         return distance;
     }
