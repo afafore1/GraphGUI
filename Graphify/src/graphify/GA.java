@@ -35,6 +35,7 @@ public class GA {
             TSP_GA.setPath(child);
             child.getFitness();
             newPopulation.saveTour(i, child);
+            Model.Gui.setlblIterations(String.valueOf(Model.counter++));
         }
 
         for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {
@@ -58,6 +59,7 @@ public class GA {
                 }
             }
         }
+
 
         for (int i = 0; i < parent2.tourSize(); i++) {
             if (!child.containsVertex(parent2.getVertex(i))) {

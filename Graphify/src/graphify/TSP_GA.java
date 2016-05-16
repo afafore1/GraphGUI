@@ -46,7 +46,7 @@ public class TSP_GA {
         pop = GA.evolvePopulation(pop);
         for(int i = 0; i < iterations; i++){
             pop = GA.evolvePopulation(pop);
-            Model.Gui.setlblIterations(String.valueOf(Model.counter++));
+            //Model.Gui.setlblIterations(String.valueOf(Model.counter++));
         }
         Model.endTime = System.currentTimeMillis();
         GraphifyGUI.lblTimeTaken.setText(String.valueOf((Model.endTime - Model.startTime))+" ms");

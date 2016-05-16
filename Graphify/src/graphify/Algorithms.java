@@ -20,6 +20,7 @@ import java.util.Stack;
  */
 public class Algorithms {
 
+    static boolean pop = true;
     /**
      *
      * @param u
@@ -161,7 +162,56 @@ public class Algorithms {
         }
         Model.Gui.printlnConsole("Order is " + Model.conn);
     }
-    
+
+    public static void NearestNeighbor() {
+        reset();
+        Model.startTime = System.currentTimeMillis();
+        Model.stack = new Stack();
+        // start with a random Node
+        int random = (int) (Math.random() * Model.vertices.size());
+        Vertex startNode = Model.vertices.get(random);
+        startNode.setVisited(true);
+        Model.stack.push(startNode);
+        while (!Model.stack.isEmpty()) {
+            startNode = nextPath(startNode);
+            if(startNode == null){
+                printSolution();
+            }
+        }
+        Model.endTime = System.currentTimeMillis();
+        GraphifyGUI.lblTimeTaken.setText(String.valueOf((Model.endTime - Model.startTime))+" ms");
+    }
+
+    static void printSolution(){
+        Model.glowMap.clear();
+        Vertex last = Model.stack.peek();
+        Model.FinalDistanceValue = 0;
+        while(!Model.stack.isEmpty()){
+            Vertex current = Model.stack.pop();
+            Vertex next = Model.stack.isEmpty() ? last : Model.stack.peek();
+            Model.glowMap.put(current, next);
+            Model.FinalDistanceValue += GetEdgeWeight(current, next);
+            Model.Gui.printConsole("Vertex "+ current.label+" -> ");
+        }
+    }
+    private static Vertex nextPath(Vertex source) {
+        Vertex n = null;
+        int leastWeight = Integer.MAX_VALUE;
+        for (Edge e : source.eList()) {
+            if (e.getWeight() < leastWeight) {
+                if (e.getDest().visited() == false) {
+                    leastWeight = e.getWeight();
+                    n = e.getDest();
+                    pop = false;
+                }
+            }
+        }
+        if(n != null){
+            n.setVisited(true);
+            Model.stack.push(n);
+        }
+        return n;
+    }
 
     public static boolean pathExist(Vertex source, Vertex dest) {
         Model.vertices.values().stream().forEach((v) -> {
@@ -178,11 +228,9 @@ public class Algorithms {
                     Vertex next = getConn(current, t);
                     if (next == dest) {
                         return true; // a path exist
-                    } else {
-                        if (next.visited() == false) {
-                            next.setVisited(true);
-                            Model.queue.add(next);
-                        }
+                    } else if (next.visited() == false) {
+                        next.setVisited(true);
+                        Model.queue.add(next);
                     }
                 }
             }
@@ -225,6 +273,15 @@ public class Algorithms {
             }
         }
         return null;
+    }
+    
+    public static int GetEdgeWeight(Vertex s, Vertex d){
+        for(Edge edge : s.eList()){
+            if(edge.getDest().equals(d)){
+                return edge.getWeight();
+            }
+        }
+        return -1;
     }
 
     public static void disJointshortestPath(int v, int e) {
@@ -327,7 +384,7 @@ public class Algorithms {
         List<Vertex> neighbors = getNeighbors(v);
         neighbors.stream().forEach((Vertex t) -> {
             int combWeight = GSD(v) + getWeight(v, t);
-            /*getWeight*/   if (GSD(t) > combWeight) {
+            /*getWeight*/ if (GSD(t) > combWeight) {
                 Model.dist.put(t, GSD(v) + getWeight(v, t));
                 t.parent = v;
                 Model.uSNodes.add(t);
@@ -456,7 +513,7 @@ public class Algorithms {
         for (Vertex v : Model.vertices.values()) {
             v.setVisited(false);
         }
-        for (Edge e : Model.edges){
+        for (Edge e : Model.edges) {
             e.setFailed(false);
         }
         Model.setShortestPath.clear();

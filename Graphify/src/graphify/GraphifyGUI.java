@@ -276,7 +276,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
         });
 
-        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "OtherBfs", "DFS", "Dijkstra", "Connectedness", "TSP-SA", "TSP-GA" }));
+        jcbAlgo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BFS", "OtherBfs", "DFS", "Dijkstra", "Connectedness", "TSP-SA", "TSP-GA", "Nearest Neighbor" }));
         jcbAlgo.setSelectedIndex(0);
         jcbAlgo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -623,6 +623,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 int yDistance = Math.abs(v.getY() - dest.getY());
                 Model.weight = (int) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
                 addEdge(Model.Edgeid, v.getId(), dest.getId(), Model.weight);
+                addEdge(Model.Edgeid, dest.getId(), v.getId(), Model.weight);
                 Autodraw(point);
                 //Model._selectedNode = -1;
                 Model.changesMade = true;
@@ -838,6 +839,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
             lblCoolingRate.setVisible(true);
             txtTemperature.setVisible(true);
             txtCoolingRate.setVisible(true);
+        }else if(selected.equals("Nearest Neighbor")){
+            lblFinalDistance.setVisible(true);
+            lblFinalDistValue.setVisible(true);
         }
     }//GEN-LAST:event_jcbAlgoActionPerformed
 
@@ -915,6 +919,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 txtConsole.setText("");
                 TSP_GA.start();
                 lblInitalDistValue.setText(String.valueOf(Model.InitialDistanceValue));
+                lblFinalDistValue.setText(String.valueOf(Model.FinalDistanceValue));
+                break;
+            case "Nearest Neighbor":
+                txtConsole.setText("");
+                Algorithms.NearestNeighbor();
                 lblFinalDistValue.setText(String.valueOf(Model.FinalDistanceValue));
                 break;
             default:
