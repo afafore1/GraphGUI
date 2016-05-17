@@ -181,7 +181,36 @@ public class Algorithms {
         Model.endTime = System.currentTimeMillis();
         GraphifyGUI.lblTimeTaken.setText(String.valueOf((Model.endTime - Model.startTime))+" ms");
     }
+    
+    public static void startGANN(Population pop){
+        Tour [] tours = pop.getTours();
+        int size = pop.populationSize() - 1;
+        for(int i = 0; i < size; i++){
+            Tour t = tours[i];
+            t = GANearestNeighbor(t, size);
+            pop.saveTour(i, t);
+        }
+    }
 
+    public static Tour GANearestNeighbor(Tour tour, int populationSize){
+        reset();
+        Model.stack = new Stack();
+        int random = (int) (Math.random() * Model.vertices.size());
+        Vertex startNode = Model.vertices.get(random);
+        startNode.setVisited(true);
+        Model.stack.push(startNode);
+        while (!Model.stack.isEmpty()) {
+            startNode = nextPath(startNode);
+            if(startNode == null){
+                while(!Model.stack.isEmpty()){
+                    Vertex current = Model.stack.pop();
+                    tour.setVertex(populationSize, current);
+                    populationSize--;
+                }
+            }
+        }
+        return tour;
+    }
     static void printSolution(){
         Model.glowMap.clear();
         Vertex last = Model.stack.peek();

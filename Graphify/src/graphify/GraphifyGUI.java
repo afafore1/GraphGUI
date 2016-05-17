@@ -143,8 +143,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         btnFindVertex = new javax.swing.JButton();
         lblNoIterations = new javax.swing.JLabel();
         txtIterNum = new javax.swing.JTextField();
-        lblPopulationSize = new javax.swing.JLabel();
-        txtPopSize = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         lblTimeTaken = new javax.swing.JLabel();
         lblTemperature = new javax.swing.JLabel();
@@ -230,7 +228,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         pnlGraph.setLayout(pnlGraphLayout);
         pnlGraphLayout.setHorizontalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1093, Short.MAX_VALUE)
+            .addGap(0, 1089, Short.MAX_VALUE)
         );
         pnlGraphLayout.setVerticalGroup(
             pnlGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -310,10 +308,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
         lblNoIterations.setText("Number of Iterations");
 
         txtIterNum.setText("100");
-
-        lblPopulationSize.setText("Population Size");
-
-        txtPopSize.setText("0");
 
         jLabel6.setText("Time Taken");
 
@@ -446,7 +440,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 659, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 655, Short.MAX_VALUE)
                                 .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -481,18 +475,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btnPrintList, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(9, 9, 9))))
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1099, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1095, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnFindVertex)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(txtCoolingRate, javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(lblTemperature, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(txtTemperature, javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(lblNoIterations, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(txtIterNum, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(lblPopulationSize, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(txtPopSize, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(txtIterNum, javax.swing.GroupLayout.Alignment.LEADING))
+                    .addComponent(btnFindVertex)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(txtCoolingRate, javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(txtVertexLookUp, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblCoolingRate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -524,11 +517,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
                                 .addComponent(lblNoIterations)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtIterNum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lblPopulationSize)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtPopSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblTemperature)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtTemperature, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -587,8 +576,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
         lblFinalDistance.setVisible(false);
         lblInitalDistValue.setVisible(false);
         lblFinalDistValue.setVisible(false);
-        lblPopulationSize.setVisible(false);
-        txtPopSize.setVisible(false);
+//        lblPopulationSize.setVisible(false);
+//        txtPopSize.setVisible(false);
         lblNoIterations.setVisible(false);
         txtIterNum.setVisible(false);
         lblTemperature.setVisible(false);
@@ -823,13 +812,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
             lblFinalDistance.setVisible(true);
             lblInitalDistValue.setVisible(true);
             lblFinalDistValue.setVisible(true);
-            lblPopulationSize.setVisible(true);
-            txtPopSize.setVisible(true);
+//            lblPopulationSize.setVisible(true);
+//            txtPopSize.setVisible(true);
             lblNoIterations.setVisible(true);
             txtIterNum.setVisible(true);
-            if (Model.vertices.size() != -1) {
-                txtPopSize.setText(String.valueOf(Model.vertices.size()));
-            }
+//            if (Model.vertices.size() != -1) {
+//                txtPopSize.setText(String.valueOf(Model.vertices.size()));
+//            }
         } else if (selected.equals("TSP-SA")) {
             lblInitalDistance.setVisible(true);
             lblFinalDistance.setVisible(true);
@@ -1597,7 +1586,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JLabel lblInitalDistance;
     public static javax.swing.JLabel lblIterationNum;
     private javax.swing.JLabel lblNoIterations;
-    private javax.swing.JLabel lblPopulationSize;
     private javax.swing.JLabel lblTemperature;
     public static javax.swing.JLabel lblTimeTaken;
     private javax.swing.JMenu mnuEdit;
@@ -1614,7 +1602,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JTextArea txtConsole;
     public static javax.swing.JTextField txtCoolingRate;
     public static javax.swing.JTextField txtIterNum;
-    public static javax.swing.JTextField txtPopSize;
     public static javax.swing.JTextField txtTemperature;
     private javax.swing.JTextField txtVertexLookUp;
     // End of variables declaration//GEN-END:variables

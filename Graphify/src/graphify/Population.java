@@ -5,9 +5,6 @@
  */
 package graphify;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 /**
  *
  * @author Ayomitunde
@@ -26,6 +23,9 @@ public class Population {
         }
     }
     
+    public Tour[] getTours(){
+        return tours;
+    }
     public final void saveTour(int index, Tour tour){
         tours[index] = tour;
     }

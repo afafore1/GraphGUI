@@ -26,7 +26,6 @@ public class GA {
         }
 
         for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {
-            //parent1 = tourSelection(pop);
             tournamentSelection(pop);
             parent1 = pop.getTour(0);
             parent2 = pop.getTour(1);
@@ -114,7 +113,6 @@ public class GA {
 
     private static void tournamentSelection(Population pop) {
         Population tournament = new Population(_tournamentSize, false);
-        
         for (int i = 0; i < _tournamentSize; i++) {
             int randomId = (int) (Math.random() * pop.populationSize());
             tournament.saveTour(i, pop.getTour(randomId));

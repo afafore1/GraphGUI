@@ -170,7 +170,7 @@
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <EmptySpace pref="659" max="32767" attributes="0"/>
+                              <EmptySpace pref="655" max="32767" attributes="0"/>
                               <Component id="lblInfo" min="-2" pref="197" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
@@ -218,19 +218,19 @@
                           </Group>
                       </Group>
                   </Group>
-                  <Component id="jSplitPane1" pref="1099" max="32767" attributes="0"/>
+                  <Component id="jSplitPane1" pref="1095" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="btnFindVertex" min="-2" max="-2" attributes="0"/>
-                  <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                      <Component id="txtCoolingRate" alignment="0" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
                       <Component id="lblTemperature" alignment="0" max="32767" attributes="0"/>
                       <Component id="txtTemperature" alignment="0" max="32767" attributes="0"/>
                       <Component id="lblNoIterations" alignment="0" max="32767" attributes="0"/>
                       <Component id="txtIterNum" alignment="0" max="32767" attributes="0"/>
-                      <Component id="lblPopulationSize" alignment="0" max="32767" attributes="0"/>
-                      <Component id="txtPopSize" alignment="0" max="32767" attributes="0"/>
+                  </Group>
+                  <Component id="btnFindVertex" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                      <Component id="txtCoolingRate" alignment="0" max="32767" attributes="0"/>
                       <Component id="txtVertexLookUp" alignment="0" min="-2" pref="50" max="-2" attributes="0"/>
                       <Component id="lblCoolingRate" alignment="0" max="32767" attributes="0"/>
                   </Group>
@@ -267,11 +267,7 @@
                               <Component id="lblNoIterations" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="txtIterNum" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="lblPopulationSize" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="txtPopSize" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="lblTemperature" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="txtTemperature" min="-2" max="-2" attributes="0"/>
@@ -410,7 +406,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="1093" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="1089" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -563,21 +559,6 @@
     <Component class="javax.swing.JTextField" name="txtIterNum">
       <Properties>
         <Property name="text" type="java.lang.String" value="100"/>
-      </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
-      </AuxValues>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblPopulationSize">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Population Size"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="txtPopSize">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="&quot;0&quot;" type="code"/>
-        </Property>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>

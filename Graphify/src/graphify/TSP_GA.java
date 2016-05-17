@@ -34,16 +34,17 @@ public class TSP_GA {
     public static void start(){
         reset();
         Model.counter = 1;
-        String txtPopSize = GraphifyGUI.txtPopSize.getText();
+        //String txtPopSize = GraphifyGUI.txtPopSize.getText();
         String txtIterNum = GraphifyGUI.txtIterNum.getText();
         int vertexSize = Model.vertices.size();
-        int popSize = !String.valueOf(vertexSize).equals(txtPopSize) ? Integer.parseInt(txtPopSize) : vertexSize;
+        int popSize = vertexSize;
         int iterations = !txtIterNum.equals("100") ? Integer.parseInt(txtIterNum) : 100;
         Model.startTime = System.currentTimeMillis();
         Population pop = new Population(popSize, true);
+        Algorithms.startGANN(pop);
         Model.InitialDistanceValue = pop.getFittest(0).getTourDistance();
         
-        pop = GA.evolvePopulation(pop);
+        //pop = GA.evolvePopulation(pop);
         for(int i = 0; i < iterations; i++){
             pop = GA.evolvePopulation(pop);
             //Model.Gui.setlblIterations(String.valueOf(Model.counter++));
