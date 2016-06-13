@@ -46,6 +46,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class GraphifyGUI extends javax.swing.JFrame {
 
     private static final long serialVersionUID = 1L;
+    Image backgroundImage;
     Image bufferImage;
     Graphics2D bufferGraphic;
     private ActionListener decreseWeights;
@@ -54,56 +55,56 @@ public class GraphifyGUI extends javax.swing.JFrame {
     static boolean isComplete = false;
 
     public GraphifyGUI() {
-        initComponents();
-        bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
-        bufferGraphic = (Graphics2D) bufferImage.getGraphics();
-        hider();
-        Model.vertices = new HashMap<>();
-        Model.edges = new ArrayList<>();
-        Model.failed = new ArrayList<>();
-        Model.vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
-        Model.randomKeys = new HashSet<>();
-        Model.glowMap = new HashMap<>();
-        Model.cutV = new ArrayList<>();
-        Model.set = new HashMap<>();
-        Model.visited = new HashMap<>();
-        Timer animationTimer = new Timer(30, (ActionEvent e) -> {
-            if (Model.glowMap.size() > 0) {
-                Model.dotOffset = (Model.dotOffset + .07) % 1;
-                graph();
-            }
-        });
-        animationTimer.start();
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                if (checkForChange()) {
-                    System.exit(0);
+            initComponents();
+            bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
+            bufferGraphic = (Graphics2D) bufferImage.getGraphics();
+            hider();
+            Model.vertices = new HashMap<>();
+            Model.edges = new ArrayList<>();
+            Model.failed = new ArrayList<>();
+            Model.vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
+            Model.randomKeys = new HashSet<>();
+            Model.glowMap = new HashMap<>();
+            Model.cutV = new ArrayList<>();
+            Model.set = new HashMap<>();
+            Model.visited = new HashMap<>();
+            Timer animationTimer = new Timer(30, (ActionEvent e) -> {
+                if (Model.glowMap.size() > 0) {
+                    Model.dotOffset = (Model.dotOffset + .07) % 1;
+                    graph();
                 }
-            }
-        });
-
-        for (int i = 0; i < tools.length; i++) {
-            tools[i] = new JToggleButton();
-            tools[i].setFocusable(false);
-            tools[i].setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-            tools[i].setPreferredSize(new java.awt.Dimension(40, 40));
-            tools[i].setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-            tools[i].addActionListener((ActionEvent e) -> {
-                for (JToggleButton tool : tools) {
-                    if (tool != e.getSource()) {
-                        tool.setSelected(false);
+            });
+            animationTimer.start();
+            this.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    if (checkForChange()) {
+                        System.exit(0);
                     }
                 }
             });
-            jToolBar1.add(tools[i]);
-        }
-        tools[0].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/vertex.png")));
-        tools[0].setToolTipText("Place Vertex");
-        tools[1].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/bidirectional.png")));
-        tools[1].setToolTipText("Bidirectonal");
-        tools[2].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/directional.png")));
-        tools[2].setToolTipText("Directional");
+
+            for (int i = 0; i < tools.length; i++) {
+                tools[i] = new JToggleButton();
+                tools[i].setFocusable(false);
+                tools[i].setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+                tools[i].setPreferredSize(new java.awt.Dimension(40, 40));
+                tools[i].setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+                tools[i].addActionListener((ActionEvent e) -> {
+                    for (JToggleButton tool : tools) {
+                        if (tool != e.getSource()) {
+                            tool.setSelected(false);
+                        }
+                    }
+                });
+                jToolBar1.add(tools[i]);
+            }
+            tools[0].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/vertex.png")));
+            tools[0].setToolTipText("Place Vertex");
+            tools[1].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/bidirectional.png")));
+            tools[1].setToolTipText("Bidirectonal");
+            tools[2].setIcon(new javax.swing.ImageIcon(getClass().getResource("/graphify/images/directional.png")));
+            tools[2].setToolTipText("Directional");
     }
 
     @SuppressWarnings("unchecked")
@@ -121,6 +122,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             public void paintComponent(Graphics g) {
                 graph();
                 super.paintComponent(g);
+                g.drawImage(backgroundImage, 0, 0, null);
             }
         };
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -151,6 +153,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         txtCoolingRate = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         lblIterationNum = new javax.swing.JLabel();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0));
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuFile = new javax.swing.JMenu();
         mnuNew = new javax.swing.JMenuItem();
@@ -1263,6 +1266,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     public void graph() {
+//        try {
+//            this.backgroundImage = ImageIO.read(new File("C:\\Users\\Ayomitunde\\Desktop\\GraphifyGUI\\Graphify\\src\\graphify\\images\\us-map.png"));
+//        } catch (IOException ex) {
+//            Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         bufferGraphic.setColor(Color.white);
         bufferGraphic.fillRect(0, 0, pnlGraph.getWidth(), pnlGraph.getHeight());
         Model.connectionCache.clear();
@@ -1564,6 +1572,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private javax.swing.JButton btnStart;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBoxMenuItem chkComplete;
+    private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
