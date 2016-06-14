@@ -1,0 +1,69 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+//code modified from http://www.netinstructions.com/how-to-make-a-simple-web-crawler-in-java/
+// purpose here is to enhance this soon
+package graphify;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jsoup.nodes.Document;
+
+/**
+ *
+ * @author Ayomitunde
+ */
+public class Crawler {
+    static Document doc;
+    static int _maxSearch = 20;
+    static HashSet<String> _visited = new HashSet<>();
+    static List<String> _unvisited = new LinkedList<>();
+
+    public static void Crawl(String url, String searchWord) throws IOException {
+          while(_visited.size() < _maxSearch){
+              String currentUrl;
+              JSearch js = new JSearch();
+              if(_unvisited.isEmpty()){
+                  currentUrl = url;
+                  _visited.add(url);
+              }else{
+                  currentUrl = nextUrl();
+              }
+              js.strip(currentUrl);
+              if(js.searchWord(searchWord))
+              {
+                  System.out.println("found "+searchWord+" at "+currentUrl);
+                  //break;
+              }
+              _unvisited.addAll(js.getLinks());
+          }
+          System.out.println("Visited all ");
+    }
+    
+    private static String nextUrl()
+    {
+        String nextUrl;
+        do
+        {
+            nextUrl = _unvisited.remove(0);
+        }while(_visited.contains(nextUrl));
+        _visited.add(nextUrl);
+        return nextUrl;
+    }
+    
+    public static void main(String [] args){
+        try {
+            Crawl("http://arstechnica.com/", "computer");
+        } catch (IOException ex) {
+            Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+}
