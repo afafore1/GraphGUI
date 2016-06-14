@@ -28,6 +28,7 @@ public class Crawler {
     static HashSet<String> _visited = new HashSet<>();
     static List<String> _unvisited = new LinkedList<>();
     static HashMap<String, ArrayList> wordMeaning = new HashMap<>();
+    static List<String> searchedText = new ArrayList<>();
     static String searchWord = "";
 
     public static void Crawl(String url, String searchWord) throws IOException {
@@ -44,7 +45,6 @@ public class Crawler {
               if(js.searchWord(searchWord))
               {
                   System.out.println("found "+searchWord+" at "+currentUrl);
-                 // break;
               }
               _unvisited.addAll(js.getLinks());
           }

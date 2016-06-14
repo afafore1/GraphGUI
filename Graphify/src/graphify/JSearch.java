@@ -71,7 +71,11 @@ public class JSearch {
             String text = "";
             for(int i = 0; i < word.size(); i++)
             {
-                text = word.get(i).ownText();
+                if(!Crawler.searchedText.contains(word.get(i).ownText()) && "".equals(text))
+                {
+                    text = word.get(i).ownText();
+                    Crawler.searchedText.add(text);
+                }
                 String textMean = meaning.get(i).ownText();
                 _unvisited.add(word.get(i).attr("abs:href"));
                 if(Crawler.wordMeaning.containsKey(text)){
@@ -84,6 +88,7 @@ public class JSearch {
                 }
                 System.out.println(text+": "+textMean);
             }
+            System.err.println("I am text "+text);
             Crawler.searchWord = text;
         }        
         return found;
