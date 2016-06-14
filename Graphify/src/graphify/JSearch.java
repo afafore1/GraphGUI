@@ -5,7 +5,10 @@
  */
 package graphify;
 
+import static graphify.Crawler._unvisited;
+import static graphify.Crawler.searchWord;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.jsoup.Connection;
@@ -22,6 +25,7 @@ public class JSearch {
     private static final String _userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
     private List<String> links = new LinkedList<>();
     private Document doc;
+    private boolean found = false;
     
     public boolean strip(String url) throws IOException{
         try{
@@ -37,7 +41,12 @@ public class JSearch {
                 System.out.println("No html here");
                 return false;
             }
-            Elements allLinks = hdoc.select("a[href]");
+            Elements allLinks = hdoc.select("a[href*=/define.php?]");
+            String snip = url.substring(url.lastIndexOf("="));
+            Elements badremove = hdoc.select("a[href*="+snip+"]");
+            allLinks.remove(badremove);
+            System.out.println(allLinks);
+            //System.exit(0);
             for(Element l : allLinks)
             {
                 links.add(l.absUrl("href"));
@@ -55,7 +64,30 @@ public class JSearch {
             return false;
         }
         String body = doc.body().text();
-        return body.toLowerCase().contains(searchWord.toLowerCase());
+        found = body.toLowerCase().contains(searchWord.toLowerCase());
+        if(found)
+        {
+            Elements word = doc.select("a.word");
+            Elements meaning = doc.select("div.meaning");
+            String text = "";
+            for(int i = 0; i < word.size(); i++)
+            {
+                text = word.get(i).ownText();
+                String textMean = meaning.get(i).ownText();
+                _unvisited.add(word.get(i).attr("abs:href"));
+                if(Crawler.wordMeaning.containsKey(text)){
+                    ArrayList<String> textList = Crawler.wordMeaning.get(text);
+                    textList.add(textMean);
+                    Crawler.wordMeaning.put(text, textList);
+                }else{
+                    ArrayList<String> list = new ArrayList<>();
+                    Crawler.wordMeaning.put(text, list);
+                }
+                System.out.println(text+": "+textMean);
+            }
+            searchWord = text;
+        }        
+        return found;
     }
     
     public List<String> getLinks()

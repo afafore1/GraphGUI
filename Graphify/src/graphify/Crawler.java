@@ -9,6 +9,8 @@
 package graphify;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,9 +24,11 @@ import org.jsoup.nodes.Document;
  */
 public class Crawler {
     static Document doc;
-    static int _maxSearch = 20;
+    static int _maxSearch = 10;
     static HashSet<String> _visited = new HashSet<>();
     static List<String> _unvisited = new LinkedList<>();
+    static HashMap<String, ArrayList> wordMeaning = new HashMap<>();
+    static String searchWord = "";
 
     public static void Crawl(String url, String searchWord) throws IOException {
           while(_visited.size() < _maxSearch){
@@ -40,7 +44,7 @@ public class Crawler {
               if(js.searchWord(searchWord))
               {
                   System.out.println("found "+searchWord+" at "+currentUrl);
-                  //break;
+                 // break;
               }
               _unvisited.addAll(js.getLinks());
           }
@@ -53,14 +57,17 @@ public class Crawler {
         do
         {
             nextUrl = _unvisited.remove(0);
-        }while(_visited.contains(nextUrl));
+            String subUrl = nextUrl.substring(nextUrl.indexOf("&"));
+            //removeDups(subUrl);
+        }while(_visited.contains(nextUrl) && _unvisited.size() > 0);
         _visited.add(nextUrl);
         return nextUrl;
     }
     
     public static void main(String [] args){
+        searchWord = "hi";
         try {
-            Crawl("http://arstechnica.com/", "computer");
+            Crawl("http://www.urbandictionary.com/define.php?term=hi", searchWord);
         } catch (IOException ex) {
             Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
         }
