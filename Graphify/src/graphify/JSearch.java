@@ -27,7 +27,7 @@ public class JSearch {
     private Document doc;
     private boolean found = false;
     
-    public boolean strip(String url) throws IOException{
+    public boolean strip(String url, String searchWord) throws IOException{
         try{
             Connection conn = Jsoup.connect(url).userAgent(_userAgent);
             Document hdoc = conn.get();
@@ -42,11 +42,10 @@ public class JSearch {
                 return false;
             }
             Elements allLinks = hdoc.select("a[href*=/define.php?]");
-            String snip = url.substring(url.lastIndexOf("="));
-            Elements badremove = hdoc.select("a[href*="+snip+"]");
-            allLinks.remove(badremove);
-            System.out.println(allLinks);
-            //System.exit(0);
+            Elements badLinks = hdoc.select("a[href*="+searchWord+"]");
+            allLinks.removeAll(badLinks);
+//            System.out.println(allLinks);
+//            System.exit(0);
             for(Element l : allLinks)
             {
                 links.add(l.absUrl("href"));
@@ -85,7 +84,7 @@ public class JSearch {
                 }
                 System.out.println(text+": "+textMean);
             }
-            searchWord = text;
+            Crawler.searchWord = text;
         }        
         return found;
     }

@@ -24,7 +24,7 @@ import org.jsoup.nodes.Document;
  */
 public class Crawler {
     static Document doc;
-    static int _maxSearch = 10;
+    static int _maxSearch = 28;
     static HashSet<String> _visited = new HashSet<>();
     static List<String> _unvisited = new LinkedList<>();
     static HashMap<String, ArrayList> wordMeaning = new HashMap<>();
@@ -40,7 +40,7 @@ public class Crawler {
               }else{
                   currentUrl = nextUrl();
               }
-              js.strip(currentUrl);
+              js.strip(currentUrl, searchWord);
               if(js.searchWord(searchWord))
               {
                   System.out.println("found "+searchWord+" at "+currentUrl);
@@ -57,7 +57,6 @@ public class Crawler {
         do
         {
             nextUrl = _unvisited.remove(0);
-            String subUrl = nextUrl.substring(nextUrl.indexOf("&"));
             //removeDups(subUrl);
         }while(_visited.contains(nextUrl) && _unvisited.size() > 0);
         _visited.add(nextUrl);
