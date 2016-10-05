@@ -115,7 +115,7 @@ public class Algorithms {
                 Model.Gui.printlnConsole("Removing " + Model.stack.pop());
             } else {
                 for (Iterator<Edge> currentList = current.eList().iterator(); currentList.hasNext();) {
-                    Edge t = currentList.next();
+                    IEdge t = currentList.next();
                     if (!t.isFailed()) {
                         Vertex next = getConn(current, t);
                         if (next.visited() == false) { // visited just one at a time
@@ -347,7 +347,7 @@ public class Algorithms {
      * @param e edge associated with vertex s
      * @return get destination of vertex passed in from edge
      */
-    public static Vertex getConn(Vertex s, Edge e) {
+    public static Vertex getConn(Vertex s, IEdge e) {
         if (e.getBidirectional()) {
             if (e.getSource() == s) {
                 return e.getDest();
@@ -397,7 +397,7 @@ public class Algorithms {
         HashSet<Edge> n = Model.vertices.get(v.getId()).eList();
         Iterator<Edge> neighb = n.iterator();
         while (neighb.hasNext()) {
-            Edge t = neighb.next();
+            IEdge t = neighb.next();
             if (!Model.failed.contains(t.getDest())) {
                 Vertex next = getConn(v, t);
                 if (!isSettled(next)) {
@@ -453,7 +453,7 @@ public class Algorithms {
             Vertex current = Model.suggestQueue.poll(); // remove first 
             Iterator<Edge> currentList = current.eList().iterator();
             while (currentList.hasNext()) {
-                Edge t = currentList.next();
+                IEdge t = currentList.next();
                 Vertex next = getConn(current, t);
                 if (next.visited() == false) {
                     next.setVisited(true);

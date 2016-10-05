@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Queue;
 import java.io.Serializable;
 
-public class Vertex implements Serializable {
+public class Vertex implements Serializable, IVertex {
 
     public String label;
     private boolean wasVisited;
@@ -45,17 +45,21 @@ public class Vertex implements Serializable {
     }
 
     
+    @Override
     public int getX(){
         return this.location.x;
     }
     
+    @Override
     public int getY(){
         return this.location.y;
     }
+    @Override
     public String getLabel() {
         return (this.label + " ");
     }
     
+    @Override
     public HashMap getPath(){
         return this.path;
     }
@@ -65,14 +69,17 @@ public class Vertex implements Serializable {
      * @return 
      * returns name assigned to this vertex
      */
+    @Override
     public String getName() {
         return this.label;
     }
     
+    @Override
     public boolean visited(){
         return this.wasVisited;
     }
     
+    @Override
     public void setVisited(boolean bool){
         this.wasVisited = bool;
     }
@@ -81,10 +88,12 @@ public class Vertex implements Serializable {
      * @return 
      * returns type of this vertex
      */
+    @Override
     public String getType() {
         return this.type;
     }
 
+    @Override
     public int getId() {
         return this.id;
     }
@@ -98,6 +107,7 @@ public class Vertex implements Serializable {
      * @return 
      * returns the capacity of this vertex
      */
+    @Override
     public int getCapacity() {
         return this.cap;
     }
@@ -107,10 +117,12 @@ public class Vertex implements Serializable {
      * @param x
      * sets capacity of vertex to x
      */
+    @Override
     public void setCapacity(int x){
         this.cap = x;
     }
 
+    @Override
     public Vertex getVertex(int id) {
         return this;
     }
@@ -120,6 +132,7 @@ public class Vertex implements Serializable {
      * @return 
      * returns x,y coordinate of vertex
      */
+    @Override
     public Point getLocation() {
         return this.location;
     }
@@ -129,6 +142,7 @@ public class Vertex implements Serializable {
      * @return 
      * returns edges connected to this vertex
      */
+    @Override
     public HashSet<Edge> eList() {
         return this.eList;
     }
@@ -138,14 +152,17 @@ public class Vertex implements Serializable {
      * @return 
      * returns the parent of this vertex
      */
+    @Override
     public Vertex getParent() {
         return this.parent;
     }
 
+    @Override
     public boolean getSelected() {
         return selected;
     }
     
+    @Override
     public void setSelected(boolean sel) {
         selected = sel;
     }
@@ -175,7 +192,7 @@ public class Vertex implements Serializable {
 //	}
 }
 
-class Edge implements Serializable {
+class Edge implements Serializable, IEdge {
 
     private final int id;
     private final Vertex source;
@@ -194,54 +211,67 @@ class Edge implements Serializable {
         bidirectional = false;
     }
 
+    @Override
     public boolean getBidirectional() {
         return bidirectional;
     }
 
+    @Override
     public void setBidirectional(boolean bi) {
         bidirectional = bi;
     }
 
+    @Override
     public int getId() {
         return id;
     }
 
+    @Override
     public Vertex getDest() {
         return dest;
     }
 
+    @Override
     public Vertex getSource() {
         return source;
     }
 
+    @Override
     public int getWeight() {
         return weight;
     }
     
+    @Override
     public void setWeight(int w){
         this.weight = w;
     }
 
+    @Override
     public String getConnections() {
         return source.getId() + "," + dest.getId();
     }
 
+    @Override
     public double getGlowLevel() {
         return glowLevel;
     }
 
+    @Override
     public void glowDie(double decrement) {
         glowLevel = Math.max(glowLevel - decrement, 0);
     }
 
+    @Override
     public void setGlowLevel(double newGlow) {
         glowLevel = newGlow;
     }
 
+    @Override
     public boolean isFailed() {
         return this.fail;
     }
 
+    @Override
     public void setFailed(boolean bool) {
         this.fail = bool;
     }
