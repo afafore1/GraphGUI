@@ -5,6 +5,12 @@
  */
 package graphify;
 
+
+import algorithms.GraphAlgos;
+import graph.Edge;
+import graph.Graph;
+import graph.IGraph;
+import graph.Vertex;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -46,30 +52,50 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class GraphifyGUI extends javax.swing.JFrame {
 
     private static final long serialVersionUID = 1L;
+    double _dotOffset = 0.0;
     Image bufferImage;
     Graphics2D bufferGraphic;
     private ActionListener decreseWeights;
     private JToggleButton[] tools = new JToggleButton[3];
+    HashMap<Integer, Integer> _connectionCache = new HashMap<>();
+    private Color[] _vertexColors;
     static boolean isWeighted = false;
     static boolean isComplete = false;
+    boolean changesMade = false;
+    private IGraph _graph;
+    private GraphAlgos _graphAlgo;
+    final int ARR_SIZE = 8;
+    int _id = 0;
+    int _selectedNode = -1;
+    int _source = -1;
+    int _dest = -1;
+    int node1 = -1; // is node1 and node2 really necessary ?
+    int node2 = -1;
+    int _findNode = -1;
+    int TOOL_NONE = -1;
+    int _toolType = -1;
+    int TOOL_VERTEX = 0;
+    int TOOL_BIDIRECTIONAL = 1;
+    int TOOL_DIRECTIONAL = 2;
+    int _SIZE_OF_NODE = 20;
+    int _edgeId = 0;
+    int _decreaseWeightEllapse = 0;
+    String _sim = null;
+    HashMap<Integer, Integer> _set;
+    String _currentProject = null;
 
     public GraphifyGUI() {
+        _graph = new Graph();
+        _graphAlgo = new GraphAlgos(_graph);
+        _set = new HashMap<>();
         initComponents();
         bufferImage = createImage(pnlGraph.getWidth() - 2, pnlGraph.getHeight() - 2);
         bufferGraphic = (Graphics2D) bufferImage.getGraphics();
         hider();
-        Model.vertices = new HashMap<>();
-        Model.edges = new ArrayList<>();
-        Model.failed = new ArrayList<>();
-        Model.vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
-        Model.randomKeys = new HashSet<>();
-        Model.glowMap = new HashMap<>();
-        Model.cutV = new ArrayList<>();
-        Model.set = new HashMap<>();
-        Model.visited = new HashMap<>();
+        _vertexColors = new Color[]{Color.blue, Color.red, Color.yellow, Color.green, Color.magenta, Color.orange};
         Timer animationTimer = new Timer(30, (ActionEvent e) -> {
-            if (Model.glowMap.size() > 0) {
-                Model.dotOffset = (Model.dotOffset + .07) % 1;
+            if (_graphAlgo.GetPathMap().size() > 0) {
+                _dotOffset = (_dotOffset + .07) % 1;
                 graph();
             }
         });
@@ -591,33 +617,33 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Image buff = createImage(pnlGraph.getWidth() - 1, pnlGraph.getHeight() - 1);
         Graphics buffG = buff.getGraphics();
         buffG.drawImage(bufferImage, 0, 0, this);
-        Point source = Model.vertices.get(Model._selectedNode).getLocation();
+        Point source = _graph.GetVertices().get(_selectedNode).getLocation();
         drawArrow(buffG, source.x, source.y, dest.x, dest.y);
         drawArrow(buffG, dest.x, dest.y, source.x, source.y);
         pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
     }
 
     private void AutoAddEdge(Vertex v) {
-        Model.weight = 0;
-        if (Model._selectedNode >= 0) {
-            for (Integer d : Model.vertices.keySet()) {
+        int weight = 0;
+        if (_selectedNode >= 0) {
+            for (Integer d : _graph.GetVertices().keySet()) {
                 Vertex dest = null;
-                if (!Model.vertices.get(d).equals(v)) {
-                    dest = Model.vertices.get(d);
+                if (!_graph.GetVertices().get(d).equals(v)) {
+                    dest = _graph.GetVertices().get(d);
+                    Point point = dest.getLocation();
+                int xDistance = Math.abs(v.getX() - dest.getX());
+                int yDistance = Math.abs(v.getY() - dest.getY());
+                weight = (int) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
+                addEdge(_edgeId, v.getId(), dest.getId(), weight);
+                //addEdge(_edgeId, dest.getId(), v.getId(), weight);
+                Autodraw(point);
+                //_selectedNode = -1;
+                changesMade = true;
+                _edgeId++;
                 } else {
                     continue;
                 }
-                Point point = dest.getLocation();
-                int xDistance = Math.abs(v.getX() - dest.getX());
-                int yDistance = Math.abs(v.getY() - dest.getY());
-                Model.weight = (int) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
-                addEdge(Model.Edgeid, v.getId(), dest.getId(), Model.weight);
-                addEdge(Model.Edgeid, dest.getId(), v.getId(), Model.weight);
-                Autodraw(point);
-                //Model._selectedNode = -1;
-                Model.changesMade = true;
-                Model.Edgeid++;
-                //graph();
+                //_graph();
             }
         }
         graph();
@@ -625,27 +651,27 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void pnlGraphMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseDragged
         if (SwingUtilities.isLeftMouseButton(evt)) {
-            if ((Model.toolType == Model.TOOL_BIDIRECTIONAL
-                    || Model.toolType == Model.TOOL_DIRECTIONAL)
-                    && Model._selectedNode >= 0) {
+            if ((_toolType == TOOL_BIDIRECTIONAL
+                    || _toolType == TOOL_DIRECTIONAL)
+                    && _selectedNode >= 0) {
                 Image buff = createImage(pnlGraph.getWidth() - 1, pnlGraph.getHeight() - 1);
                 Graphics buffG = buff.getGraphics();
                 buffG.drawImage(bufferImage, 0, 0, this);
-                Point source = Model.vertices.get(Model._selectedNode).getLocation();
+                Point source = _graph.GetVertices().get(_selectedNode).getLocation();
                 drawArrow(buffG, source.x, source.y, evt.getX(), evt.getY());
-                if (Model.toolType == Model.TOOL_BIDIRECTIONAL) {
+                if (_toolType == TOOL_BIDIRECTIONAL) {
                     drawArrow(buffG, evt.getX(), evt.getY(), source.x, source.y);
                 }
                 pnlGraph.getGraphics().drawImage(buff, 1, 1, this);
             }
-            if ((Model.toolType == Model.TOOL_NONE
-                    || Model.toolType == Model.TOOL_VERTEX)
-                    && Model._selectedNode >= 0) {
-                Vertex selectedVertex = Model.vertices.get(Model._selectedNode);
+            if ((_toolType == TOOL_NONE
+                    || _toolType == TOOL_VERTEX)
+                    && _selectedNode >= 0) {
+                Vertex selectedVertex = _graph.GetVertices().get(_selectedNode);
                 int dX = evt.getX() - selectedVertex.getLocation().x;
                 int dY = evt.getY() - selectedVertex.getLocation().y;
                 for (Iterator<Vertex> it
-                        = Model.vertices.values().iterator();
+                        = _graph.GetVertices().values().iterator();
                         it.hasNext();) {
                     Vertex vertex = it.next();
                     if (vertex.getSelected()) {
@@ -655,25 +681,25 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     }
                 }
                 graph();
-                Model.changesMade = true;
+                changesMade = true;
             }
         }
     }//GEN-LAST:event_pnlGraphMouseDragged
 
     private void pnlGraphMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseClicked
         if (SwingUtilities.isLeftMouseButton(evt)) {
-            Model._selectedNode = nodeSelected(evt.getX(), evt.getY());
+            _selectedNode = nodeSelected(evt.getX(), evt.getY());
             if (evt.getClickCount() == 2) {
-                if (Model._source == -1 && Model._dest == -1
-                        || Model._source != -1 && Model._dest != -1) {
-                    Model.glowMap.clear();
-                    Model._source = Model._selectedNode;
-                    Model._dest = -1;
-                } else if (Model._source != Model._selectedNode) {
-                    Model.glowMap.clear();
-                    Model._dest = Model._selectedNode;
-                    Model.set.clear();
-                    Vertex dest = Model.vertices.get(Model._dest);
+                if (_source == -1 && _dest == -1
+                        || _source != -1 && _dest != -1) {
+                    _graphAlgo.GetPathMap().clear();
+                    _source = _selectedNode;
+                    _dest = -1;
+                } else if (_source != _selectedNode) {
+                    _graphAlgo.GetPathMap().clear();
+                    _dest = _selectedNode;
+                    _set.clear();
+                    Vertex dest = _graph.GetVertices().get(_dest);
                     dest.setCapacity(150);
                 }
                 graph();
@@ -684,18 +710,18 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private void pnlGraphMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMousePressed
         pnlGraph.requestFocus();
         if (SwingUtilities.isLeftMouseButton(evt)) {
-            Model.toolType = getTool();
+            _toolType = getTool();
             String[] types = new String[]{"Person", "City", "Place"};
-            Model._selectedNode = nodeSelected(evt.getX(), evt.getY());
-            if (Model.node1 == -1) {
-                Model.node1 = Model._selectedNode;
+            _selectedNode = nodeSelected(evt.getX(), evt.getY());
+            if (node1 == -1) {
+                node1 = _selectedNode;
             }
-            if (Model.toolType == Model.TOOL_VERTEX
-                    || Model.toolType == Model.TOOL_NONE) {
+            if (_toolType == TOOL_VERTEX
+                    || _toolType == TOOL_NONE) {
                 if (!evt.isControlDown()) {
-                    if (Model._selectedNode >= 0) {
+                    if (_selectedNode >= 0) {
                         Vertex selectedVertex
-                                = Model.vertices.get(Model._selectedNode);
+                                = _graph.GetVertices().get(_selectedNode);
                         if (!selectedVertex.getSelected()) {
                             clearSelected();
                         }
@@ -704,69 +730,57 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     } else {
                         clearSelected();
                     }
-                } else if (Model._selectedNode >= 0) {
+                } else if (_selectedNode >= 0) {
                     Vertex selectedVertex
-                            = Model.vertices.get(Model._selectedNode);
+                            = _graph.GetVertices().get(_selectedNode);
                     selectedVertex.setSelected(!selectedVertex.getSelected());
                     if (!selectedVertex.getSelected()) {
-                        Model._selectedNode = -1;
+                        _selectedNode = -1;
                         return;
                     }
                 }
             }
-            if (Model.toolType == Model.TOOL_VERTEX) {
-                if (Model._selectedNode < 0) {
-                    Model.changesMade = true;
+            if (_toolType == TOOL_VERTEX) {
+                if (_selectedNode < 0) {
+                    changesMade = true;
                     if (isComplete == true) {
-                        Vertex v = new Vertex(Model.id, new Point(evt.getX(), evt.getY()), String.valueOf(Model.id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
-                        Model.vertices.put(v.getId(), v);
-                        Model._selectedNode = Model.id;
-                        Model.id++;
-                        AutoAddEdge(v);
+                        _graph.AddVertex(_id, new Point(evt.getX(), evt.getY()), String.valueOf(_id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
+                        _selectedNode = _id;
+                        _id++;
+                        AutoAddEdge(_graph.GetVertices().get(_id));
                     } else {
-                        Vertex v = new Vertex(Model.id, new Point(evt.getX(), evt.getY()), String.valueOf(Model.id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
-                        Model.vertices.put(v.getId(), v);
-                        Model.id++;
+                        _graph.AddVertex(_id, new Point(evt.getX(), evt.getY()), String.valueOf(_id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
+                        _id++;
                     }
-                } else if (evt.isControlDown() && evt.isShiftDown()) { // control shift to fail all edges leading out of a vertex
-                    Vertex fail = Model.vertices.get(Model._selectedNode);
-                    if (Model.failed.contains(fail)) {
-                        Model.failed.remove(fail);
-                    } else {
-                        Model.failed.add(fail);
-                    }
-                    Iterator<Edge> e = fail.eList().iterator();
-                    while (e.hasNext()) {
-                        Edge next = e.next();
-                        next.setFailed(!next.isFailed()); //set it to opposite of what it is
-                    }
-                    Model.visited.clear();
-                    Model.glowMap.clear();
-                    Model.set.clear();
-                    if (null != Model.sim) {
-                        switch (Model.sim) {
+                } else if (evt.isControlDown() && evt.isShiftDown()) 
+                { // control shift to fail all edges leading out of a vertex
+                    _graphAlgo.FailVertex(_selectedNode);
+                    _graphAlgo.GetPathMap().clear();
+                    _set.clear();
+                    if (_sim != null) {
+                        switch (_sim) {
                             case "DFS":
-                                Algorithms.Dfs(Model.vertices.get(Model._source));
-                                Algorithms.shortestPath(Model._source, Model._dest);
+                                _graphAlgo.Dfs(_graph.GetVertices().get(_source));
+                                _graphAlgo.shortestPath(_source, _dest);
                                 break;
                             case "BFS":
-                                Algorithms.Bfs(Model.vertices.get(Model._source));
-                                Algorithms.shortestPath(Model._source, Model._dest);
+                                _graphAlgo.Bfs(_graph.GetVertices().get(_source));
+                                _graphAlgo.shortestPath(_source, _dest);
                                 break;
                             case "Dijkstra":
-                                Algorithms.execute(Model.vertices.get(Model._source));
-                                Algorithms.shortestPath(Model._source, Model._dest);
+                                _graphAlgo.execute(_graph.GetVertices().get(_source));
+                                _graphAlgo.shortestPath(_source, _dest);
                                 break;
                             default:
                                 break;
                         }
                     }
-                    Model.changesMade = true;
+                    changesMade = true;
                 }
-            } else if (Model.toolType != Model.TOOL_NONE) {
-                if (Model._selectedNode >= 0) {
+            } else if (_toolType != TOOL_NONE) {
+                if (_selectedNode >= 0) {
                     Vertex selectedVertex
-                            = Model.vertices.get(Model._selectedNode);
+                            = _graph.GetVertices().get(_selectedNode);
                     clearSelected();
                     selectedVertex.setSelected(true);
                 }
@@ -777,17 +791,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void pnlGraphMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlGraphMouseReleased
         if (SwingUtilities.isLeftMouseButton(evt)) {
-            Model.weight = 0;
-            if (Model._selectedNode >= 0) {
+            int weight = 0;
+            if (_selectedNode >= 0) {
                 int destination = nodeSelected(evt.getX(), evt.getY());
-                if (destination >= 0 && destination != Model._selectedNode) {
-                    int xDistance = Math.abs(Model.vertices.get(Model._selectedNode).getX() - Model.vertices.get(destination).getX());
-                    int yDistance = Math.abs(Model.vertices.get(Model._selectedNode).getY() - Model.vertices.get(destination).getY());
-                    Model.weight = (int) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
-                    addEdge(Model.Edgeid, Model._selectedNode, destination, Model.weight);
-                    Model._selectedNode = -1;
-                    Model.changesMade = true;
-                    Model.Edgeid++;
+                if (destination >= 0 && destination != _selectedNode) {
+                    int xDistance = Math.abs(_graph.GetVertices().get(_selectedNode).getX() - _graph.GetVertices().get(destination).getX());
+                    int yDistance = Math.abs(_graph.GetVertices().get(_selectedNode).getY() - _graph.GetVertices().get(destination).getY());
+                    weight = (int) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
+                    addEdge(_edgeId, _selectedNode, destination, weight);
+                    _selectedNode = -1;
+                    changesMade = true;
+                    _edgeId++;
                 }
             }
             graph();
@@ -795,7 +809,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlGraphMouseReleased
 
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
-        Model.changesMade = true;
+        changesMade = true;
         reset();
     }//GEN-LAST:event_btnResetActionPerformed
 
@@ -816,8 +830,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
 //            txtPopSize.setVisible(true);
             lblNoIterations.setVisible(true);
             txtIterNum.setVisible(true);
-//            if (Model.vertices.size() != -1) {
-//                txtPopSize.setText(String.valueOf(Model.vertices.size()));
+//            if (_graph.GetVertices().size() != -1) {
+//                txtPopSize.setText(String.valueOf(_graph.GetVertices().size()));
 //            }
         } else if (selected.equals("TSP-SA")) {
             lblInitalDistance.setVisible(true);
@@ -836,63 +850,64 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
         String x = String.valueOf(jcbAlgo.getSelectedItem());
-        Model.sim = x;
-        Model.glowMap.clear();
+        _sim = x;
+        _graphAlgo.GetPathMap().clear();
         txtConsole.setText("");
-        Model.visited.clear();
-        Model.set.clear();
-        Model.cutV.clear();
+//        visited.clear();
+        _set.clear();
+        _graphAlgo.GetCutVertices().clear();
         switch (x) {
             case "DFS":
                 txtConsole.setText("");
-                if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty()) {
-                    if (Model._source == -1) {
+                if (_source == -1 || _dest == -1 || _graph.GetVertices().get(_source).eList().isEmpty()) {
+                    if (_source == -1) {
                         printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
                     } else {
                         printlnConsole("Please choose a destination by double clicking a node");
                     }
                     return;
                 }
-                Algorithms.Dfs(Model.vertices.get(Model._source));
-                Algorithms.shortestPath(Model._source, Model._dest);
+                printlnConsole(_graphAlgo.Dfs(_graph.GetVertices().get(_source)));
+                _graphAlgo.shortestPath(_source, _dest);
+                
                 break;
             case "BFS":
                 txtConsole.setText("");
-                if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty()) {
-                    if (Model._source == -1) {
+                if (_source == -1 || _dest == -1 || _graph.GetVertices().get(_source).eList().isEmpty()) {
+                    if (_source == -1) {
                         printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
                     } else {
                         printlnConsole("Please choose a destination by double clicking a node");
                     }
                     return;
                 }
-                Algorithms.Bfs(Model.vertices.get(Model._source));
-                Algorithms.shortestPath(Model._source, Model._dest);
+                printlnConsole(_graphAlgo.Bfs(_graph.GetVertices().get(_source)));
+                _graphAlgo.shortestPath(_source, _dest);
                 break;
             case "OtherBfs":
                 txtConsole.setText("");
-                Algorithms.disJointshortestPath(Model._source, Model._dest);
+                _graphAlgo.disJointshortestPath(_source, _dest);
                 break;
             case "Dijkstra":
                 txtConsole.setText("");
-                if (Model._source == -1 || Model._dest == -1 || Model.vertices.get(Model._source).eList().isEmpty() || Model.vertices.get(Model._dest).eList().isEmpty()) {
-                    if (Model._source == -1) {
+                if (_source == -1 || _dest == -1 || _graph.GetVertices().get(_source).eList().isEmpty() || _graph.GetVertices().get(_dest).eList().isEmpty()) {
+                    if (_source == -1) {
                         printlnConsole("Please choose a source by double clicking a node\nMake sure source has connections");
-                    } else {
+                    } else if(_dest == -1){
                         printlnConsole("Please choose a destination by double clicking a node\nMake sure destination has connections");
                     }
                     return;
                 }
-                Algorithms.execute(Model.vertices.get(Model._source));
-                Algorithms.shortestPath(Model._source, Model._dest);
+                _graphAlgo.execute(_graph.GetVertices().get(_source));
+                _graphAlgo.shortestPath(_source, _dest);
                 break;
             case "Connectedness":
                 txtConsole.setText("");
-                if (Model._source == -1) {
+                if (_source == -1) {
                     printlnConsole("Please select a source to begin");
                     return;
                 }
-                if (Algorithms.isConnected()) {
+                if (_graphAlgo.isConnected(_source)) {
                     printlnConsole("Graph is Connected");
                 } else {
                     printlnConsole("Graph is a disconnected Graph");
@@ -901,19 +916,19 @@ public class GraphifyGUI extends javax.swing.JFrame {
             case "TSP-SA":
                 txtConsole.setText("");
                 TSP_SA.start();
-                lblInitalDistValue.setText(String.valueOf(Model.InitialDistanceValue));
-                lblFinalDistValue.setText(String.valueOf(Model.FinalDistanceValue));
+                //lblInitalDistValue.setText(String.valueOf(InitialDistanceValue));
+                //lblFinalDistValue.setText(String.valueOf(FinalDistanceValue));
                 break;
             case "TSP-GA":
                 txtConsole.setText("");
                 TSP_GA.start();
-                lblInitalDistValue.setText(String.valueOf(Model.InitialDistanceValue));
-                lblFinalDistValue.setText(String.valueOf(Model.FinalDistanceValue));
+                //lblInitalDistValue.setText(String.valueOf(InitialDistanceValue));
+                //lblFinalDistValue.setText(String.valueOf(FinalDistanceValue));
                 break;
             case "Nearest Neighbor":
                 txtConsole.setText("");
-                Algorithms.NearestNeighbor();
-                lblFinalDistValue.setText(String.valueOf(Model.FinalDistanceValue));
+                _graphAlgo.NearestNeighbor();
+                //lblFinalDistValue.setText(String.valueOf(FinalDistanceValue));
                 break;
             default:
                 break;
@@ -922,13 +937,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnStartActionPerformed
 
     private void btnPrintListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintListActionPerformed
-        Iterator<Vertex> verts = Model.vertices.values().iterator();
+        Iterator<Vertex> verts = _graph.GetVertices().values().iterator();
         while (verts.hasNext()) {
             Vertex next = verts.next();
-            printlnConsole(next.getName() + "->" + next.eList());
+            printlnConsole(next.GetName() + "->" + next.eList());
         }
-        if (Model._source != -1) {
-            printlnConsole("Source is: " + Model._source);
+        if (_source != -1) {
+            printlnConsole("Source is: " + _source);
         }
     }//GEN-LAST:event_btnPrintListActionPerformed
 
@@ -960,10 +975,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
             theChooser.setFileFilter(new FileNameExtensionFilter("GraphifyGUI files", "ser"));
             if (theChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 try {
-                    Model.changesMade = false;
+                    changesMade = false;
                     reset();
-                    Model.currentProject = theChooser.getSelectedFile().getPath();
-                    File theFile = new File(Model.currentProject);
+                    _currentProject = theChooser.getSelectedFile().getPath();
+                    File theFile = new File(_currentProject);
                     Open(theFile);
                     graph();
                 } catch (FileNotFoundException ex) {
@@ -979,26 +994,26 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private void mnuNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNewActionPerformed
         if (checkForChange()) {
             reset();
-            Model.currentProject = null;
-            Model.changesMade = false;
+            _currentProject = null;
+            changesMade = false;
         }
     }//GEN-LAST:event_mnuNewActionPerformed
 
     private void pnlGraphKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pnlGraphKeyPressed
         switch (evt.getKeyCode()) {
             case KeyEvent.VK_DELETE:
-                Model.glowMap.clear();
-                Integer[] keys = new Integer[Model.vertices.size()];
-                Model.vertices.keySet().toArray(keys);
+                _graphAlgo.GetPathMap().clear();
+                Integer[] keys = new Integer[_graph.GetVertices().size()];
+                _graph.GetVertices().keySet().toArray(keys);
                 for (Integer key : keys) {
-                    Vertex remove = Model.vertices.get(key);
+                    Vertex remove = _graph.GetVertices().get(key);
                     if (remove.getSelected()) {
-                        Model.changesMade = true;
-                        Model.cutV.clear();
-                        Model._source = -1;
-                        Model._dest = -1;
+                        changesMade = true;
+                        _graphAlgo.GetCutVertices().clear();
+                        _source = -1;
+                        _dest = -1;
 
-                        for (Iterator<Edge> e = Model.edges.iterator(); e.hasNext();) {
+                        for (Iterator<Edge> e = _graph.GetEdges().values().iterator(); e.hasNext();) {
                             Edge next = e.next();
                             if (next.getSource() == remove || next.getDest() == remove) {
                                 next.getSource().eList().remove(next);
@@ -1006,18 +1021,18 @@ public class GraphifyGUI extends javax.swing.JFrame {
                                 e.remove();
                             }
                         }
-                        Model.vertices.remove(key);
+                        _graph.GetVertices().remove(key);
 
-                        if (Model._selectedNode == Model._dest) {
-                            Model._dest = -1;
-                            Model.glowMap.clear();
+                        if (_selectedNode == _dest) {
+                            _dest = -1;
+                            _graphAlgo.GetPathMap().clear();
                         }
-                        if (Model._selectedNode == Model._source) {
-                            Model._source = -1;
-                            Model._dest = -1;
-                            Model.glowMap.clear();
+                        if (_selectedNode == _source) {
+                            _source = -1;
+                            _dest = -1;
+                            _graphAlgo.GetPathMap().clear();
                         }
-                        Model._selectedNode = -1;
+                        _selectedNode = -1;
                     }
                 }
                 break;
@@ -1037,17 +1052,17 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 clearTools();
                 break;
             case KeyEvent.VK_I:
-                if (Model._selectedNode != -1) {
-                    if (Model.node1 != -1) {
-                        Model.node2 = Model._selectedNode;
+                if (_selectedNode != -1) {
+                    if (node1 != -1) {
+                        node2 = _selectedNode;
                         try {
                             String newWeight = JOptionPane.showInputDialog(this, "Input Weight:");
                             if (newWeight == null) {
                                 break;
                             }
                             Integer weight = Integer.parseInt(newWeight);
-                            for (Edge edge : Model.vertices.get(Model.node1).eList()) {
-                                if (edge.getDest() == Model.vertices.get(Model.node2)) {
+                            for (Edge edge : _graph.GetVertices().get(node1).eList()) {
+                                if (edge.getDest() == _graph.GetVertices().get(node2)) {
                                     edge.setWeight(weight);
                                     break;
                                 }
@@ -1085,11 +1100,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
         Timer exe = new Timer(1, null);
         if (rdnFailSim.isSelected()) {
             decreseWeights = (ActionEvent e) -> {
-                if ("Dijkstra".equals(Model.sim)) {
-                    if (Model.decreaseWeightEllapse < (1000 - sldrWeightSpeed.getValue())) {
-                        Model.decreaseWeightEllapse++;
+                if ("Dijkstra".equals(_sim)) {
+                    if (_decreaseWeightEllapse < (1000 - sldrWeightSpeed.getValue())) {
+                        _decreaseWeightEllapse++;
                     } else {
-                        Model.decreaseWeightEllapse = 0;
+                        _decreaseWeightEllapse = 0;
                         reduceIncreaseWeight();
                         autoFailure();
                         autoHeal();
@@ -1114,9 +1129,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         String vertexNum = txtVertexLookUp.getText();
         if (isInteger(vertexNum)) {
-            Model._findNode = Integer.parseInt(vertexNum);
-            for (Integer i : Model.vertices.keySet()) {
-                if (i.equals(Model._findNode)) {
+            _findNode = Integer.parseInt(vertexNum);
+            for (Integer i : _graph.GetVertices().keySet()) {
+                if (i.equals(_findNode)) {
                     graph();
                     break;
                 }
@@ -1152,72 +1167,44 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_chkCompleteActionPerformed
 
     private void addEdge(Integer edgeId, Integer sourceid, Integer destid, int weight) {
-        Edge newEdge = new Edge(edgeId, Model.vertices.get(sourceid), Model.vertices.get(destid), weight, false);
-        Model.vertices.get(sourceid).eList().add(newEdge);
-        if (Model.toolType == Model.TOOL_BIDIRECTIONAL) {
-            newEdge.setBidirectional(true);
-            Edge tempEdge = new Edge(edgeId, Model.vertices.get(destid), Model.vertices.get(sourceid), weight, false);
-            Model.vertices.get(destid).eList().add(tempEdge);
+        if (_toolType == TOOL_BIDIRECTIONAL) {
+            _graph.AddEdge(edgeId, _graph.GetVertices().get(sourceid), _graph.GetVertices().get(destid), weight, false, true);
+        }else
+        {
+            _graph.AddEdge(edgeId, _graph.GetVertices().get(sourceid), _graph.GetVertices().get(destid), weight, false, false);
         }
-        Model.edges.add(newEdge);
     }
 
     private void reduceIncreaseWeight() {
-        if (Model._source > -1 && Model._dest > -1) {
-            int edgeSize = Model.edges.size();
+        if (_source > -1 && _dest > -1) {
+            int edgeSize = _graph.GetEdges().size();
             int rand = (int) (Math.random() * edgeSize);
-            Edge e = Model.edges.get(rand);
+            Edge e = _graph.GetEdges().get(rand);
             int cost = e.getWeight() + (int) (Math.sqrt(e.getWeight())) * (Math.random() > .5 ? -1 : 1);
             if (cost <= 0) {
                 cost += 5;
             }
             e.setWeight(cost); // changes it
-            Model.glowMap.clear();
-            Algorithms.execute(Model.vertices.get(Model._source));
-            Algorithms.shortestPath(Model._source, Model._dest);
+            _graphAlgo.GetPathMap().clear();
+            _graphAlgo.execute(_graph.GetVertices().get(_source));
+            _graphAlgo.shortestPath(_source, _dest);
             e.setGlowLevel(1);
         }
 
-        //graph();
+        //_graph();
     }
 
     private void autoFailure() { // randomly fail nodes in the network
-        if (Model._source > -1 && Model._dest > -1) {
-            if (0.2 >= Math.random()) { // make probability of a node failure low
-                int vertexSize = Model.vertices.size();
-                Vertex v = null;
-                int rand = 0;
-                while (v == null) {
-                    rand = (int) (Math.random() * vertexSize);
-                    v = Model.vertices.get(rand);
-                }
-                if (!(rand == Model._source || rand == Model._dest)) { // do not fail source or destination
-                    if (Model.failed.contains(v)) {
-                        Model.failed.remove(v);
-                    } else {
-                        Model.failed.add(v);
-                        printlnConsole(v.getName() + " has failed");
-                    }
-//                    Iterator<Edge> e = v.eList().iterator();
-//                    while (e.hasNext()) {
-//                        Edge next = e.next();
-//                        next.setFailed(!next.isFailed()); //set it to opposite of what it is
-//                    }
-                    Model.glowMap.clear();
-                    Algorithms.execute(Model.vertices.get(Model._source));
-                    Algorithms.shortestPath(Model._source, Model._dest);
-                }
-            }
-        }
+        _graphAlgo.AutoFailVertices(_source, _dest);
     }
 
     private void autoHeal() {
-        if (!Model.failed.isEmpty()) {
-            for (Iterator<Vertex> it = Model.failed.iterator(); it.hasNext();) {
+        if (!_graphAlgo.GetFailedVertices().isEmpty()) {
+            for (Iterator<Vertex> it = _graphAlgo.GetFailedVertices().iterator(); it.hasNext();) {
                 Vertex v = it.next();
                 if (Math.random() > 0.5) {
                     it.remove();
-                    printlnConsole(v.getName() + " has been healed");
+                    printlnConsole(v.GetName() + " has been healed");
                     v.eList().stream().forEach((next) -> {
                         next.setFailed(!next.isFailed());
                     });
@@ -1227,31 +1214,31 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     void Open(File file) throws FileNotFoundException, IOException {
-        try {
-            try (FileInputStream fis = new FileInputStream(file)) {
-                ObjectInputStream ois = new ObjectInputStream(fis);
-                Model.vertices = (HashMap) ois.readObject();
-                Model.edges = (ArrayList) ois.readObject();
-                Model.id = (int) ois.readObject();
-                Model.failed = (ArrayList) ois.readObject();
-                ois.close();
-            }
-        } catch (IOException ioe) {
-        } catch (ClassNotFoundException c) {
-            printlnConsole("Class not found");
-        }
+//        try {
+//            try (FileInputStream fis = new FileInputStream(file)) {
+//                ObjectInputStream ois = new ObjectInputStream(fis);
+//                _graph.GetVertices() = (HashMap) ois.readObject();
+//                edges = (ArrayList) ois.readObject();
+//                _id = (int) ois.readObject();
+//                _graphAlgo.GetFailedVertices() = (ArrayList) ois.readObject();
+//                ois.close();
+//            }
+//        } catch (IOException ioe) {
+//        } catch (ClassNotFoundException c) {
+//            printlnConsole("Class not found");
+//        }
     }
 
     private void reset() {
-        Model.vertices = new HashMap();
-        Model.edges = new ArrayList();
-        Model.id = 0;
-        Model.cutV = new ArrayList<>();
-        Model._colors2 = new HashSet<>();
-        Model.glowMap.clear();
-        Model.glowMap.clear();
-        Model._source = -1;
-        Model._dest = -1;
+//        _graph.GetVertices() = new HashMap();
+//        edges = new ArrayList();
+        _id = 0;
+//        cutV = new ArrayList<>();
+//        _colors2 = new HashSet<>();
+//        __graphAlgo.GetPathMap().clear();
+//        __graphAlgo.GetPathMap().clear();
+        _source = -1;
+        _dest = -1;
         graph();
     }
 
@@ -1265,23 +1252,23 @@ public class GraphifyGUI extends javax.swing.JFrame {
     public void graph() {
         bufferGraphic.setColor(Color.white);
         bufferGraphic.fillRect(0, 0, pnlGraph.getWidth(), pnlGraph.getHeight());
-        Model.connectionCache.clear();
+        _connectionCache.clear();
         // Regular connections
         int xmid = 0;
         int ymid = 0;
         bufferGraphic.setColor(Color.black);
         bufferGraphic.setStroke(new BasicStroke(1));
-        for (Iterator<Edge> edge = Model.edges.iterator(); edge.hasNext();) {
+        for (Iterator<Edge> edge = _graph.GetEdges().values().iterator(); edge.hasNext();) {
             Edge e = edge.next();
             Point source = (Point) e.getSource().getLocation().clone();
             Point dest = (Point) e.getDest().getLocation().clone();
             double dx = dest.x - source.x;
             double dy = source.y - dest.y;
             double angle = Math.atan2(dy, dx);
-            source.x += (int) (Math.cos(angle) * Model._SIZE_OF_NODE / 2);
-            source.y -= (int) (Math.sin(angle) * Model._SIZE_OF_NODE / 2);
-            dest.x -= (int) (Math.cos(angle) * Model._SIZE_OF_NODE / 2);
-            dest.y += (int) (Math.sin(angle) * Model._SIZE_OF_NODE / 2);
+            source.x += (int) (Math.cos(angle) * _SIZE_OF_NODE / 2);
+            source.y -= (int) (Math.sin(angle) * _SIZE_OF_NODE / 2);
+            dest.x -= (int) (Math.cos(angle) * _SIZE_OF_NODE / 2);
+            dest.y += (int) (Math.sin(angle) * _SIZE_OF_NODE / 2);
             xmid = (source.x + dest.x) / 2 + 5;
             ymid = (source.y + dest.y) / 2 + 5;
             drawArrowOnGraphics(bufferGraphic, source.x, source.y, dest.x, dest.y);
@@ -1315,55 +1302,55 @@ public class GraphifyGUI extends javax.swing.JFrame {
         bufferGraphic.setStroke(new BasicStroke(4));
 
         if (!btnReset.isSelected()) {
-            for (Iterator<Vertex> it = Model.glowMap.keySet().iterator();
+            for (Iterator<Vertex> it = _graphAlgo.GetPathMap().keySet().iterator();
                     it.hasNext();) {
                 Vertex sourceVertex = it.next();
-                Vertex destinationVertex = Model.glowMap.get(sourceVertex);
+                Vertex destinationVertex = _graphAlgo.GetPathMap().get(sourceVertex);
                 Point sourcePoint = sourceVertex.getLocation();
                 Point destPoint = destinationVertex.getLocation();
-                drawDottedLine(bufferGraphic, sourcePoint, destPoint, Model.dotOffset);
+                drawDottedLine(bufferGraphic, sourcePoint, destPoint, _dotOffset);
             }
         }
 
         // Nodes - red circles.
-        Model.vertices.values().stream().forEach((v) -> {
+        _graph.GetVertices().values().stream().forEach((v) -> {
             Point thePoint = v.getLocation();
-            if (v.getId() == Model._source) {
+            if (v.getId() == _source) {
                 bufferGraphic.setColor(Color.green);
-            } else if (v.getId() == Model._dest) {
+            } else if (v.getId() == _dest) {
                 bufferGraphic.setColor(Color.blue);
-            } else if (v.getId() == Model._selectedNode || v.getSelected()) {
+            } else if (v.getId() == _selectedNode || v.getSelected()) {
                 bufferGraphic.setColor(Color.orange);
-            } else if (Model._findNode != -1 && v.getId() == Model._findNode) {
+            } else if (_findNode != -1 && v.getId() == _findNode) {
                 bufferGraphic.setColor(Color.BLUE.brighter());
             } else {
                 bufferGraphic.setColor(Color.red);
             }
-            if (!Model.failed.isEmpty()) {
-                if (Model.failed.contains(v)) {
+            if (!_graphAlgo.GetFailedVertices().isEmpty()) {
+                if (_graphAlgo.GetFailedVertices().contains(v)) {
                     bufferGraphic.setColor(Color.gray);
                 }
             }
-            if (!Model.cutV.isEmpty()) {
-                if (Model.cutV.contains(v.getId())) {
+            if (!_graphAlgo.GetCutVertices().isEmpty()) {
+                if (_graphAlgo.GetCutVertices().contains(v.getId())) {
                     bufferGraphic.setColor(Color.green);
                 }
             }
 
-            bufferGraphic.fillOval(thePoint.x - Model._SIZE_OF_NODE / 2,
-                    thePoint.y - Model._SIZE_OF_NODE / 2, Model._SIZE_OF_NODE, Model._SIZE_OF_NODE);
+            bufferGraphic.fillOval(thePoint.x - _SIZE_OF_NODE / 2,
+                    thePoint.y - _SIZE_OF_NODE / 2, _SIZE_OF_NODE, _SIZE_OF_NODE);
         });
         // Node labels.
         bufferGraphic.setColor(Color.blue);
-        Model.vertices.values().stream().forEach((v) -> {
+        _graph.GetVertices().values().stream().forEach((v) -> {
             Point thePoint = v.getLocation();
             bufferGraphic.drawString("" + v.getId(),
-                    thePoint.x - Model._SIZE_OF_NODE / 2,
-                    thePoint.y - Model._SIZE_OF_NODE / 2);
+                    thePoint.x - _SIZE_OF_NODE / 2,
+                    thePoint.y - _SIZE_OF_NODE / 2);
         });
         pnlGraph.getGraphics().drawImage(bufferImage, 1, 1, this);
-        lblInfo.setText("Source: " + getNodeInfo(Model._source)
-                + " - Destination: " + getNodeInfo(Model._dest));
+        lblInfo.setText("Source: " + getNodeInfo(_source)
+                + " - Destination: " + getNodeInfo(_dest));
     }
 
     void drawArrow(Graphics g1, int x1, int y1, int x2, int y2) {
@@ -1376,10 +1363,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         double angle = Math.atan2(dy, dx);
         int len = (int) Math.sqrt(dx * dx + dy * dy);
 
-        int p1X = (int) (x2 + Math.cos(angle + Math.PI * 3 / 4) * Model.ARR_SIZE);
-        int p1Y = (int) (y2 - Math.sin(angle + Math.PI * 3 / 4) * Model.ARR_SIZE);
-        int p2X = (int) (x2 + Math.cos(angle - Math.PI * 3 / 4) * Model.ARR_SIZE);
-        int p2Y = (int) (y2 - Math.sin(angle - Math.PI * 3 / 4) * Model.ARR_SIZE);
+        int p1X = (int) (x2 + Math.cos(angle + Math.PI * 3 / 4) * ARR_SIZE);
+        int p1Y = (int) (y2 - Math.sin(angle + Math.PI * 3 / 4) * ARR_SIZE);
+        int p2X = (int) (x2 + Math.cos(angle - Math.PI * 3 / 4) * ARR_SIZE);
+        int p2Y = (int) (y2 - Math.sin(angle - Math.PI * 3 / 4) * ARR_SIZE);
         // Draw horizontal arrow starting in (0, 0)
         g1.drawLine(x1, y1, x2, y2);
         Polygon polygon = new Polygon();
@@ -1402,12 +1389,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     private int nodeSelected(int x, int y) {
-        for (Vertex v : Model.vertices.values()) {
+        for (Vertex v : _graph.GetVertices().values()) {
             Point thePoint = v.getLocation();
-            int deltaX = x - (thePoint.x - Model._SIZE_OF_NODE / 2);
-            int deltaY = y - (thePoint.y - Model._SIZE_OF_NODE / 2);
+            int deltaX = x - (thePoint.x - _SIZE_OF_NODE / 2);
+            int deltaY = y - (thePoint.y - _SIZE_OF_NODE / 2);
             if (Math.sqrt(deltaX * deltaX
-                    + deltaY * deltaY) <= Model._SIZE_OF_NODE + 6) {
+                    + deltaY * deltaY) <= _SIZE_OF_NODE + 6) {
                 return v.getId();
             }
         }
@@ -1434,10 +1421,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private void save(String path) {
         try {
             try (FileOutputStream fileOut = new FileOutputStream(path); ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-                out.writeObject(Model.vertices);
-                out.writeObject(Model.edges);
-                out.writeObject(Model.id);
-                out.writeObject(Model.failed);
+                out.writeObject(_graph.GetVertices());
+                out.writeObject(_graph.GetEdges());
+                out.writeObject(_id);
+                out.writeObject(_graphAlgo.GetFailedVertices());
             }
 
         } catch (IOException ex) {
@@ -1453,21 +1440,21 @@ public class GraphifyGUI extends javax.swing.JFrame {
             if (!nominatedPath.endsWith(".ser")) {
                 nominatedPath += ".ser";
             }
-            Model.currentProject = nominatedPath;
-            save(Model.currentProject);
+            _currentProject = nominatedPath;
+            save(_currentProject);
         }
     }
 
     private void justSave() {
-        if (Model.currentProject == null) {
+        if (_currentProject == null) {
             saveAs();
         } else {
-            save(Model.currentProject);
+            save(_currentProject);
         }
     }
 
     private boolean checkForChange() {
-        if (Model.changesMade) {
+        if (changesMade) {
             int option = JOptionPane.showConfirmDialog(this,
                     "Changes have been made. Do you want to save before continuing?", "", JOptionPane.YES_NO_CANCEL_OPTION);
             switch (option) {
@@ -1501,7 +1488,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     }
 
     private void clearSelected() {
-        for (Vertex vertex : Model.vertices.values()) {
+        for (Vertex vertex : _graph.GetVertices().values()) {
             vertex.setSelected(false);
         }
     }
@@ -1548,10 +1535,10 @@ public class GraphifyGUI extends javax.swing.JFrame {
         //</editor-fold>
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            Model.Gui = new GraphifyGUI();
-            Model.Gui.setLocationRelativeTo(null);
-            Model.Gui.setExtendedState(MAXIMIZED_BOTH);
-            Model.Gui.show();
+            GraphifyGUI Gui = new GraphifyGUI();
+            Gui.setLocationRelativeTo(null);
+            Gui.setExtendedState(MAXIMIZED_BOTH);
+            Gui.show();
         });
     }
 
