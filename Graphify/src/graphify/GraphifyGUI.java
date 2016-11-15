@@ -7,6 +7,7 @@ package graphify;
 
 
 import algorithms.GraphAlgos;
+import func.Compute;
 import graph.Edge;
 import graph.Graph;
 import graph.IGraph;
@@ -25,15 +26,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,6 +39,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
@@ -65,7 +62,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private IGraph _graph;
     private GraphAlgos _graphAlgo;
     final int ARR_SIZE = 8;
-    int _id = 0;
     int _selectedNode = -1;
     int _source = -1;
     int _dest = -1;
@@ -625,7 +621,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private void AutoAddEdge(Vertex v) {
         int weight = 0;
-        if (_selectedNode >= 0) {
+        if (_selectedNode != -1) {
             for (Integer d : _graph.GetVertices().keySet()) {
                 Vertex dest = null;
                 if (!_graph.GetVertices().get(d).equals(v)) {
@@ -653,7 +649,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         if (SwingUtilities.isLeftMouseButton(evt)) {
             if ((_toolType == TOOL_BIDIRECTIONAL
                     || _toolType == TOOL_DIRECTIONAL)
-                    && _selectedNode >= 0) {
+                    && _selectedNode != -1) {
                 Image buff = createImage(pnlGraph.getWidth() - 1, pnlGraph.getHeight() - 1);
                 Graphics buffG = buff.getGraphics();
                 buffG.drawImage(bufferImage, 0, 0, this);
@@ -666,7 +662,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
             }
             if ((_toolType == TOOL_NONE
                     || _toolType == TOOL_VERTEX)
-                    && _selectedNode >= 0) {
+                    && _selectedNode != -1) {
                 Vertex selectedVertex = _graph.GetVertices().get(_selectedNode);
                 int dX = evt.getX() - selectedVertex.getLocation().x;
                 int dY = evt.getY() - selectedVertex.getLocation().y;
@@ -744,13 +740,13 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 if (_selectedNode < 0) {
                     changesMade = true;
                     if (isComplete == true) {
-                        _graph.AddVertex(_id, new Point(evt.getX(), evt.getY()), String.valueOf(_id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
-                        _selectedNode = _id;
-                        _id++;
-                        AutoAddEdge(_graph.GetVertices().get(_id));
+                        _graph.AddVertex(new Point(evt.getX(), evt.getY()), String.valueOf(_graph.GetCurrentVertexID()), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
+                        _selectedNode = _graph.GetCurrentVertexID();
+                        
+                        AutoAddEdge(_graph.GetVertices().get(_graph.GetCurrentVertexID()));
                     } else {
-                        _graph.AddVertex(_id, new Point(evt.getX(), evt.getY()), String.valueOf(_id), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
-                        _id++;
+                        _graph.AddVertex(new Point(evt.getX(), evt.getY()), String.valueOf(_graph.GetCurrentVertexID()), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
+                        
                     }
                 } else if (evt.isControlDown() && evt.isShiftDown()) 
                 { // control shift to fail all edges leading out of a vertex
@@ -778,9 +774,8 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     changesMade = true;
                 }
             } else if (_toolType != TOOL_NONE) {
-                if (_selectedNode >= 0) {
-                    Vertex selectedVertex
-                            = _graph.GetVertices().get(_selectedNode);
+                if (_selectedNode != -1) {
+                    Vertex selectedVertex = _graph.GetVertices().get(_selectedNode);
                     clearSelected();
                     selectedVertex.setSelected(true);
                 }
@@ -1232,7 +1227,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
     private void reset() {
 //        _graph.GetVertices() = new HashMap();
 //        edges = new ArrayList();
-        _id = 0;
+        _graph.Reset();
 //        cutV = new ArrayList<>();
 //        _colors2 = new HashSet<>();
 //        __graphAlgo.GetPathMap().clear();
@@ -1418,18 +1413,29 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
     }
 
-    private void save(String path) {
+    private JSONObject GetGraph()
+    {
         try {
-            try (FileOutputStream fileOut = new FileOutputStream(path); ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-                out.writeObject(_graph.GetVertices());
-                out.writeObject(_graph.GetEdges());
-                out.writeObject(_id);
-                out.writeObject(_graphAlgo.GetFailedVertices());
-            }
-
-        } catch (IOException ex) {
+            Compute compute = new Compute();
+            //System.out.println(compute.Save(_graph, _graphAlgo).toString());
+            return compute.Save(_graph, _graphAlgo);
+        } catch (JSONException ex) {
             Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
+    }
+    private void save(String path) {
+//        try {
+//            try (FileOutputStream fileOut = new FileOutputStream(path); ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+//                out.writeObject(_graph.GetVertices());
+//                out.writeObject(_graph.GetEdges());
+//                out.writeObject(_graphAlgo.GetFailedVertices());
+//            }
+//
+//        } catch (IOException ex) {
+//            Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        printlnConsole(GetGraph().toString());
     }
 
     private void saveAs() {
