@@ -25,9 +25,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.RenderedImage;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -1413,29 +1418,31 @@ public class GraphifyGUI extends javax.swing.JFrame {
         }
     }
 
-    private JSONObject GetGraph()
+    private String GetGraph()
     {
         try {
             Compute compute = new Compute();
             //System.out.println(compute.Save(_graph, _graphAlgo).toString());
-            return compute.Save(_graph, _graphAlgo);
+            return compute.Save(_graph, _graphAlgo).toString(4);
         } catch (JSONException ex) {
             Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
-    private void save(String path) {
-//        try {
-//            try (FileOutputStream fileOut = new FileOutputStream(path); ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-//                out.writeObject(_graph.GetVertices());
-//                out.writeObject(_graph.GetEdges());
-//                out.writeObject(_graphAlgo.GetFailedVertices());
-//            }
-//
-//        } catch (IOException ex) {
-//            Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        printlnConsole(GetGraph().toString());
+    private void save(String path){
+        String result = GetGraph();
+        try(Writer writer = new BufferedWriter(new OutputStreamWriter(
+        new FileOutputStream(path), "utf-8")))
+        {
+            writer.write(result);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        printlnConsole(GetGraph());
     }
 
     private void saveAs() {
