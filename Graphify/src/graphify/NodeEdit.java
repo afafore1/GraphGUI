@@ -5,8 +5,12 @@
  */
 package graphify;
 
+import graph.Edge;
+import graph.IGraph;
+import graph.Vertex;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import java.util.Iterator;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
@@ -26,8 +30,10 @@ public class NodeEdit extends javax.swing.JFrame {
     Vertex _dest = null;
     Integer _selectedRow = null;
     Integer _selectedColumn = null;
+    IGraph _graph;
 
-    public NodeEdit() {
+    public NodeEdit(IGraph graph) {
+        _graph = graph;
         initComponents();
         tblProperties.getTableHeader().setResizingAllowed(false);
         tblProperties.getTableHeader().setReorderingAllowed(false);
@@ -56,8 +62,9 @@ public class NodeEdit extends javax.swing.JFrame {
                     selected = lstAllNodes.getSelectedItem();
                     if (selected != null) {
                         selected = selected.replace("Vertex ", "").trim();
-                        _current = Model.vertices.get(Integer.parseInt(selected));
-                        Model.edges.stream().filter((edge) -> (edge.getSource().equals(_current))).forEach((edge) -> {
+                        _current = _graph.GetVertices().get(Integer.parseInt(selected));
+                        HashMap<Integer, Edge> edges = _graph.GetEdges();
+                        edges.stream().filter((edge) -> (edge.getSource().equals(_current))).forEach((edge) -> {
                             _dest = edge.getDest();
                             _listerModel.addRow(new Object[]{edge.getDest().getLabel(), edge.getWeight()});
                         });

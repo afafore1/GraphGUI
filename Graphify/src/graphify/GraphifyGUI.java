@@ -7,10 +7,10 @@ package graphify;
 
 
 import algorithms.GraphAlgos;
-import func.Compute;
 import graph.Edge;
 import graph.Graph;
 import graph.IGraph;
+import graph.Saver;
 import graph.Vertex;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -79,7 +80,6 @@ public class GraphifyGUI extends javax.swing.JFrame {
     int TOOL_BIDIRECTIONAL = 1;
     int TOOL_DIRECTIONAL = 2;
     int _SIZE_OF_NODE = 20;
-    int _edgeId = 0;
     int _decreaseWeightEllapse = 0;
     String _sim = null;
     HashMap<Integer, Integer> _set;
@@ -635,12 +635,11 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 int xDistance = Math.abs(v.getX() - dest.getX());
                 int yDistance = Math.abs(v.getY() - dest.getY());
                 weight = (int) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
-                addEdge(_edgeId, v.getId(), dest.getId(), weight);
+                addEdge(v.getId(), dest.getId(), weight);
                 //addEdge(_edgeId, dest.getId(), v.getId(), weight);
                 Autodraw(point);
                 //_selectedNode = -1;
                 changesMade = true;
-                _edgeId++;
                 } else {
                     continue;
                 }
@@ -742,18 +741,20 @@ public class GraphifyGUI extends javax.swing.JFrame {
                 }
             }
             if (_toolType == TOOL_VERTEX) {
-                if (_selectedNode < 0) {
+                if (_selectedNode < 0) 
+                {
                     changesMade = true;
-                    if (isComplete == true) {
-                        _graph.AddVertex(new Point(evt.getX(), evt.getY()), String.valueOf(_graph.GetCurrentVertexID()), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
-                        _selectedNode = _graph.GetCurrentVertexID();
-                        
-                        AutoAddEdge(_graph.GetVertices().get(_graph.GetCurrentVertexID()));
-                    } else {
-                        _graph.AddVertex(new Point(evt.getX(), evt.getY()), String.valueOf(_graph.GetCurrentVertexID()), types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));
-                        
+                    _selectedNode = _graph.GetCurrentVertexID();
+                    int x = evt.getX();
+                    int y = evt.getY();
+                    Point location = new Point(x, y );
+                    _graph.AddVertex(String.valueOf(_selectedNode), location, types[(int) (Math.random() * types.length)], (int) (Math.random() * 50));                     
+                    if (isComplete == true) 
+                    {                        
+                        AutoAddEdge(_graph.GetVertices().get(_selectedNode));
                     }
-                } else if (evt.isControlDown() && evt.isShiftDown()) 
+                } 
+                else if (evt.isControlDown() && evt.isShiftDown()) 
                 { // control shift to fail all edges leading out of a vertex
                     _graphAlgo.FailVertex(_selectedNode);
                     _graphAlgo.GetPathMap().clear();
@@ -798,10 +799,9 @@ public class GraphifyGUI extends javax.swing.JFrame {
                     int xDistance = Math.abs(_graph.GetVertices().get(_selectedNode).getX() - _graph.GetVertices().get(destination).getX());
                     int yDistance = Math.abs(_graph.GetVertices().get(_selectedNode).getY() - _graph.GetVertices().get(destination).getY());
                     weight = (int) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
-                    addEdge(_edgeId, _selectedNode, destination, weight);
+                    addEdge(_selectedNode, destination, weight);
                     _selectedNode = -1;
                     changesMade = true;
-                    _edgeId++;
                 }
             }
             graph();
@@ -1166,12 +1166,12 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     }//GEN-LAST:event_chkCompleteActionPerformed
 
-    private void addEdge(Integer edgeId, Integer sourceid, Integer destid, int weight) {
+    private void addEdge(Integer sourceid, Integer destid, int weight) {
         if (_toolType == TOOL_BIDIRECTIONAL) {
-            _graph.AddEdge(edgeId, _graph.GetVertices().get(sourceid), _graph.GetVertices().get(destid), weight, false, true);
+            _graph.AddEdge(_graph.GetVertices().get(sourceid), _graph.GetVertices().get(destid), weight, false, true);
         }else
         {
-            _graph.AddEdge(edgeId, _graph.GetVertices().get(sourceid), _graph.GetVertices().get(destid), weight, false, false);
+            _graph.AddEdge(_graph.GetVertices().get(sourceid), _graph.GetVertices().get(destid), weight, false, false);
         }
     }
 
@@ -1420,17 +1420,20 @@ public class GraphifyGUI extends javax.swing.JFrame {
 
     private String GetGraph()
     {
+        String result = null;
         try {
-            Compute compute = new Compute();
-            //System.out.println(compute.Save(_graph, _graphAlgo).toString());
-            return compute.Save(_graph, _graphAlgo).toString(4);
+            Saver save = new Saver();
+            result = save.Save(_graph, _graphAlgo).toString(4);
+            printlnConsole(result);
         } catch (JSONException ex) {
             Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
+        return result;
     }
     private void save(String path){
         String result = GetGraph();
+        if(result != null)
+        {
         try(Writer writer = new BufferedWriter(new OutputStreamWriter(
         new FileOutputStream(path), "utf-8")))
         {
@@ -1442,7 +1445,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(GraphifyGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        printlnConsole(GetGraph());
+        }
     }
 
     private void saveAs() {
