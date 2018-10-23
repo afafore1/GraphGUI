@@ -1270,7 +1270,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
         int xmid = 0;
         int ymid = 0;
         bufferGraphic.setColor(Color.black);
-        bufferGraphic.setStroke(new BasicStroke(1));
+        bufferGraphic.setStroke(new BasicStroke(2));
         for (Iterator<Edge> edge = Model.edges.iterator(); edge.hasNext();) {
             Edge e = edge.next();
             Point source = (Point) e.getSource().getLocation().clone();
@@ -1299,7 +1299,7 @@ public class GraphifyGUI extends javax.swing.JFrame {
 //                }else{
 //                    bufferGraphic.setStroke(new BasicStroke(1));
 //                }
-                bufferGraphic.setStroke(new BasicStroke(1));
+                bufferGraphic.setStroke(new BasicStroke(2));
 
                 if (isWeighted == true) {
                     bufferGraphic.drawString(String.valueOf(edgeWeight), xmid, ymid);
